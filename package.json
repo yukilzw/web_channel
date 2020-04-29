@@ -1,0 +1,35 @@
+{
+    "name": "prince-spa",
+    "version": "0.0.5",
+    "scripts": {
+        "dev": "webpack --config webpack.config.js",
+        "build": "webpack -p --config webpack.config.js"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.7.4",
+        "@babel/plugin-proposal-class-properties": "^7.7.4",
+        "@babel/plugin-proposal-decorators": "^7.7.4",
+        "@babel/plugin-syntax-dynamic-import": "^7.7.4",
+        "@babel/plugin-transform-object-assign": "^7.7.4",
+        "@babel/plugin-transform-runtime": "^7.7.4",
+        "@babel/preset-env": "^7.7.4",
+        "@babel/preset-react": "^7.7.4",
+        "@babel/runtime-corejs2": "^7.7.4",
+        "babel-eslint": "^10.0.3",
+        "babel-jest": "^24.9.0",
+        "babel-loader": "^8.0.6",
+        "babel-polyfill": "^6.26.0",
+        "clean-webpack-plugin": "^3.0.0",
+        "cross-env": "^5.2.1",
+        "css-loader": "^0.28.11",
+        "file-loader": "^1.1.11",
+        "html-webpack-plugin": "^3.2.0",
+        "react": "^16.12.0",
+        "react-dom": "^16.12.0",
+        "webpack": "^4.41.2",
+        "webpack-bundle-analyzer": "^3.6.0",
+        "webpack-cli": "^3.3.11",
+        "webpack-dev-server": "^3.9.0"
+    }
+}
