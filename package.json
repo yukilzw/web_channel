@@ -1,11 +1,13 @@
 {
-    "name": "prince-spa",
-    "version": "0.0.5",
+    "name": "rc-tools",
+    "version": "0.0.1-develop",
     "scripts": {
-        "dev": "webpack --config webpack.config.js",
-        "build": "webpack -p --config webpack.config.js"
+        "dev": "webpack --config ./script/webpack.config.js",
+        "build": "webpack -p --config ./script/webpack.config.js"
     },
-    "dependencies": {},
+    "dependencies": {
+
+    },
     "devDependencies": {
         "@babel/core": "^7.7.4",
         "@babel/plugin-proposal-class-properties": "^7.7.4",
@@ -30,6 +32,12 @@
         "webpack": "^4.41.2",
         "webpack-bundle-analyzer": "^3.6.0",
         "webpack-cli": "^3.3.11",
-        "webpack-dev-server": "^3.9.0"
+        "webpack-dev-server": "^3.9.0",
+        "express": "^4.17.1",
+        "ejs": "^3.1.2",
+        "eslint": "^5.16.0",
+        "eslint-plugin-react": "^7.11.1",
+        "axios": "^0.19.2",
+        "body-parser": "^1.19.0"
     }
 }
