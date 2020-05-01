@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.less';
 
 export default class Image extends React.Component {
     openLink() {
@@ -10,6 +11,6 @@ export default class Image extends React.Component {
     render() {
         const { src } = this.props;
 
-        return <img className="img" src={src} onClick={this.openLink.bind(this)} />;
+        return <img className="wp-img" src={src} onClick={this.openLink.bind(this)} />;
     }
 }

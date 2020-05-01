@@ -8,6 +8,6 @@ export default class Text extends React.Component {
     render() {
         const { text } = this.props;
 
-        return <p className="text">{text}</p>;
+        return <p className="wp-text">{text}</p>;
     }
 }

@@ -14,28 +14,12 @@ const config = {
             }
         },
         {
-            test: /\.(css)$/,
+            test: /\.(css|less)$/,
             use: [
                 'style-loader',
-                'css-loader?minimize=' + !isDev
+                'css-loader?minimize=' + !isDev,
+                'less-loader'
             ]
-        },
-        {
-            test: /\.js$/,
-            exclude: [path.join(process.cwd(), './node_modules/')],
-            loader: 'babel-loader',
-            options: {
-                presets: [
-                    ['@babel/preset-env', { modules: false }],
-                    '@babel/preset-react'
-                ],
-                plugins: [
-                    ['@babel/plugin-proposal-decorators', { 'legacy': true }],
-                    '@babel/proposal-class-properties',
-                    '@babel/plugin-syntax-dynamic-import',
-                    '@babel/plugin-transform-object-assign'
-                ]
-            }
         }]
     },
     plugins: [
@@ -54,13 +38,13 @@ const config = {
 const configBase = {
     ...config,
     entry: {
-        main: ['./src/module.js', './src/index.js']
+        sdk: ['./src/page/module.js', './src/page/index.js']
     },
     output: {
         path: path.join(process.cwd(), './static/dist'),
         publicPath: 'http://127.0.0.1:1235/dist',
-        filename: '[name]_[chunkhash:5].js',
-        chunkFilename: '[name]_[chunkhash:5].js'
+        filename: '[name].js',
+        chunkFilename: '[name].js'
     },
     optimization: {
         splitChunks: {
@@ -74,17 +58,41 @@ const configBase = {
             }
         }
     },
+    module: {
+        rules: [
+            ...config.module.rules,
+            {
+                test: /\.js$/,
+                exclude: [path.join(process.cwd(), './node_modules/')],
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        ['@babel/preset-env', { modules: false }],
+                        '@babel/preset-react'
+                    ],
+                    plugins: [
+                        ['@babel/plugin-proposal-decorators', { 'legacy': true }],
+                        '@babel/proposal-class-properties',
+                        '@babel/plugin-syntax-dynamic-import',
+                        '@babel/plugin-transform-object-assign',
+                        ['@babel/plugin-transform-runtime', { 'corejs': 2 }]
+                    ]
+                }
+            }
+        ]
+    },
     plugins: [
-        new HtmlWebpackPlugin({
+        /* new HtmlWebpackPlugin({
             template: path.join(process.cwd(), './src/index.html'),
             filename: 'index.html',
             inject: 'body',
             minify: {
                 removeComments: false,
                 collapseWhitespace: false,
-                minifyJS: true
+                minifyJS: true,
+                minifyCSS: true
             }
-        })
+        }) */
     ]
 };
 
@@ -101,8 +109,30 @@ const configComp = {
         publicPath: 'http://127.0.0.1:1235/dist',
         library: '[name]',
         libraryTarget: 'this',
-        filename: '[name]_[chunkhash:5].js',
-        chunkFilename: '[name]_[chunkhash:5].js'
+        filename: '[name].js',
+        chunkFilename: '[name].js'
+    },
+    module: {
+        rules: [
+            ...config.module.rules,
+            {
+                test: /\.js$/,
+                exclude: [path.join(process.cwd(), './node_modules/')],
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        ['@babel/preset-env', { modules: false }],
+                        '@babel/preset-react'
+                    ],
+                    plugins: [
+                        ['@babel/plugin-proposal-decorators', { 'legacy': true }],
+                        '@babel/proposal-class-properties',
+                        '@babel/plugin-syntax-dynamic-import',
+                        '@babel/plugin-transform-object-assign'
+                    ]
+                }
+            }
+        ]
     }
 };
 
