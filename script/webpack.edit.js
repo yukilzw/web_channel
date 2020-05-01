@@ -7,7 +7,7 @@ const isDev = process.argv.indexOf('-p') === -1;
 
 const config = {
     entry: {
-        edit: './src/edit/index.js'
+        edit: ['./src/page/module.js', './src/edit/index.js']
     },
     output: {
         path: path.join(process.cwd(), './static/edit'),

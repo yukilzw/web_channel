@@ -1,0 +1,19 @@
+{
+    "name": "布局组件",
+    "compName": "View",
+    "staticProps": [
+        {
+            "name": "点击链接",
+            "prop": "link"
+        },
+        {
+            "name": "图片地址",
+            "prop": "src"
+        }
+    ],
+    "defaultStyles": {
+        "width": "100%",
+        "height": "300px",
+        "backgroundColor": "red"
+    }
+}

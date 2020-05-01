@@ -17,11 +17,40 @@ const loadAsync = (name, hook) => new Promise((resolve) => {
     document.getElementsByTagName('head')[0].appendChild(script);
 });
 
+const handleDragEnter = (el) => {
+    if (window.ENV !== 'edit') {
+        return;
+    }
+    const msgEvent = document.createEvent('CustomEvent');
 
-const compileJson2Comp = async ({ el, name, hook, style, props, children }) => {
+    msgEvent.initCustomEvent(`dragIntoCmp`, true, true, el);
+    document.dispatchEvent(msgEvent);
+};
+
+const handleDragleave = (el) => {
+    if (window.ENV !== 'edit') {
+        return;
+    }
+    const msgEvent = document.createEvent('CustomEvent');
+
+    msgEvent.initCustomEvent(`dragLeaveCmp`, true, true, el);
+    document.dispatchEvent(msgEvent);
+};
+
+const compileJson2Comp = async ({ el, name, hook, style, props, children, DragIn }) => {
     let Comp = await loadAsync(name, hook);
 
-    return <div key={el} id={el} style={style}>
+    return <div key={el} id={el}
+        onDragOver={(e) => {
+            e.stopPropagation();
+            handleDragEnter(el);
+        }}
+        onDragLeave={(e) => {
+            e.stopPropagation();
+            handleDragleave(el);
+        }}
+        style={style}
+    >
         <Comp {...props} >
             {await checkChildren(children)}
         </Comp>
@@ -43,11 +72,14 @@ const checkChildren = async (children) => {
     return res;
 };
 
+let initBeforeStr = '';
+
 const Main = (props) => {
     const { init } = props;
     const [page, setPage] = useState(null);
 
-    if (page === null) {
+    if (initBeforeStr !== JSON.stringify(init)) {
+        initBeforeStr = JSON.stringify(init);
         checkChildren(init).then((page) => {
             setPage(page);
         });
