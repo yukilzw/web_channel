@@ -1,6 +1,5 @@
 {
     "name": "文本组件",
-    "compName": "Text",
     "staticProps": [
         {
             "name": "文本",

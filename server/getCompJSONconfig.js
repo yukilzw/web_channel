@@ -4,7 +4,7 @@ const path = require('path');
 const getCompJSONconfig = () => {
     const compDir = path.join(process.cwd(), './comp/');
     const files = fs.readdirSync(compDir);
-    const jsonArr = [];
+    const cmpMap = {};
 
     files.forEach((item, index) => {
         let stat = fs.lstatSync(path.join(compDir, item));
@@ -12,11 +12,11 @@ const getCompJSONconfig = () => {
         if (stat.isDirectory()) {
             const config = JSON.parse(fs.readFileSync(path.join(compDir, item, './config.json'), 'utf-8'));
 
-            jsonArr.push(config);
+            cmpMap[item] = config;
         }
     });
 
-    return jsonArr;
+    return cmpMap;
 };
 
 

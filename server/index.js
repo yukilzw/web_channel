@@ -30,7 +30,7 @@ app.get('/edit', (req, res) => {
     res.render(path.join(__dirname, './template/edit.html'));
 });
 
-app.post('/getCurrentComp', (req, res) => {
+app.post('/getCompMenu', (req, res) => {
     res.send({
         error: 0,
         msg: '',
@@ -55,14 +55,14 @@ app.post('/loadPage', (req, res) => {
                         hook: 'http://localhost:1235/dist/Text.js',
                         name: 'Text',
                         props: { text: '这是一段文本' },
-                        style: { 'color': '#fff', 'fontSize': '20px', 'textAlign': 'center' }
+                        style: { 'color': '#fff', 'fontSize': '20px', 'textAlign': 'center', 'marginBottom': '20px' }
                     },
                     {
                         el: 'bc1-2',
                         hook: 'http://localhost:1235/dist/Image.js',
                         name: 'Image',
                         props: {
-                            src: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1588305791655&di=a4c4e7f039335e817fb013ae7ed5c85a&imgtype=0&src=http%3A%2F%2Fimg5.iqiyipic.com%2Fimage%2Fppopen%2Fppopen_5ba51077ad8c1227bbf05f06_0.jpg',
+                            src: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1588433325594&di=c0da65a0a9388d331e14bbce4ca03448&imgtype=0&src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F946b8cb7121fde9b63c060766143427257fc2186b75f-WKxmW2_fw658',
                             link: 'https://www.douyu.com'
                         },
                         style: {

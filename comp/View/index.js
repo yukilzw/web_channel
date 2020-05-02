@@ -1,5 +1,4 @@
 import React from 'react';
-import './index.less';
 
 export default class View extends React.Component {
     render() {

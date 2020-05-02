@@ -1,6 +1,5 @@
 {
     "name": "图片组件",
-    "compName": "Image",
     "staticProps": [
         {
             "name": "点击链接",

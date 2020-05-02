@@ -2,9 +2,9 @@
     "name": "prince-producer",
     "version": "0.0.1-develop",
     "scripts": {
-        "build": "webpack -p --config ./script/webpack.config.js",
-        "build:edit": "webpack -p --config ./script/webpack.edit.js",
-        "dev:edit": "webpack-dev-server --config ./script/webpack.edit.js"
+        "build": "webpack -p --config ./script/webpack.config.page.js",
+        "build:edit": "webpack -p --config ./script/webpack.config.edit.js",
+        "dev:edit": "webpack-dev-server --config ./script/webpack.config.edit.js"
     },
     "dependencies": {
         "@babel/core": "^7.7.4",

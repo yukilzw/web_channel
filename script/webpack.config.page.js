@@ -38,7 +38,7 @@ const config = {
 const configBase = {
     ...config,
     entry: {
-        sdk: ['./src/page/module.js', './src/page/index.js']
+        sdk: './src/page/index.js'
     },
     output: {
         path: path.join(process.cwd(), './static/dist'),

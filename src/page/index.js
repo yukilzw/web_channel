@@ -1,7 +1,11 @@
+import '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
 import axios from 'axios';
-import Main from './compile';
+import App from '../reducer';
+import Page from '../compile';
+
+window.ENV = 'page';
 
 axios({
     method: 'post',
@@ -14,7 +18,12 @@ axios({
         console.warn(res.msg);
         return;
     }
-    ReactDom.render(<Main init={res.data} />, document.getElementById('app'));
-}).catch((err) => {
-    console.warn(err);
+    ReactDom.render(
+        <App
+            init={res.data}
+        >
+            <Page />
+        </App>
+        , document.getElementById('app')
+    );
 });
