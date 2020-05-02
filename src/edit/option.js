@@ -24,7 +24,7 @@ const tab = ['样式', '属性'];
 const Option = () => {
     const { state, dispatch } = useContext(storeContext);
     const { tabIndex, optionArr, propsArr, choose, init } = state;
-    console.log(init, optionArr);
+
     const renderOption = useCallback(() => {
         if (!choose) {
             return null;

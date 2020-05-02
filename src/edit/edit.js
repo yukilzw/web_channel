@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback } from 'react';
+import React, { useContext, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import storeContext from '../context';
 import Page from '../compile';
@@ -12,6 +12,11 @@ let dragCmpConfig;
 const Edit = () => {
     const { state, dispatch } = useContext(storeContext);
     const root = 'root';
+    const stateRef = useRef();
+
+    useEffect(() => {
+        stateRef.current = state;
+    });
 
     useEffect(() => {
         getCompMenu();
@@ -79,14 +84,14 @@ const Edit = () => {
     });
 
     const chooseCurrentCmpOption = useCallback(async () => {
-        const { init } = state;
+        const { init, menu } = stateRef.current;
 
         const config = await searchInitStatus(init, targetCmpDom.id, Enum.choose);
 
         const optionArr = [];
         const propsArr = [];
 
-        state.menu[config.name].staticProps.forEach(item => {
+        menu[config.name].staticProps.forEach(item => {
             if (config.props[item.prop]) {
                 propsArr.push({
                     ...item,
@@ -126,7 +131,7 @@ const Edit = () => {
     });
 
     const putCmpIntoArea = useCallback(async () => {
-        const { init } = state;
+        const { init } = stateRef.current;
 
         const compJson = {
             hook: `http://localhost:1235/dist/${dragCmpConfig.compName}.js`,
