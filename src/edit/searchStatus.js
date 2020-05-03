@@ -1,5 +1,6 @@
 /* eslint-disable complexity */
 const Enum = {
+    add: 'add',
     choose: 'choose',
     edit: 'edit',
     delete: 'delete'
@@ -10,13 +11,13 @@ const searchInitStatus = (...arg) => new Promise((resolve) => {
 
     arg[0] = copyInit;
     const main = () => {
-        const [arr, el, data, expand] = arg;
+        const [arr, el, type, expand] = arg;
 
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].el === el) {
-                if (data === Enum.choose) {
+                if (type === Enum.choose) {
                     resolve(arr[i]);
-                } else if (data === Enum.edit) {
+                } else if (type === Enum.edit) {
                     const { tabIndex, key, value } = expand;
 
                     if (tabIndex === 0) {
@@ -25,10 +26,10 @@ const searchInitStatus = (...arg) => new Promise((resolve) => {
                         arr[i].props[key] = value;
                     }
                     resolve(copyInit);
-                } else if (data === Enum.delete) {
+                } else if (type === Enum.delete) {
                     arr.splice(i, 1);
                     resolve(copyInit);
-                } else if (Object.prototype.toString.call(data) === '[object Object]') {
+                } else if (type === Enum.add) {
                     if (Array.isArray(arr[i].children)) {
                         const { el: lastEl } = arr[i].children[arr[i].children.length - 1];
                         const lastElArr = lastEl.split('-');
@@ -37,16 +38,16 @@ const searchInitStatus = (...arg) => new Promise((resolve) => {
                         const nextEl = lastElArr.join('-');
 
                         arr[i].children.push(
-                            Object.assign(data, { el: nextEl })
+                            Object.assign(expand, { el: nextEl })
                         );
                     } else {
                         const { el: parentEl } = arr[i];
 
                         arr[i].children = [
-                            Object.assign(data, { el: `${parentEl}-1` })
+                            Object.assign(expand, { el: `${parentEl}-1` })
                         ];
                     }
-                    resolve([copyInit, data.el]);
+                    resolve([copyInit, expand.el]);
                 }
                 return;
             }

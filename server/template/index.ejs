@@ -1,0 +1,17 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <script>window.comp = {};</script>
+    <style>
+        html,body,ul,li,ol,dl,p,h1,h2,h3,h4,h5,h6,img,nav { margin: 0; padding: 0 }
+        ol,ul { list-style: none; }
+    </style>
+</head>
+<body>
+<div id="<%= id %>"></div>
+</body>
+<% js.forEach(function(url) { %>
+<script type="text/javascript" src="<%- url %>"></script>
+<% }); %>
+</html>

@@ -1,39 +1,26 @@
 const path = require('path');
-const webpack = require('webpack');
+const fs = require('fs');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { CONFIG } = require('../config');
 
 const isDev = process.argv.indexOf('-p') === -1;
 
+const compfiles = fs.readdirSync(path.join(process.cwd(), './comp/'));
+const Component = {};
+
+compfiles.forEach((item) => {
+    Component[item] = `./comp/${item}/index.js`;
+});
+
 const config = {
-    entry: {
-        edit: './src/edit/index.js',
-        page: './src/page/index.js'
-    },
+    entry: Component,
     output: {
-        path: path.join(process.cwd(), './.build/sdk'),
-        publicPath: !isDev ? `${CONFIG.HOST}:${CONFIG.PORT}/sdk` : undefined,
+        path: path.join(process.cwd(), './.build/dist'),
+        publicPath: `${CONFIG.HOST}:${CONFIG.PORT}/dist`,
+        library: '[name]',
+        libraryTarget: 'this',
         filename: '[name].js',
         chunkFilename: '[name].js'
-    },
-    devServer: {
-        compress: false,
-        port: CONFIG.DEV_SERVER_PORT,
-        inline: true,
-        open: false,
-        hot: true
-    },
-    optimization: {
-        splitChunks: {
-            cacheGroups: {
-                commons: {
-                    chunks: 'initial',
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'commons',
-                    priority: 10
-                }
-            }
-        }
     },
     module: {
         rules: [
@@ -64,23 +51,24 @@ const config = {
                         ['@babel/plugin-proposal-decorators', { 'legacy': true }],
                         '@babel/proposal-class-properties',
                         '@babel/plugin-syntax-dynamic-import',
-                        '@babel/plugin-transform-object-assign',
-                        ['@babel/plugin-transform-runtime', { 'corejs': 2 }]
+                        '@babel/plugin-transform-object-assign'
                     ]
                 }
             }
         ]
     },
-    plugins: ([
+    plugins: [
         new CleanWebpackPlugin()
-    ]).concat(isDev ? [
-        new webpack.HotModuleReplacementPlugin()
-    ] : []),
+    ],
     resolve: {
         extensions: [
             '.js',
             '.jsx'
         ]
+    },
+    externals: {
+        'react': '__react__',
+        'react-dom': '__reactDom__'
     },
     mode: isDev ? 'development' : 'production',
     devtool: 'source-map'

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useCallback } from 'react';
-import { Headers } from '../global';
+import { Headers, DOMIN } from '../global';
 import storeContext from '../context';
 
 const Menu = ({ chooseDragComp }) => {
@@ -10,7 +10,7 @@ const Menu = ({ chooseDragComp }) => {
     }, []);
 
     const getCompMenu = useCallback(() => {
-        fetch(window.HOST + '/getCompMenu', {
+        fetch(DOMIN + '/getCompMenu', {
             method: 'POST',
             headers: Headers.json
         }).then(response => response.json()).then(res => {

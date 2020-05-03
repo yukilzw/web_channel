@@ -4,12 +4,31 @@
         {
             "name": "文本",
             "prop": "text"
+        },
+        {
+            "name": "文字颜色",
+            "prop": "color"
+        },
+        {
+            "name": "文字大小",
+            "prop": "fontSize"
+        },
+        {
+            "name": "行高",
+            "prop": "lineHeight"
+        },
+        {
+            "name": "对齐方式",
+            "prop": "textAlign"
         }
     ],
     "defaultStyles": {
-
+        "width": "70px"
     },
     "defaultProps": {
-        "text": "默认文本"
+        "text": "默认文本",
+        "fontSize": "12px",
+        "lineHeight": "16px",
+        "textAlign": "center"
     }
 }

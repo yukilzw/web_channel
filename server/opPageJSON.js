@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const jsonPath = path.join(__dirname, './page.json');
+const jsonPath = path.join(__dirname, './template/page.json');
 
 const getPageJSON = () => {
     const config = fs.readFileSync(jsonPath, 'utf-8');

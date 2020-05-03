@@ -7,8 +7,8 @@
     "style": {
       "width": "100%",
       "height": "200px",
-      "backgroundColor": "red",
-      "backgroundSize": "p"
+      "backgroundColor": "blue",
+      "backgroundSize": ""
     },
     "children": [
       {
@@ -34,12 +34,27 @@
           "link": "https://www.douyu.com"
         },
         "style": {
-          "width": "100px",
+          "width": "140px",
           "height": "100px",
           "marginLeft": "auto",
           "marginRight": "auto",
           "marginTop": "0px"
         }
+      },
+      {
+        "hook": "http://localhost:1235/dist/Text.js",
+        "name": "Text",
+        "style": {
+          "width": "150px"
+        },
+        "props": {
+          "text": "默认文本",
+          "fontSize": "20px",
+          "lineHeight": "30px",
+          "textAlign": "center",
+          "color": "#fff"
+        },
+        "el": "bc1-3"
       }
     ]
   },

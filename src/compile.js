@@ -47,10 +47,13 @@ const Page = () => {
             fillter = { backgroundImage: `url(${style.backgroundImage})` };
         }
 
-        return <div key={el} id={el} style={Object.assign({}, style, fillter)}
+        return <div
+            key={el}
+            id={el}
+            style={Object.assign({}, style, fillter)}
             {...dragEvent}
         >
-            <Comp {...props} >
+            <Comp {...props} env={window.ENV} >
                 {await checkChildren(children)}
             </Comp>
         </div>;

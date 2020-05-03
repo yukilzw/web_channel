@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from 'react';
 import storeContext from '../context';
-import { Header } from '../global';
+import { Headers, DOMIN } from '../global';
 import Page from '../compile';
 import Menu from './menu';
 import Option, { initStylesItemArr } from './option';
@@ -13,7 +13,7 @@ let targetCmpDom;
 
 let dragCmpConfig;
 
-const Edit = () => {
+const Board = () => {
     const { state, dispatch } = useContext(storeContext);
     const stateRef = useRef();
 
@@ -148,7 +148,7 @@ const Edit = () => {
         const { init } = stateRef.current;
 
         const compJson = {
-            hook: window.HOST + `/dist/${dragCmpConfig.compName}.js`,
+            hook: DOMIN + `/dist/${dragCmpConfig.compName}.js`,
             name: dragCmpConfig.compName,
             style: dragCmpConfig.defaultStyles,
             props: dragCmpConfig.defaultProps
@@ -173,7 +173,7 @@ const Edit = () => {
                 );
             }
         } else {
-            let promiseArr = await searchInitStatus(init, targetCmpDom.id, compJson);
+            let promiseArr = await searchInitStatus(init, targetCmpDom.id, Enum.add, compJson);
 
             newInit = promiseArr[0];
             el = promiseArr[1];
@@ -194,15 +194,23 @@ const Edit = () => {
     const publishPage = useCallback(() => {
         const { init } = stateRef.current;
 
-        fetch(window.HOST + '/savepage', {
+        fetch(DOMIN + '/savepage', {
             method: 'POST',
             headers: Headers.json,
             body: JSON.stringify(init)
         }).then(response => response.json()).then(res => {
-            const confirmChoose = confirm(res.msg + '，是否立即预览？');
+            if (res.error !== 0) {
+                console.warn(res.msg);
+                return;
+            }
+            if (window.location.search.match('debug=1')) {
+                alert('保存成功');
+            } else {
+                const confirmChoose = confirm('保存成功，是否立即预览？');
 
-            if (confirmChoose) {
-                console.log(1);
+                if (confirmChoose) {
+                    window.open(`${DOMIN}/page`, '_blank');
+                }
             }
         });
     }, []);
@@ -231,4 +239,4 @@ const Edit = () => {
     </>;
 };
 
-export default Edit;
+export default Board;

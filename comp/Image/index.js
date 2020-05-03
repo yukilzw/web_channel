@@ -1,10 +1,16 @@
+/**
+ * 图片组件
+ */
 import React from 'react';
 import './index.less';
 
 export default class Image extends React.Component {
     openLink() {
-        const { link } = this.props;
+        const { link, env } = this.props;
 
+        if (env === 'edit') {
+            return;
+        }
         window.open(link, '_blank');
     }
 

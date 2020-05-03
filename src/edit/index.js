@@ -1,14 +1,14 @@
-import { Headers } from '../global';
+import { Headers, DOMIN } from '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
-import Edit from './edit';
+import Board from './board';
 import App from '../reducer';
 import * as event from './event';
 import './style/index.less';
 
 window.ENV = 'edit';
 
-fetch(window.HOST + '/loadPage', {
+fetch(DOMIN + '/loadPage', {
     method: 'POST',
     headers: Headers.json
 }).then(response => response.json()).then(res => {
@@ -21,7 +21,7 @@ fetch(window.HOST + '/loadPage', {
             init={res.data}
             event={event}
         >
-            <Edit />
+            <Board />
         </App>
         , document.getElementById('edit')
     );
