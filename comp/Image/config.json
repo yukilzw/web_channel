@@ -16,5 +16,8 @@
         "marginLeft": "auto",
         "marginRight": "auto",
         "marginTop": "0px"
+    },
+    "defaultProps": {
+
     }
 }

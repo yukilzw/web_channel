@@ -31,5 +31,6 @@ export {
     handleDragOver,
     handleDragleave,
     handleDrop,
-    handleClick
+    handleClick,
+    creatCustomEvent
 };

@@ -1,7 +1,6 @@
-import '../global';
+import { Headers } from '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
-import axios from 'axios';
 import Edit from './edit';
 import App from '../reducer';
 import * as event from './event';
@@ -9,13 +8,10 @@ import './style/index.less';
 
 window.ENV = 'edit';
 
-axios({
-    method: 'post',
-    url: 'http://localhost:1235/loadPage',
-    data: {
-        id: 100
-    }
-}).then(({ data: res }) => {
+fetch(window.HOST + '/loadPage', {
+    method: 'POST',
+    headers: Headers.json
+}).then(response => response.json()).then(res => {
     if (res.error !== 0) {
         console.warn(res.msg);
         return;

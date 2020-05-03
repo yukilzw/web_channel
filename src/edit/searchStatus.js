@@ -1,7 +1,8 @@
 /* eslint-disable complexity */
 const Enum = {
     choose: 'choose',
-    edit: 'edit'
+    edit: 'edit',
+    delete: 'delete'
 };
 
 const searchInitStatus = (...arg) => new Promise((resolve) => {
@@ -24,6 +25,9 @@ const searchInitStatus = (...arg) => new Promise((resolve) => {
                         arr[i].props[key] = value;
                     }
                     resolve(copyInit);
+                } else if (data === Enum.delete) {
+                    arr.splice(i, 1);
+                    resolve(copyInit);
                 } else if (Object.prototype.toString.call(data) === '[object Object]') {
                     if (Array.isArray(arr[i].children)) {
                         const { el: lastEl } = arr[i].children[arr[i].children.length - 1];
@@ -42,7 +46,7 @@ const searchInitStatus = (...arg) => new Promise((resolve) => {
                             Object.assign(data, { el: `${parentEl}-1` })
                         ];
                     }
-                    resolve(copyInit);
+                    resolve([copyInit, data.el]);
                 }
                 return;
             }

@@ -8,5 +8,8 @@
     ],
     "defaultStyles": {
 
+    },
+    "defaultProps": {
+        "text": "默认文本"
     }
 }

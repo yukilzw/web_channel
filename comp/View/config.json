@@ -5,7 +5,9 @@
     ],
     "defaultStyles": {
         "width": "100%",
-        "height": "300px",
-        "backgroundColor": "red"
+        "height": "120px"
+    },
+    "defaultProps": {
+
     }
 }

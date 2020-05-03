@@ -23,9 +23,9 @@ const tab = ['样式', '属性'];
 
 const Option = () => {
     const { state, dispatch } = useContext(storeContext);
-    const { tabIndex, optionArr, propsArr, choose, init } = state;
+    const { tabIndex, optionArr, propsArr, choose, init, menu } = state;
 
-    const renderOption = useCallback(() => {
+    const renderOption = () => {
         if (!choose) {
             return null;
         }
@@ -51,9 +51,9 @@ const Option = () => {
                 </li>)
             }
         </ul>;
-    });
+    };
 
-    const changeInputStyle = useCallback(async (e, i, key) => {
+    const changeInputStyle = async (e, i, key) => {
         const { value } = e.target;
 
         const newInit = await searchInitStatus(init, choose.el, Enum.edit, { tabIndex, key, value });
@@ -68,25 +68,28 @@ const Option = () => {
             type: 'UPDATE_INIT',
             payload: newInit
         });
-    });
+    };
 
     const setTab = useCallback((i) => {
         dispatch({
             type: 'EDIT_CHANGE_TABNAV',
             payload: i
         });
-    });
+    }, []);
 
     return <>
-        <ul className="optionNav">
-            {
-                tab.map((name, i) => <li
-                    key={name}
-                    className={`optionNavTab ${tabIndex === i ? 'active' : ''}`}
-                    onClick={() => setTab(i)}
-                >{name}</li>)
-            }
-        </ul>
+        {choose && <>
+        <p className="optionTtile">{menu[choose.name].name}({choose.name})：#{choose.el}</p>
+            <ul className="optionNav">
+                {
+                    tab.map((name, i) => <li
+                        key={name}
+                        className={`optionNavTab ${tabIndex === i ? 'active' : ''}`}
+                        onClick={() => setTab(i)}
+                    >{name}</li>)
+                }
+            </ul>
+        </>}
         {renderOption()}
     </>;
 };

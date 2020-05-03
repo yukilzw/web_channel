@@ -6,6 +6,7 @@ const compression = require('compression');
 const app = express();
 
 const getCompJSONconfig = require('./getCompJSONconfig');
+const { getPageJSON, setPageJSON } = require('./opPageJSON');
 
 app.use(compression());
 app.use(express.static(path.join(__dirname, '../static')));
@@ -42,50 +43,19 @@ app.post('/loadPage', (req, res) => {
     res.send({
         error: 0,
         msg: '',
-        data: [
-            {
-                el: 'bc1',
-                hook: 'http://localhost:1235/dist/View.js',
-                name: 'View',
-                props: {},
-                style: { 'width': '100%', 'height': '300px', 'backgroundColor': 'red' },
-                children: [
-                    {
-                        el: 'bc1-1',
-                        hook: 'http://localhost:1235/dist/Text.js',
-                        name: 'Text',
-                        props: { text: '这是一段文本' },
-                        style: { 'color': '#fff', 'fontSize': '20px', 'textAlign': 'center', 'marginBottom': '20px' }
-                    },
-                    {
-                        el: 'bc1-2',
-                        hook: 'http://localhost:1235/dist/Image.js',
-                        name: 'Image',
-                        props: {
-                            src: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1588433325594&di=c0da65a0a9388d331e14bbce4ca03448&imgtype=0&src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F946b8cb7121fde9b63c060766143427257fc2186b75f-WKxmW2_fw658',
-                            link: 'https://www.douyu.com'
-                        },
-                        style: {
-                            'width': '100px',
-                            'height': '100px',
-                            'marginLeft': 'auto',
-                            'marginRight': 'auto',
-                            'marginTop': '0px'
-                        }
-                    }
-                ]
-            },
-            {
-                el: 'bc2',
-                hook: 'http://localhost:1235/dist/View.js',
-                name: 'View',
-                props: {},
-                style: { 'width': '100%', 'height': '300px', 'backgroundColor': 'blue' }
-            }
-        ]
+        data: getPageJSON()
+    });
+});
+
+app.post('/savePage', (req, res) => {
+    setPageJSON(req.body);
+    res.send({
+        error: 0,
+        msg: '保存成功',
+        data: null
     });
 });
 
 app.listen(1235);
 
-console.log('market server start.');
+console.log('server start.');

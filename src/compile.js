@@ -7,7 +7,6 @@ const Page = () => {
     const [pageDom, setPage] = useState(null);
 
     useEffect(() => {
-        console.log(init);
         checkChildren(init).then((page) => {
             setPage(page);
         });
@@ -42,7 +41,13 @@ const Page = () => {
             };
         }
 
-        return <div key={el} id={el} style={style}
+        let fillter;
+
+        if (style.backgroundImage) {
+            fillter = { backgroundImage: `url(${style.backgroundImage})` };
+        }
+
+        return <div key={el} id={el} style={Object.assign({}, style, fillter)}
             {...dragEvent}
         >
             <Comp {...props} >

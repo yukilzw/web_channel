@@ -1,39 +1,55 @@
 #edit {
     .dragIn {
-        box-sizing: border-box;
-        border: 3px solid #00ff11;
+        outline-offset: -2.5px;
+        outline: 2.5px solid #03d000;
     }
 
     .chooseIn {
-        box-sizing: border-box;
-        border: 2px solid #88bcec;
+        outline-offset: -2.5px;
+        outline: 2.5px solid #40a9ff;
     }
 }
 
 #edit {
+    min-width: 1100px;
+    height: 100%;
     display: flex;
-    align-items: center;
-    min-width: 1200px;
+    flex-direction: column;
+
+    nav {
+        height: 50px;
+        background-color: #000;
+        border-bottom: 1px solid #fff;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding-right: 20px;
+    }
+
+    .content {
+        display: flex;
+        flex: 1;
+    }
 
     .cmpList {
         display: block;
         width: 300px;
-        height: 100%;
-        background-color: palevioletred;
+        background-color: #000;
 
         .item {
             text-align: center;
             font-size: 20px;
             line-height: 36px;
-            border-bottom: 1px solid #000;
+            color: #fff;
+            border-bottom: 1px solid #fff;
             cursor: grab;
         }
     }
 
     .board {
         display: block;
+        position: relative;
         width: 300px;
-        height: 100%;
         flex: 1;
         overflow: auto;
         background-color: #fff;
@@ -43,9 +59,17 @@
         display: flex;
         flex-direction: column;
         width: 300px;
-        height: 100%;
-        background-color: rgb(120, 122, 223);
+        background-color: #000;
         overflow: auto;
+    }
+
+    .optionTtile {
+        color: #fff;
+        line-height: 20px;
+        margin: 10px 10px 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .optionNav {
@@ -54,15 +78,17 @@
         border-bottom: 1px solid;
     }
 
-    .optionNavTab {
-        padding: 5px;
+    .optionNavTab, .navBtn {
+        padding: 2px 10px;
         margin-right: 5px;
         cursor: pointer;
-        border: 1px solid #000;
+        color: #fff;
+        border: 1px solid #fff;
+        border-radius: 6px;
 
         &.active {
-            color: #fff;
-            background-color: #000;
+            color: #000;
+            background-color: #fff;
         }
     }
 
@@ -77,6 +103,10 @@
     .optionItem {
         margin: 5px 10px;
         width: 40%;
+
+        p {
+            color: #fff;
+        }
 
         input {
             width: 100%;
