@@ -41,21 +41,24 @@ const Page = () => {
 
         let dragEvent = {};
 
-        // 如果是编辑器内，将reducer里绑定的自定义event注入到每一个原始事件上
+        let fillter = {};
+
         if (window.ENV === 'edit') {
+            // 如果是编辑器内，将reducer里绑定的自定义event注入到每一个原始事件上
             dragEvent = {
                 onDragOver: event.handleDragOver.bind(window, el),
                 onDragLeave: event.handleDragleave.bind(window, el),
                 onDrop: event.handleDrop.bind(window, el),
-                onClick: event.handleClick.bind(window, el)
+                onClick: event.handleClick.bind(window, el),
+                onMouseOver: event.handleMouseOver.bind(window, el),
+                onMouseLeave: event.handleMouseLeave.bind(window, el)
             };
+            Object.assign(fillter, { cursor: 'default' });
         }
 
-        let fillter;
-
-        // 过滤一些属性
+        // 过滤处理一些属性
         if (style.backgroundImage) {
-            fillter = { backgroundImage: `url(${style.backgroundImage})` };
+            Object.assign(fillter, { backgroundImage: `url(${style.backgroundImage})` });
         }
 
         // 对渲染组件包裹一层div元素，用来处理编辑器内事件，以及将编辑器配置的样式渲染到视图

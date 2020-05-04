@@ -15,23 +15,31 @@ const creatCustomEvent = (eventName, data) => {
 const handleDragOver = (el, e) => {
     e.stopPropagation();
     e.preventDefault();
-    creatCustomEvent(`CUSTOM_handleDragOver`, el);
+    creatCustomEvent(`PIPE_handleDragOver`, el);
 };
 
 const handleDragleave = (el, e) => {
     e.stopPropagation();
-    creatCustomEvent(`CUSTOM_handleDragleave`, el);
+    creatCustomEvent(`PIPE_handleDragleave`, el);
 };
 
 const handleDrop = (el, e) => {
     e.stopPropagation();
-    creatCustomEvent(`CUSTOM_handleDrop`, el);
+    creatCustomEvent(`PIPE_handleDrop`, el);
 };
 
 const handleClick = (el, e) => {
     e.nativeEvent.stopImmediatePropagation();
     e.stopPropagation();
-    creatCustomEvent(`CUSTOM_handleClick`, el);
+    creatCustomEvent(`PIPE_handleClick`, el);
+};
+
+const handleMouseOver = (el, e) => {
+    creatCustomEvent(`PIPE_handleMouseOver`, el);
+};
+
+const handleMouseLeave = (el, e) => {
+    creatCustomEvent(`PIPE_handleMouseLeave`, el);
 };
 
 export {
@@ -39,5 +47,7 @@ export {
     handleDragleave,
     handleDrop,
     handleClick,
+    handleMouseOver,
+    handleMouseLeave,
     creatCustomEvent
 };

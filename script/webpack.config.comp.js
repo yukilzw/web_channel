@@ -6,7 +6,7 @@ const fs = require('fs');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { CONFIG } = require('../config');
 
-const isDev = process.argv.indexOf('-p') === -1;
+const isDev = process.argv.indexOf('-dev') !== -1;
 
 // 找出组件仓库的所有组件的入口index.js作为每个组件的构建入口分别打包
 const compfiles = fs.readdirSync(path.join(process.cwd(), './comp/'));

@@ -1,12 +1,17 @@
 #edit {
+    .hoverIn {
+        outline-offset: -1.7px;
+        outline: 1.7px solid #40a9ff;
+    }
+
     .dragIn {
         outline-offset: -2.5px;
         outline: 2.5px solid #03d000;
     }
 
     .chooseIn {
-        outline-offset: -2.5px;
-        outline: 2.5px solid #40a9ff;
+        outline-offset: -3px;
+        outline: 3px solid #40a9ff;
     }
 }
 
@@ -33,7 +38,7 @@
 
     .cmpList {
         display: block;
-        width: 300px;
+        width: 230px;
         background-color: #000;
 
         .item {
@@ -102,7 +107,11 @@
 
     .optionItem {
         margin: 5px 10px;
-        width: 40%;
+        width: 42%;
+
+        &.long {
+            width: 90%;
+        }
 
         p {
             color: #fff;

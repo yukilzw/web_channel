@@ -32,6 +32,11 @@ const reducer = (state, action) => {
                 ...state,
                 tabIndex: action.payload
             };
+        case 'VV':
+            return {
+                ...state,
+                vv: action.payload
+            };
         default:
             return state;
     }
@@ -41,7 +46,7 @@ const App = ({ tree, event, children }) => {
     // 预览页面只需要tree，不注入编辑器内的reducer
     const [state, dispatch] = useReducer(reducer, Object.assign(
         { tree }, window.ENV === 'edit' && {
-            event,          // 对应edit/event.js里的自定义事件，用于compile时绑定到dom
+            event,          // 对应edit/event.js里的自定义事件构造函数，用于compile时绑定到dom
             choose: null,   // 当前选中的组件配置
             tabIndex: 0,    // 属性面板tab索引
             optionArr: [],  // 属性面板样式配置列表

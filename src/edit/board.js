@@ -9,7 +9,7 @@ import { Headers, DOMIN } from '../global';
 import Page from '../compile';
 import Menu from './menu';
 import Option, { initStylesItemArr } from './option';
-import { searchInitStatus, Enum } from './searchStatus';
+import { searchTree, Enum } from './searchTree';
 import { creatCustomEvent } from './event';
 
 const root = 'root';
@@ -41,15 +41,17 @@ const Board = () => {
     // 绑定编辑器事件
     const bindEditDomEvent = () => {
         // 拖拽进入后，高亮目标容器选框
-        document.addEventListener(`CUSTOM_handleDragOver`, (e) => handleEventCallBack('in', e), false);
+        document.addEventListener(`PIPE_handleDragOver`, (e) => handleEventCallBack('in', e), false);
         // 拖拽移出目标容器，取消高亮选框
-        document.addEventListener(`CUSTOM_handleDragleave`, (e) => handleEventCallBack('out', e), false);
+        document.addEventListener(`PIPE_handleDragleave`, (e) => handleEventCallBack('out', e), false);
         // 拖拽到目标容器，松开鼠标，将新的组件添加到页面配置中
-        document.addEventListener(`CUSTOM_handleDrop`, (e) => handleEventCallBack('drop', e), false);
+        document.addEventListener(`PIPE_handleDrop`, (e) => handleEventCallBack('drop', e), false);
         // 选中可视区域内的任意组件
-        document.addEventListener(`CUSTOM_handleClick`, (e) => handleEventCallBack('click', e), false);
-        // 点击屏幕其他位置取消选中组件
-        document.addEventListener('click', clearChooseCmp, false);
+        document.addEventListener(`PIPE_handleClick`, (e) => handleEventCallBack('click', e), false);
+        // 鼠标移入可视区域内的任意组件
+        document.addEventListener(`PIPE_handleMouseOver`, (e) => handleHoverCallBack('hover', e), false);
+        // 鼠标移出可视区域内的任意组件
+        document.addEventListener(`PIPE_handleMouseLeave`, (e) => handleHoverCallBack('leave', e), false);
         // 键盘快捷键自定义
         document.addEventListener(`keydown`, handlekeyDown, false);
     };
@@ -67,7 +69,7 @@ const Board = () => {
     };
 
     // 键盘事件
-    const handlekeyDown = async (e) => {
+    const handlekeyDown = (e) => {
         // `DEL`键删除选中的可视区组件
         if (e.keyCode === 46) {
             const { choose, tree } = stateRef.current;
@@ -75,7 +77,7 @@ const Board = () => {
             if (!choose) {
                 return;
             }
-            const nextTree = await searchInitStatus(tree, choose.el, Enum.delete);
+            const nextTree = searchTree(tree, choose.el, Enum.delete);
 
             dispatch({
                 type: 'EDIT_CHOOSE_CMP',
@@ -85,6 +87,9 @@ const Board = () => {
                 type: 'UPDATE_TREE',
                 payload: nextTree
             });
+        } else if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
+            e.preventDefault();
+            publishPage();
         }
     };
 
@@ -111,11 +116,22 @@ const Board = () => {
         }
     };
 
+    const handleHoverCallBack = (type, e) => {
+        const el = e.detail;
+        const hoverCmpDom = document.querySelector(`#${el}`);
+
+        if (type === 'hover') {
+            hoverCmpDom.classList.add('hoverIn');
+        } else if (type === 'leave') {
+            hoverCmpDom.classList.remove('hoverIn');
+        }
+    };
+
     // 选择组件后，展示编辑面板区内容
-    const chooseCurrentCmpOption = async () => {
+    const chooseCurrentCmpOption = () => {
         const { tree, menu } = stateRef.current;
 
-        const config = await searchInitStatus(tree, targetCmpDom.id, Enum.choose);
+        const config = searchTree(tree, targetCmpDom.id, Enum.choose);
 
         const optionArr = [];   // 固有样式面板style
         const propsArr = [];    // 自定义属性面板props
@@ -163,7 +179,7 @@ const Board = () => {
     };
 
     // 释放拖拽，将新组建加入页面配置
-    const putCmpIntoArea = async () => {
+    const putCmpIntoArea = () => {
         const { tree } = stateRef.current;
 
         // 生成新组件的配置
@@ -197,7 +213,7 @@ const Board = () => {
             }
         // 如果拖入的目标区域的某个组件嵌套
         } else {
-            let promiseArr = await searchInitStatus(tree, targetCmpDom.id, Enum.add, compJson);
+            let promiseArr = searchTree(tree, targetCmpDom.id, Enum.add, compJson);
 
             nextTree = promiseArr[0];
             el = promiseArr[1];
@@ -209,7 +225,7 @@ const Board = () => {
         });
         // 拖入成功后，等待页面DOM渲染，然后自动选中新组建编辑
         // 这里无法得到新组件DOM生成的通知，目前使用定时器，此方法不稳定，待优化
-        setTimeout(() => creatCustomEvent(`CUSTOM_handleClick`, el), 100);
+        setTimeout(() => creatCustomEvent(`PIPE_handleClick`, el), 50);
     };
 
     // 选中菜单中的组件开始拖拽时
@@ -257,7 +273,7 @@ const Board = () => {
             <a className="navBtn" onClick={publishPage}>保存</a>
         </nav>
         <div className="content">
-            <ul className="cmpList">
+            <ul className="cmpList" onClick={clearChooseCmp}>
                 <Menu chooseDragComp={chooseDragComp}/>
             </ul>
             <div
@@ -267,9 +283,7 @@ const Board = () => {
             >
                 <Page />
             </div>
-            <div className="option"
-                onClick={optionBoxPropagation}
-            >
+            <div className="option" onClick={optionBoxPropagation}>
                 <Option />
             </div>
         </div>

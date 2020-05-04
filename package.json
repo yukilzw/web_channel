@@ -1,13 +1,15 @@
 {
-    "name": "editor_channel",
+    "name": "web_channel",
     "version": "0.1.0",
+    "description": "Web page visualization productivity tools",
+    "author": "yukilzw",
     "scripts": {
         "start": "npm run build:sdk && npm run build:comp && npm run server",
-        "server": "node ./server/index.js -p",
-        "dev:server": "node ./server/index.js",
-        "dev:edit": "webpack-dev-server --config ./script/webpack.config.edit.js",
-        "build:sdk": "webpack -p --progress --config ./script/webpack.config.edit.js",
-        "build:comp": "webpack -p --progress --config ./script/webpack.config.comp.js"
+        "server": "node ./server/index.js",
+        "dev:server": "node ./server/index.js -dev",
+        "dev:edit": "webpack-dev-server --config ./script/webpack.config.edit.js -dev",
+        "build:sdk": "webpack --progress --config ./script/webpack.config.edit.js",
+        "build:comp": "webpack --progress --config ./script/webpack.config.comp.js"
     },
     "dependencies": {
         "@babel/core": "^7.7.4",
@@ -40,5 +42,14 @@
         "webpack-dev-server": "^3.9.0",
         "html-webpack-plugin": "^3.2.0"
     },
-    "devDependencies": {}
+    "devDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/yukilzw/web_channel.git"
+    },
+    "keywords": [
+        "editor",
+        "channel"
+    ],
+    "license": "MIT"
 }

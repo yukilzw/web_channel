@@ -12,10 +12,11 @@ const getCompJSONconfig = require('./getCompJSONconfig');
 const { getPageJSON, setPageJSON } = require('./opPageJSON');
 
 const app = express();
-const isDev = process.argv.indexOf('-p') === -1;
+const isDev = process.argv.indexOf('-dev') !== -1;
 
 app.use(compression());
 app.use(express.static(path.join(__dirname, '../.build')));
+app.use('/template', express.static(path.join(__dirname, './template')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -32,7 +33,7 @@ app.all('*', (req, res, next) => {
 app.get('/page', (req, res) => {
     res.render(path.join(__dirname, './template/index.ejs'), {
         id: 'app',
-        title: '专题页',
+        title: '预览页',
         js: [
             `${CONFIG.HOST}:${CONFIG.PORT}/sdk/commons.js`,
             `${CONFIG.HOST}:${CONFIG.PORT}/sdk/page.js`
@@ -88,10 +89,10 @@ app.post('/savePage', (req, res) => {
 app.listen(CONFIG.PORT);
 
 if (isDev) {
-    console.log(`\x1B[31m★\x1B[0m editor_channel \x1B[31m★\x1B[0m  server start for debug Editor.`);
-    console.log(`编辑器（调试）：\x1B[35m${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/edit?debug=1\x1B[0m`);
+    console.log(`\x1B[31m★\x1B[0m web_channel\x1B[31m★\x1B[0m  server start for debug Editor.`);
+    console.log(`编辑器（开发）：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug=1\x1B[0m`);
 } else {
-    console.log(`\x1B[32m★\x1B[0m editor_channel \x1B[32m★\x1B[0m  server start.`);
+    console.log(`\x1B[32m★\x1B[0m web_channel\x1B[32m★\x1B[0m  server start.`);
     console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit\x1B[0m`);
     console.log(`页面预览：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page\x1B[0m`);
 }
