@@ -1,3 +1,6 @@
+/**
+ * @description 编辑器、预览页打包配置
+ */
 const path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -6,6 +9,7 @@ const { CONFIG } = require('../config');
 const isDev = process.argv.indexOf('-p') === -1;
 
 const config = {
+    // 对编辑器、预览页入口分别打包成两个js文件
     entry: {
         edit: './src/edit/index.js',
         page: './src/page/index.js'
@@ -23,6 +27,7 @@ const config = {
         open: false,
         hot: true
     },
+    // 公用的代码放到commons.js里
     optimization: {
         splitChunks: {
             cacheGroups: {

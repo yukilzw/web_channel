@@ -1,3 +1,6 @@
+/**
+ * @description 编辑器组件菜单
+ */
 import React, { useContext, useEffect, useCallback } from 'react';
 import { Headers, DOMIN } from '../global';
 import storeContext from '../context';
@@ -9,6 +12,7 @@ const Menu = ({ chooseDragComp }) => {
         getCompMenu();
     }, []);
 
+    // 获取当前可选用的组件列表
     const getCompMenu = useCallback(() => {
         fetch(DOMIN + '/getCompMenu', {
             method: 'POST',

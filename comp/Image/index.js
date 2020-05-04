@@ -1,5 +1,5 @@
 /**
- * 图片组件
+ * @description 图片组件
  */
 import React from 'react';
 import './index.less';

@@ -1,3 +1,8 @@
+/**
+ * @description 建站平台服务端
+ * 用于处理编辑器、预览页的接口请求，以及服务端路由
+ * （PS：编辑器与预览页相互独立，引用的JS文件也不同，不属于SPA，因此不能使用客户端路由）
+ */
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -23,6 +28,7 @@ app.all('*', (req, res, next) => {
     next();
 });
 
+// 预览页面路由模板
 app.get('/page', (req, res) => {
     res.render(path.join(__dirname, './template/index.ejs'), {
         id: 'app',
@@ -34,6 +40,7 @@ app.get('/page', (req, res) => {
     });
 });
 
+// 编辑器路由模板
 app.get('/edit', (req, res) => {
     const { debug } = req.query;
 
@@ -50,6 +57,7 @@ app.get('/edit', (req, res) => {
     });
 });
 
+// 编辑器内获取当前可拖入的组件菜单
 app.post('/getCompMenu', (req, res) => {
     res.send({
         error: 0,
@@ -58,6 +66,7 @@ app.post('/getCompMenu', (req, res) => {
     });
 });
 
+// 获取当前页面的JSON配置以此来渲染出DOM
 app.post('/loadPage', (req, res) => {
     res.send({
         error: 0,
@@ -66,6 +75,7 @@ app.post('/loadPage', (req, res) => {
     });
 });
 
+// 编辑器内保存当前修改
 app.post('/savePage', (req, res) => {
     setPageJSON(req.body);
     res.send({

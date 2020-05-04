@@ -1,7 +1,11 @@
+/**
+ * @description 编辑器配置面板
+ */
 import React, { useContext, useCallback, useRef, useLayoutEffect } from 'react';
 import storeContext from '../context';
 import { searchInitStatus, Enum } from './searchStatus';
 
+// 定义固有的样式属性配置项，后续可持续拓展（自定义属性配置项没有固有的，是根据每个组件JSON中staticProps动态渲染的）
 export const initStylesItemArr = [
     { name: '宽度', styleName: 'width' },
     { name: '高度', styleName: 'height' },
@@ -23,10 +27,10 @@ const tab = ['样式', '属性'];
 
 const Option = () => {
     const { state, dispatch } = useContext(storeContext);
-    const { tabIndex, optionArr, propsArr, choose, init, menu } = state;
-    const focusInputEl = useRef(null);
-    const prevInputValue = useRef(null);
-    const inputSelection = useRef(null);
+    const { tabIndex, optionArr, propsArr, choose, tree, menu } = state;
+    const focusInputEl = useRef(null);      // 选中操作的输入框
+    const prevInputValue = useRef(null);    // 改变输入框之前的value
+    const inputSelection = useRef(null);    // 改变输入框之前的光标位置记录
 
     useLayoutEffect(() => {
         // 在视图更新时根据情况恢复光标的位置
@@ -46,15 +50,19 @@ const Option = () => {
         }
     });
 
+    // 绑定当前在操作的输入框
     const bindFocusRef = useCallback((e) => {
         focusInputEl.current = e.target;
         prevInputValue.current = e.target.value;
     }, []);
 
+    // 渲染面板配置列表
     const renderOption = () => {
+        // 没选中组件不显示面板
         if (!choose) {
             return null;
         }
+        // 样式面板
         if (tabIndex === 0) {
             return <ul className="optionBox" key={tabIndex}>
                 {
@@ -67,6 +75,7 @@ const Option = () => {
                 }
             </ul>;
         }
+        // 属性面板
         return <ul className="optionBox" key={tabIndex}>
             {
                 propsArr.map(({ name, prop, value }, i) => <li className="optionItem" key={prop}>
@@ -79,7 +88,9 @@ const Option = () => {
         </ul>;
     };
 
+    // 改变面板属性值的回调
     const changeInputStyle = async (e, i, key) => {
+        // 暂存光标位置
         inputSelection.current = {
             start: focusInputEl.current.selectionStart,
             end: focusInputEl.current.selectionEnd
@@ -87,8 +98,9 @@ const Option = () => {
 
         const { value } = e.target;
 
-        const newInit = await searchInitStatus(init, choose.el, Enum.edit, { tabIndex, key, value });
+        const nextTree = await searchInitStatus(tree, choose.el, Enum.edit, { tabIndex, key, value });
 
+        // 判断当前是要更新到样式面板，还是自定义属性面板
         if (tabIndex === 0) {
             optionArr[i].value = value;
         } else if (tabIndex === 1) {
@@ -96,11 +108,12 @@ const Option = () => {
         }
 
         dispatch({
-            type: 'UPDATE_INIT',
-            payload: newInit
+            type: 'UPDATE_TREE',
+            payload: nextTree
         });
     };
 
+    // 面板TAB切换
     const setTab = useCallback((i) => {
         dispatch({
             type: 'EDIT_CHANGE_TABNAV',

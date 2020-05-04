@@ -1,3 +1,6 @@
+/**
+ * @description 编辑器打包总入口
+ */
 import { Headers, DOMIN } from '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
@@ -8,6 +11,7 @@ import './style/index.less';
 
 window.ENV = 'edit';
 
+// 拉取当前页面的JSON配置后再渲染编辑器
 fetch(DOMIN + '/loadPage', {
     method: 'POST',
     headers: Headers.json
@@ -18,7 +22,7 @@ fetch(DOMIN + '/loadPage', {
     }
     ReactDom.render(
         <App
-            init={res.data}
+            tree={res.data}
             event={event}
         >
             <Board />

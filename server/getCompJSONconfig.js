@@ -1,3 +1,6 @@
+/**
+ * @description 查询Comp仓库内当前所有存在的组件配置config.json
+ */
 const fs = require('fs');
 const path = require('path');
 

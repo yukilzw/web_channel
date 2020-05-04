@@ -1,3 +1,6 @@
+/**
+ * @description 组件打包配置
+ */
 const path = require('path');
 const fs = require('fs');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -5,6 +8,7 @@ const { CONFIG } = require('../config');
 
 const isDev = process.argv.indexOf('-p') === -1;
 
+// 找出组件仓库的所有组件的入口index.js作为每个组件的构建入口分别打包
 const compfiles = fs.readdirSync(path.join(process.cwd(), './comp/'));
 const Component = {};
 
@@ -17,6 +21,7 @@ const config = {
     output: {
         path: path.join(process.cwd(), './.build/dist'),
         publicPath: `${CONFIG.HOST}:${CONFIG.PORT}/dist`,
+        // 配置library与libraryTarget，让组件加载后挂载到window[name]下
         library: '[name]',
         libraryTarget: 'this',
         filename: '[name].js',
@@ -66,6 +71,8 @@ const config = {
             '.jsx'
         ]
     },
+    // 所有组件公共的依赖，不需要单独打包，直接取window下的对象
+    // 公共对象暴露请见src里的index.js入口
     externals: {
         'react': '__react__',
         'react-dom': '__reactDom__'
