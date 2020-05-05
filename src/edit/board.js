@@ -13,8 +13,7 @@ import { searchTree, EnumEdit } from './searchTree';
 import { Layout, Button } from 'antd';
 import style from './style/index.less';
 
-const { Header, Sider, Content } = Layout;
-
+const { Header, Sider } = Layout;
 const EnumId = { root: 'root' };
 
 let targetCmpDom;   // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
@@ -247,32 +246,6 @@ const Board = () => {
         });
     }, []);
 
-    // return <div className={style.edit}>
-    //     <nav>
-    //         <a className={style.navBtn} onClick={publishPage}>保存</a>
-    //     </nav>
-    //     <div className={style.content}>
-    //         <ul className={style.cmpList} onClick={clearChooseCmp}>
-    //             <CompMenu chooseDragComp={chooseDragComp}/>
-    //         </ul>
-    //         <div
-    //             id={EnumId.root}
-    //             className={style.board}
-    //             onClick={clearChooseCmp}
-    //             onDragOver={(e) => handleEventCallBack('in', EnumId.root, e)}
-    //             onDragLeave={(e) => handleEventCallBack('out', EnumId.root, e)}
-    //             onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
-    //         >
-    //             <Page
-    //                 handleEventCallBack={handleEventCallBack}
-    //                 handleHoverCallBack={handleHoverCallBack}
-    //             />
-    //         </div>
-    //         <div className={style.option} onClick={optionBoxPropagation}>
-    //             <Option />
-    //         </div>
-    //     </div>
-    // </div>;
     return <Layout style={{ minWidth: 1100 }}>
         <Sider theme="light" style={{ overflow: 'auto' }} onClick={clearChooseCmp}>
             <CompMenu chooseDragComp={chooseDragComp}/>
