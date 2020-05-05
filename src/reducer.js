@@ -42,11 +42,12 @@ const reducer = (state, action) => {
     }
 };
 
-const App = ({ tree, event, children }) => {
+const App = ({ tree, children }) => {
     // 预览页面只需要tree，不注入编辑器内的reducer
     const [state, dispatch] = useReducer(reducer, Object.assign(
-        { tree }, window.ENV === 'edit' && {
-            event,          // 对应edit/event.js里的自定义事件构造函数，用于compile时绑定到dom
+        {
+            tree            // 页面配置JSON树
+        }, window.ENV === 'edit' && {
             choose: null,   // 当前选中的组件配置
             tabIndex: 0,    // 属性面板tab索引
             optionArr: [],  // 属性面板样式配置列表

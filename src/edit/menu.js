@@ -4,8 +4,9 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { Headers, DOMIN } from '../global';
 import storeContext from '../context';
+import { Menu } from 'antd';
 
-const Menu = ({ chooseDragComp }) => {
+const CompMenu = ({ chooseDragComp }) => {
     const { state, dispatch } = useContext(storeContext);
 
     useEffect(() => {
@@ -29,12 +30,22 @@ const Menu = ({ chooseDragComp }) => {
         });
     }, []);
 
-    return state.menu ? Object.entries(state.menu).map(([compName, config]) => <li
-        key={compName}
-        className="item"
-        draggable="true"
-        onDragStart={() => chooseDragComp(compName, config)}
-    >{config.name}</li>) : null;
+    return state.menu ? <Menu
+        selectable={false}
+        mode="inline"
+        theme="light"
+    >
+        {
+            Object.entries(state.menu).map(([compName, config]) => <Menu.Item key="1"
+                key={compName}
+                style={{ cursor: 'grab' }}
+                draggable="true"
+                onDragStart={() => chooseDragComp(compName, config)}
+            >
+                {config.name}
+            </Menu.Item>)
+        }
+    </Menu> : null;
 };
 
-export default Menu;
+export default CompMenu;

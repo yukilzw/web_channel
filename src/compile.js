@@ -5,9 +5,12 @@
 import React, { useContext, useState, useEffect } from 'react';
 import storeContext from './context';
 
-const Page = () => {
+const Page = ({
+    handleEventCallBack,
+    handleHoverCallBack
+}) => {
     const { state } = useContext(storeContext);
-    const { tree, event } = state;
+    const { tree } = state;
     const [pageDom, setPage] = useState(null);
 
     // 当state更新时，只有在深比较当前tree与next tree不同时，才重新触发编译，提高性能
@@ -39,19 +42,19 @@ const Page = () => {
         // 首先获取当前组件的构造函数
         let Comp = await loadAsync(name, hook);
 
-        let dragEvent = {};
+        let editEvent = {};
 
         let fillter = {};
 
         if (window.ENV === 'edit') {
             // 如果是编辑器内，将reducer里绑定的自定义event注入到每一个原始事件上
-            dragEvent = {
-                onDragOver: event.handleDragOver.bind(window, el),
-                onDragLeave: event.handleDragleave.bind(window, el),
-                onDrop: event.handleDrop.bind(window, el),
-                onClick: event.handleClick.bind(window, el),
-                onMouseOver: event.handleMouseOver.bind(window, el),
-                onMouseLeave: event.handleMouseLeave.bind(window, el)
+            editEvent = {
+                onDragOver(e) {handleEventCallBack('in', el, e);},
+                onDragLeave(e) {handleEventCallBack('out', el, e);},
+                onDrop(e) {handleEventCallBack('drop', el, e);},
+                onClick(e) {handleEventCallBack('click', el, e);},
+                onMouseOver(e) {handleHoverCallBack('hover', el, e);},
+                onMouseLeave(e) {handleHoverCallBack('leave', el, e);}
             };
             Object.assign(fillter, { cursor: 'default' });
         }
@@ -66,7 +69,7 @@ const Page = () => {
             key={el}
             id={el}
             style={Object.assign({}, style, fillter)}
-            {...dragEvent}
+            {...editEvent}
         >
             <Comp {...props} env={window.ENV} >
                 {/* 递归检查当前节点的子节点配置 */}

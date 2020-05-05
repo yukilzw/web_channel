@@ -3,16 +3,19 @@
  * 包含三个模块（组件菜单、页面可视区、属性配置面板）
  * 此外层组件定义了大部分编辑器内事件的函数
  */
-import React, { useContext, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from 'react';
+import React, { useContext, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import storeContext from '../context';
 import { Headers, DOMIN } from '../global';
 import Page from '../compile';
-import Menu from './menu';
+import CompMenu from './menu';
 import Option, { initStylesItemArr } from './option';
-import { searchTree, Enum } from './searchTree';
-import { creatCustomEvent } from './event';
+import { searchTree, EnumEdit } from './searchTree';
+import { Layout, Button } from 'antd';
+import style from './style/index.less';
 
-const root = 'root';
+const { Header, Sider, Content } = Layout;
+
+const EnumId = { root: 'root' };
 
 let targetCmpDom;   // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
 
@@ -33,25 +36,8 @@ const Board = () => {
         state.menu && bindEditDomEvent();
     }, [state.menu]);
 
-    // 防止操作页面属性面板时，点击事件冒泡到document导致当前choose的组件被清空
-    const optionBoxPropagation = useCallback((e) => {
-        e.nativeEvent.stopImmediatePropagation();
-    }, []);
-
     // 绑定编辑器事件
     const bindEditDomEvent = () => {
-        // 拖拽进入后，高亮目标容器选框
-        document.addEventListener(`PIPE_handleDragOver`, (e) => handleEventCallBack('in', e), false);
-        // 拖拽移出目标容器，取消高亮选框
-        document.addEventListener(`PIPE_handleDragleave`, (e) => handleEventCallBack('out', e), false);
-        // 拖拽到目标容器，松开鼠标，将新的组件添加到页面配置中
-        document.addEventListener(`PIPE_handleDrop`, (e) => handleEventCallBack('drop', e), false);
-        // 选中可视区域内的任意组件
-        document.addEventListener(`PIPE_handleClick`, (e) => handleEventCallBack('click', e), false);
-        // 鼠标移入可视区域内的任意组件
-        document.addEventListener(`PIPE_handleMouseOver`, (e) => handleHoverCallBack('hover', e), false);
-        // 鼠标移出可视区域内的任意组件
-        document.addEventListener(`PIPE_handleMouseLeave`, (e) => handleHoverCallBack('leave', e), false);
         // 键盘快捷键自定义
         document.addEventListener(`keydown`, handlekeyDown, false);
     };
@@ -59,7 +45,7 @@ const Board = () => {
     // 清空当前选中的编辑组件
     const clearChooseCmp = () => {
         if (targetCmpDom) {
-            targetCmpDom.classList.remove('chooseIn');
+            targetCmpDom.classList.remove(style.chooseIn);
             targetCmpDom = null;
         }
         dispatch({
@@ -77,7 +63,7 @@ const Board = () => {
             if (!choose) {
                 return;
             }
-            const nextTree = searchTree(tree, choose.el, Enum.delete);
+            const nextTree = searchTree(tree, choose.el, EnumEdit.delete);
 
             dispatch({
                 type: 'EDIT_CHOOSE_CMP',
@@ -93,37 +79,39 @@ const Board = () => {
         }
     };
 
-    // 自定义事件回调
-    const handleEventCallBack = (type, e) => {
-        const el = e.detail;
-
+    // 事件回调
+    const handleEventCallBack = (type, el, e) => {
         targetCmpDom = document.querySelector(`#${el}`);
 
         if (type === 'in') {
-            targetCmpDom.classList.add('dragIn');
+            e && e.stopPropagation();
+            e && e.preventDefault();
+            targetCmpDom.classList.add(style.dragIn);
         } else if (type === 'out') {
-            targetCmpDom.classList.remove('dragIn');
+            e && e.stopPropagation();
+            targetCmpDom.classList.remove(style.dragIn);
         } else if (type === 'drop') {
-            targetCmpDom.classList.remove('dragIn');
+            e && e.stopPropagation();
+            targetCmpDom.classList.remove(style.dragIn);
             putCmpIntoArea();
         } else if (type === 'click') {
-            const currentChoose = document.querySelector('.chooseIn');
+            e && e.stopPropagation();
+            const currentChoose = document.querySelector(`.${style.chooseIn}`);
 
-            currentChoose && currentChoose.classList.remove('chooseIn');
-            targetCmpDom.classList.add('chooseIn');
+            currentChoose && currentChoose.classList.remove(style.chooseIn);
+            targetCmpDom.classList.add(style.chooseIn);
 
             chooseCurrentCmpOption(el);
         }
     };
 
-    const handleHoverCallBack = (type, e) => {
-        const el = e.detail;
+    const handleHoverCallBack = (type, el) => {
         const hoverCmpDom = document.querySelector(`#${el}`);
 
         if (type === 'hover') {
-            hoverCmpDom.classList.add('hoverIn');
+            hoverCmpDom.classList.add(style.hoverIn);
         } else if (type === 'leave') {
-            hoverCmpDom.classList.remove('hoverIn');
+            hoverCmpDom.classList.remove(style.hoverIn);
         }
     };
 
@@ -131,7 +119,7 @@ const Board = () => {
     const chooseCurrentCmpOption = () => {
         const { tree, menu } = stateRef.current;
 
-        const config = searchTree(tree, targetCmpDom.id, Enum.choose);
+        const config = searchTree(tree, targetCmpDom.id, EnumEdit.choose);
 
         const optionArr = [];   // 固有样式面板style
         const propsArr = [];    // 自定义属性面板props
@@ -170,7 +158,6 @@ const Board = () => {
         dispatch({
             type: 'EDIT_CHOOSE_CMP',
             payload: {
-                tabIndex: 0,        // 每次重新选中组件，将操作面板tab切到第一栏
                 choose: config,     // 将当前选中的组件配置缓存，方便其他操作直接读取
                 optionArr,
                 propsArr
@@ -197,7 +184,7 @@ const Board = () => {
         let el;
 
         // 如果拖入的目标区域是根目录
-        if (targetCmpDom.id === root) {
+        if (targetCmpDom.id === EnumId.root) {
             if (tree.length === 0) {
                 el = 'bc1';
                 tree.push(
@@ -213,7 +200,7 @@ const Board = () => {
             }
         // 如果拖入的目标区域的某个组件嵌套
         } else {
-            let promiseArr = searchTree(tree, targetCmpDom.id, Enum.add, compJson);
+            let promiseArr = searchTree(tree, targetCmpDom.id, EnumEdit.add, compJson);
 
             nextTree = promiseArr[0];
             el = promiseArr[1];
@@ -225,7 +212,7 @@ const Board = () => {
         });
         // 拖入成功后，等待页面DOM渲染，然后自动选中新组建编辑
         // 这里无法得到新组件DOM生成的通知，目前使用定时器，此方法不稳定，待优化
-        setTimeout(() => creatCustomEvent(`PIPE_handleClick`, el), 50);
+        setTimeout(() => handleEventCallBack('click', el, null), 50);
     };
 
     // 选中菜单中的组件开始拖拽时
@@ -260,34 +247,61 @@ const Board = () => {
         });
     }, []);
 
-    // 除了可视区内每个嵌套组件进行拖入事件绑定（compile.js内）
-    // 还要绑定外层board面板的拖入事件，来处理组件拖入页面根节点
-    const dragEvent = useMemo(() => ({
-        onDragOver: state.event.handleDragOver.bind(this, root),
-        onDragLeave: state.event.handleDragleave.bind(this, root),
-        onDrop: state.event.handleDrop.bind(this, root)
-    }));
-
-    return <>
-        <nav>
-            <a className="navBtn" onClick={publishPage}>保存</a>
-        </nav>
-        <div className="content">
-            <ul className="cmpList" onClick={clearChooseCmp}>
-                <Menu chooseDragComp={chooseDragComp}/>
-            </ul>
-            <div
-                id={root}
-                className="board"
-                {...dragEvent}
-            >
-                <Page />
-            </div>
-            <div className="option" onClick={optionBoxPropagation}>
-                <Option />
-            </div>
-        </div>
-    </>;
+    // return <div className={style.edit}>
+    //     <nav>
+    //         <a className={style.navBtn} onClick={publishPage}>保存</a>
+    //     </nav>
+    //     <div className={style.content}>
+    //         <ul className={style.cmpList} onClick={clearChooseCmp}>
+    //             <CompMenu chooseDragComp={chooseDragComp}/>
+    //         </ul>
+    //         <div
+    //             id={EnumId.root}
+    //             className={style.board}
+    //             onClick={clearChooseCmp}
+    //             onDragOver={(e) => handleEventCallBack('in', EnumId.root, e)}
+    //             onDragLeave={(e) => handleEventCallBack('out', EnumId.root, e)}
+    //             onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
+    //         >
+    //             <Page
+    //                 handleEventCallBack={handleEventCallBack}
+    //                 handleHoverCallBack={handleHoverCallBack}
+    //             />
+    //         </div>
+    //         <div className={style.option} onClick={optionBoxPropagation}>
+    //             <Option />
+    //         </div>
+    //     </div>
+    // </div>;
+    return <Layout style={{ minWidth: 1100 }}>
+        <Sider theme="light" style={{ overflow: 'auto' }} onClick={clearChooseCmp}>
+            <CompMenu chooseDragComp={chooseDragComp}/>
+        </Sider>
+        <Layout>
+            <Header className={style.header}>
+                <Button type="primary" onClick={publishPage}>保存</Button>
+            </Header>
+            <Layout>
+                <Layout>
+                    <div
+                        id={EnumId.root}
+                        onClick={clearChooseCmp}
+                        onDragOver={(e) => handleEventCallBack('in', EnumId.root, e)}
+                        onDragLeave={(e) => handleEventCallBack('out', EnumId.root, e)}
+                        onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
+                    >
+                        <Page
+                            handleEventCallBack={handleEventCallBack}
+                            handleHoverCallBack={handleHoverCallBack}
+                        />
+                    </div>
+                </Layout>
+                <Sider width={300} theme="light" className={style.optionSlide}>
+                    <Option />
+                </Sider>
+            </Layout>
+        </Layout>
+    </Layout>;
 };
 
 export default Board;

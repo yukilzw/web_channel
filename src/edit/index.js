@@ -6,8 +6,8 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import Board from './board';
 import App from '../reducer';
-import * as event from './event';
-import './style/index.less';
+import 'antd/dist/antd.less';
+import './style/antd.less';
 
 window.ENV = 'edit';
 
@@ -23,7 +23,6 @@ fetch(DOMIN + '/loadPage', {
     ReactDom.render(
         <App
             tree={res.data}
-            event={event}
         >
             <Board />
         </App>

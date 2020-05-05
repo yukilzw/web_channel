@@ -3,7 +3,11 @@
  */
 import React, { useContext, useCallback } from 'react';
 import storeContext from '../context';
-import { searchTree, Enum } from './searchTree';
+import { searchTree, EnumEdit } from './searchTree';
+import { Tabs, Layout, Input } from 'antd';
+import style from './style/index.less';
+
+const { TabPane } = Tabs;
 
 // 定义固有的样式属性配置项，后续可持续拓展（自定义属性配置项没有固有的，是根据每个组件JSON中staticProps动态渲染的）
 export const initStylesItemArr = [
@@ -38,34 +42,30 @@ const Option = () => {
         }
         // 样式面板
         if (tabIndex === 0) {
-            return <ul className="optionBox" key={tabIndex}>
+            return <div className={style.configWrap} key={0}>
                 {
-                    optionArr.map(({ name, styleName, value }, i) => <li className="optionItem" key={styleName}>
+                    optionArr.map(({ name, styleName, value }, i) => <div className={style.config} key={styleName}>
                         <p>{name}</p>
-                        <input value={value}
-                            onChange={(e) => changeInputStyle(e, i, styleName)}
-                        />
-                    </li>)
+                        <Input value={value} onChange={(e) => changeInputStyle(e, i, styleName)}/>
+                    </div>)
                 }
-            </ul>;
+            </div>;
         }
         // 属性面板
-        return <ul className="optionBox" key={tabIndex}>
+        return <div className={style.configWrap} key={1}>
             {
-                propsArr.map(({ name, prop, value }, i) => <li className="optionItem long" key={prop}>
+                propsArr.map(({ name, prop, value }, i) => <div className={[style.config, style.long].join(' ')} key={prop}>
                     <p>{name}</p>
-                    <input value={value}
-                        onChange={(e) => changeInputStyle(e, i, prop)}
-                    />
-                </li>)
+                    <Input value={value} onChange={(e) => changeInputStyle(e, i, prop)}/>
+                </div>)
             }
-        </ul>;
+        </div>;
     };
 
     // 改变面板属性值的回调
     const changeInputStyle = (e, i, key) => {
         const { value } = e.target;
-        const nextTree = searchTree(tree, choose.el, Enum.edit, { tabIndex, key, value });
+        const nextTree = searchTree(tree, choose.el, EnumEdit.change, { tabIndex, key, value });
 
         // 判断当前是要更新到样式面板，还是自定义属性面板
         if (tabIndex === 0) {
@@ -81,28 +81,27 @@ const Option = () => {
     };
 
     // 面板TAB切换
-    const setTab = useCallback((i) => {
+    const changeTab = useCallback((i) => {
         dispatch({
             type: 'EDIT_CHANGE_TABNAV',
-            payload: i
+            payload: Number(i)
         });
     }, []);
 
-    return <>
-        {choose && <>
-        <p className="optionTtile">{menu[choose.name].name}({choose.name})：#{choose.el}</p>
-            <ul className="optionNav">
-                {
-                    tab.map((name, i) => <li
-                        key={name}
-                        className={`optionNavTab ${tabIndex === i ? 'active' : ''}`}
-                        onClick={() => setTab(i)}
-                    >{name}</li>)
-                }
-            </ul>
-        </>}
-        {renderOption()}
-    </>;
+    return <Tabs activeKey={tabIndex.toString()} onChange={changeTab}>
+        <TabPane tab={tab[0]} key="0">
+            {choose && <Layout className={style.tabPane}>
+                <p className={style.compName}>{menu[choose.name].name}({choose.name})：#{choose.el}</p>
+                {renderOption()}
+            </Layout>}
+        </TabPane>
+        <TabPane tab={tab[1]} key="1">
+            {choose && <Layout className={style.tabPane}>
+                <p className={style.compName}>{menu[choose.name].name}({choose.name})：#{choose.el}</p>
+                {renderOption()}
+            </Layout>}
+        </TabPane>
+    </Tabs>;
 };
 
 export default Option;

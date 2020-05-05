@@ -5,17 +5,17 @@
  * 此方法根据id，搜索当前操作的目标节点的位置，根据不同的操作返回所需要的值
  * 考虑到日常搭建中组件嵌套层级不会过深，采用广度优先搜索
  */
-const Enum = {
+const EnumEdit = {
     add: 'add',         // 插入
     choose: 'choose',   // 选择
-    edit: 'edit',       // 编辑
+    change: 'change',   // 编辑
     delete: 'delete'    // 删除
 };
 
 /**
  * @param {Array<Config>} arg[0] 页面配置tree
  * @param {String} arg[1] 要搜索的元素id
- * @param {Enum} arg[2] 操作的枚举类型
+ * @param {EnumEdit} arg[2] 操作的枚举类型
  * @param {any} arg[3] 拓展参数，不同操作类型入参不同
  */
 const searchTree = (...arg) => {
@@ -35,9 +35,9 @@ const searchTree = (...arg) => {
         for (let child of children) {
             if (child.el === el) {
                 switch (type) {
-                    case Enum.choose:
+                    case EnumEdit.choose:
                         return child;
-                    case Enum.edit:
+                    case EnumEdit.change:
                         var { tabIndex, key, value } = expand;
 
                         if (tabIndex === 0) {
@@ -46,10 +46,10 @@ const searchTree = (...arg) => {
                             child.props[key] = value;
                         }
                         return arr;
-                    case Enum.delete:
+                    case EnumEdit.delete:
                         children.splice(children.indexOf(child), 1);
                         return arr;
-                    case Enum.add:
+                    case EnumEdit.add:
                         // 如果插入的目标存在子元素数组
                         if (Array.isArray(child.children)) {
                             const { el: lastEl } = child.children[child.children.length - 1];
@@ -80,6 +80,6 @@ const searchTree = (...arg) => {
 
 
 export {
-    Enum,
+    EnumEdit,
     searchTree
 };

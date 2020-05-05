@@ -5,7 +5,7 @@
 
 #### 快速体验
 `npm i`后在项目根目录下运行`npm start`打包并启动服务<br/>
-编辑器：`http://localhost:1235/edit`
+编辑器：`http://localhost:1235/edit`<br/>
 预览页：`http://localhost:1235/page`
 
 #### 工作流程
@@ -56,14 +56,12 @@ web_channel:
     │  
     ├─edit				// 编辑器
     │  │  board.js			// 编辑器可视区域面板
-    │  │  event.js			// 自定义事件分发中心
     │  │  index.js			// 编辑器总入口
     │  │  menu.js			// 编辑器组件菜单
     │  │  option.js			// 编辑器属性操作面板
     │  │  searchTree.js		// 搜索页面配置树方法
     │  │  
     │  └─style			// 编辑器样式
-    │          index.less
     │          
     └─page			// 预览页
             index.js			// 预览页总入口
