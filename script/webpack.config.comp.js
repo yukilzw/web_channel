@@ -19,8 +19,8 @@ compfiles.forEach((item) => {
 const config = {
     entry: Component,
     output: {
-        path: path.join(process.cwd(), './.build/dist'),
-        publicPath: `${CONFIG.HOST}:${CONFIG.PORT}/dist`,
+        path: path.join(process.cwd(), './.build/comp'),
+        publicPath: `${CONFIG.HOST}:${CONFIG.PORT}/comp`,
         // 配置library与libraryTarget，让组件加载后挂载到window[name]下
         library: '[name]',
         libraryTarget: 'this',

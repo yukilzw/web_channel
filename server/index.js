@@ -35,8 +35,8 @@ app.get('/page', (req, res) => {
         id: 'app',
         title: '预览页',
         js: [
-            `${CONFIG.HOST}:${CONFIG.PORT}/sdk/commons.js`,
-            `${CONFIG.HOST}:${CONFIG.PORT}/sdk/page.js`
+            `${CONFIG.HOST}:${CONFIG.PORT}/page/commons.js`,
+            `${CONFIG.HOST}:${CONFIG.PORT}/page/main.js`
         ]
     });
 });
@@ -50,10 +50,10 @@ app.get('/edit', (req, res) => {
         title: debug ? '搭建编辑器(开发模式)' : '搭建编辑器',
         js: debug ? [
             `${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons.js`,
-            `${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/edit.js`
+            `${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/main.js`
         ] : [
-            `${CONFIG.HOST}:${CONFIG.PORT}/sdk/commons.js`,
-            `${CONFIG.HOST}:${CONFIG.PORT}/sdk/edit.js`
+            `${CONFIG.HOST}:${CONFIG.PORT}/edit/commons.js`,
+            `${CONFIG.HOST}:${CONFIG.PORT}/edit/main.js`
         ]
     });
 });

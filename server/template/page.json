@@ -1,7 +1,7 @@
 [
   {
     "el": "bc1",
-    "hook": "http://localhost:1235/dist/View.js",
+    "hook": "http://localhost:1235/comp/View.js",
     "name": "View",
     "props": {},
     "style": {
@@ -13,7 +13,7 @@
     "children": [
       {
         "el": "bc1-1",
-        "hook": "http://localhost:1235/dist/Text.js",
+        "hook": "http://localhost:1235/comp/Text.js",
         "name": "Text",
         "props": {
           "text": "这是文本组件鸭~",
@@ -24,12 +24,12 @@
           "fontSize": "20px",
           "textAlign": "center",
           "marginBottom": "20px",
-          "width": "300px"
+          "width": "200px"
         }
       },
       {
         "el": "bc1-2",
-        "hook": "http://localhost:1235/dist/Image.js",
+        "hook": "http://localhost:1235/comp/Image.js",
         "name": "Image",
         "props": {
           "src": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1588512426345&di=95d871fc57d2057218028877fb544a07&imgtype=0&src=http%3A%2F%2Ffile02.16sucai.com%2Fd%2Ffile%2F2014%2F0829%2F372edfeb74c3119b666237bd4af92be5.jpg",
@@ -44,7 +44,7 @@
         }
       },
       {
-        "hook": "http://localhost:1235/dist/Text.js",
+        "hook": "http://localhost:1235/comp/Text.js",
         "name": "Text",
         "style": {
           "width": "150px"
@@ -62,7 +62,7 @@
   },
   {
     "el": "bc2",
-    "hook": "http://localhost:1235/dist/View.js",
+    "hook": "http://localhost:1235/comp/View.js",
     "name": "View",
     "props": {},
     "style": {
@@ -74,14 +74,14 @@
     },
     "children": [
       {
-        "hook": "http://localhost:1235/dist/Text.js",
+        "hook": "http://localhost:1235/comp/Text.js",
         "name": "Text",
         "style": {},
         "props": {},
         "el": "bc2-1"
       },
       {
-        "hook": "http://localhost:1235/dist/View.js",
+        "hook": "http://localhost:1235/comp/View.js",
         "name": "View",
         "style": {
           "width": "60%",

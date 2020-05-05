@@ -1,35 +1,22 @@
 /**
- * @description 编辑器打包配置
+ * @description 预览页打包配置
  */
 const path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { CONFIG } = require('../config');
 
 const isDev = process.argv.indexOf('-dev') !== -1;
 
-const cssFillPath = [
-    path.join(process.cwd(), './src/edit/style/antd.less'),
-    path.join(process.cwd(), './node_modules/')
-];
-
 const config = {
     entry: {
-        main: './src/edit/index.js'
+        main: './src/page/index.js'
     },
     output: {
-        path: path.join(process.cwd(), './.build/edit'),
-        publicPath: !isDev ? `${CONFIG.HOST}:${CONFIG.PORT}/edit` : undefined,
+        path: path.join(process.cwd(), './.build/page'),
+        publicPath: !isDev ? `${CONFIG.HOST}:${CONFIG.PORT}/page` : undefined,
         filename: '[name].js',
         chunkFilename: '[name].js'
-    },
-    devServer: {
-        compress: false,
-        port: CONFIG.DEV_SERVER_PORT,
-        inline: true,
-        open: false,
-        hot: true
     },
     // 公用的代码放到commons.js里
     optimization: {
@@ -54,26 +41,6 @@ const config = {
             },
             {
                 test: /\.(css|less)$/,
-                include: cssFillPath,
-                use: [
-                    'style-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            minimize: !isDev
-                        }
-                    },
-                    {
-                        loader: 'less-loader',
-                        options: {
-                            javascriptEnabled: true
-                        }
-                    }
-                ]
-            },
-            {
-                test: /\.(css|less)$/,
-                exclude: cssFillPath,
                 use: [
                     'style-loader',
                     {
@@ -111,9 +78,7 @@ const config = {
         new CleanWebpackPlugin()
     ]).concat(isDev ? [
         new webpack.HotModuleReplacementPlugin()
-    ] : [
-        // new BundleAnalyzerPlugin()
-    ]),
+    ] : []),
     resolve: {
         extensions: [
             '.js',

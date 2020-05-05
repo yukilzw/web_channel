@@ -171,7 +171,7 @@ const Board = () => {
 
         // 生成新组件的配置
         const compJson = {
-            hook: DOMIN + `/dist/${dragCmpConfig.compName}.js`,
+            hook: DOMIN + `/comp/${dragCmpConfig.compName}.js`,
             name: dragCmpConfig.compName,
             style: dragCmpConfig.defaultStyles,
             props: dragCmpConfig.defaultProps
