@@ -3,7 +3,7 @@
  * 包含三个模块（组件菜单、页面可视区、属性配置面板）
  * 此外层组件定义了大部分编辑器内事件的函数
  */
-import React, { useContext, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
+import React, { useContext, useEffect, useRef, useCallback, useLayoutEffect, useState } from 'react';
 import storeContext from '../context';
 import { Headers, DOMIN } from '../global';
 import Page from '../compile';
@@ -15,6 +15,7 @@ import style from './style/index.less';
 
 const { Header, Sider } = Layout;
 const EnumId = { root: 'root' };
+const PaintBoxMargin = 30;
 
 let targetCmpDom;   // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
 
@@ -22,11 +23,31 @@ let dragCmpConfig;  // 选取拖拽菜单内组件时，暂存该组件的默认
 
 const Board = () => {
     const { state, dispatch } = useContext(storeContext);
-    const stateRef = useRef();
+    const stateRef = useRef();          // 暂存实时reducer
+    const paintingWrap = useRef();       // 画布所在的区域DOM元素
+    const [paintOffset, setPaintOffset] = useState({ width: 0, height: 0 });    // 包裹真实画布的一层实际可视区域容器，用来触发paintingWrap滚动
+    const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
+    const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
 
-    // 由于hooks自带闭包机制，事件回调函数的异步触发只能最初拿到绑定事件时注入的state
-    // 每次状态有改变，就将state存到静态变量stateRef，在事件触发时取改变量代替state
     useEffect(() => {
+        const paintingWrapDom = paintingWrap.current;
+
+        // 画布所在区域宽度变化就重新计算画布缩放比例
+        if ((paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / 1920 !== paintScale) {
+            const nextPaintScale = (paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / 1920;
+            const nextPaintMinHeight = ((paintingWrapDom.offsetHeight - PaintBoxMargin) + 300) / nextPaintScale;
+            const nextPaintOffset = {
+                width: 1920 * nextPaintScale,
+                height: nextPaintMinHeight * nextPaintScale
+            };
+
+            setPaintScale(nextPaintScale);
+            setPaintMinHeight(nextPaintMinHeight);
+            setPaintOffset(nextPaintOffset);
+        }
+
+        // 由于hooks自带闭包机制，事件回调函数的异步触发只能最初拿到绑定事件时注入的state
+        // 每次状态有改变，就将state存到静态变量stateRef，在事件触发时取改变量代替state
         stateRef.current = state;
     });
 
@@ -255,18 +276,30 @@ const Board = () => {
                 <Button type="primary" onClick={publishPage}>保存</Button>
             </Header>
             <Layout>
-                <Layout>
-                    <div
-                        id={EnumId.root}
-                        onClick={clearChooseCmp}
-                        onDragOver={(e) => handleEventCallBack('in', EnumId.root, e)}
-                        onDragLeave={(e) => handleEventCallBack('out', EnumId.root, e)}
-                        onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
-                    >
-                        <Page
-                            handleEventCallBack={handleEventCallBack}
-                            handleHoverCallBack={handleHoverCallBack}
-                        />
+                <Layout className={style.paintingLayout}>
+                    <div className={style.paintingWrap} ref={paintingWrap}>
+                        <div style={{
+                            height: `${paintOffset.height}px`,
+                            width: `${paintOffset.width}px`
+                        }}>
+                            <div
+                                style={{
+                                    transform: `scale(${paintScale})`,
+                                    minHeight: `${paintMinHeight}px`
+                                }}
+                                id={EnumId.root}
+                                className={style.root}
+                                onClick={clearChooseCmp}
+                                onDragOver={(e) => handleEventCallBack('in', EnumId.root, e)}
+                                onDragLeave={(e) => handleEventCallBack('out', EnumId.root, e)}
+                                onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
+                            >
+                                <Page
+                                    handleEventCallBack={handleEventCallBack}
+                                    handleHoverCallBack={handleHoverCallBack}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </Layout>
                 <Sider width={300} theme="light" className={style.optionSlide}>
