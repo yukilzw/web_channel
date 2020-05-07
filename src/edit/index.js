@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import Board from './board';
 import App from '../reducer';
-import 'antd/dist/antd.less';
+import { message } from 'antd';
 import './style/antd.less';
 
 window.ENV = 'edit';
@@ -17,7 +17,7 @@ fetch(DOMIN + '/loadPage', {
     headers: Headers.json
 }).then(response => response.json()).then(res => {
     if (res.error !== 0) {
-        console.warn(res.msg);
+        message.warning(res.msg);
         return;
     }
     ReactDom.render(

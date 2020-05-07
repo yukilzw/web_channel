@@ -1,4 +1,5 @@
-// 此文件遵循CSS module
+@import './var.less';
+// 此文件仅遵循CSS module编译
 .publicTextOverflow {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -22,10 +23,27 @@
 
 .header {
     height: 50px !important;
-    padding: 0 20px !important;
+    padding: 0 !important;
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    background-color: #fff !important;
+    box-shadow: 0 0 8px rgb(184, 181, 181);
+    z-index: 1;
+
+    .headerLeft {
+        flex: 1;
+        display: flex;
+        margin-left: 15px;
+    }
+
+    .headerBtn {
+        margin-right: 15px;
+    }
+
+    .headerSlider {
+        width: 200px;
+    }
 }
 
 .optionSlide {
@@ -40,12 +58,17 @@
     flex: 1;
     overflow: auto;
     padding: 30px;
-    padding-bottom: 0;
+    text-align: center;
+
+    .paintingBox {
+        display: inline-block;
+    }
 
     .root {
         width: 1920px;
         transform-origin: 0 0;
         min-height: calc(100% - 30px);
+        padding-bottom: 300px;
         background-color: #fff;
         box-shadow: 0 0 10px rgb(184, 181, 181);
     }
@@ -66,7 +89,7 @@
 }
 
 .compName {
-    font-weight: bold;
+    color: @primary-color;
     margin-left: 10px;
     .publicTextOverflow();
 }

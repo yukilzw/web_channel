@@ -6,16 +6,22 @@
 import React, { useContext, useEffect, useRef, useCallback, useLayoutEffect, useState } from 'react';
 import storeContext from '../context';
 import { Headers, DOMIN } from '../global';
-import Page from '../compile';
+import Page from './compile';
 import CompMenu from './menu';
 import Option, { initStylesItemArr } from './option';
 import { searchTree, EnumEdit } from './searchTree';
-import { Layout, Button } from 'antd';
+import { Layout, Button, Slider, message } from 'antd';
 import style from './style/index.less';
 
-const { Header, Sider } = Layout;
 const EnumId = { root: 'root' };
 const PaintBoxMargin = 30;
+const SliderMarks = {
+    0: '0%',
+    25: '26%',
+    50: '75%',
+    75: '75%',
+    100: '100%'
+};
 
 let targetCmpDom;   // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
 
@@ -25,41 +31,56 @@ const Board = () => {
     const { state, dispatch } = useContext(storeContext);
     const stateRef = useRef();          // 暂存实时reducer
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
+    const paintingWrapWidthPre = useRef();     // 上次改变画布大小时的画布所在DOM的宽度，用于鉴别容器是否变宽
     const [paintOffset, setPaintOffset] = useState({ width: 0, height: 0 });    // 包裹真实画布的一层实际可视区域容器，用来触发paintingWrap滚动
     const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
 
     useEffect(() => {
-        const paintingWrapDom = paintingWrap.current;
-
-        // 画布所在区域宽度变化就重新计算画布缩放比例
-        if ((paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / 1920 !== paintScale) {
-            const nextPaintScale = (paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / 1920;
-            const nextPaintMinHeight = ((paintingWrapDom.offsetHeight - PaintBoxMargin) + 300) / nextPaintScale;
-            const nextPaintOffset = {
-                width: 1920 * nextPaintScale,
-                height: nextPaintMinHeight * nextPaintScale
-            };
-
-            setPaintScale(nextPaintScale);
-            setPaintMinHeight(nextPaintMinHeight);
-            setPaintOffset(nextPaintOffset);
-        }
+        repainting();
 
         // 由于hooks自带闭包机制，事件回调函数的异步触发只能最初拿到绑定事件时注入的state
         // 每次状态有改变，就将state存到静态变量stateRef，在事件触发时取改变量代替state
         stateRef.current = state;
     });
 
-    // 进入编辑器后，等组件菜单接口返回，更新menu状态时，再对全局事件进行绑定注册
+    // 进入编辑器后，对全局事件进行绑定注册
     useLayoutEffect(() => {
-        state.menu && bindEditDomEvent();
-    }, [state.menu]);
+        bindEditDomEvent();
+    }, []);
 
     // 绑定编辑器事件
     const bindEditDomEvent = () => {
         // 键盘快捷键自定义
         document.addEventListener(`keydown`, handlekeyDown, false);
+        // 浏览器窗口改变
+        window.addEventListener('resize', repainting, false);
+        // 鼠标抬起置空拖动编辑组件对象
+        document.addEventListener(`mouseup`, handleMouseUp, false);
+    };
+
+    const repainting = (forceScale) => {
+        const paintingWrapDom = paintingWrap.current;
+        const shouldFoceUpdate = typeof forceScale === 'number';
+
+        // 画布所在区域宽度变化,或者拖动滑块强制缩放，就重新计算画布缩放比例
+        if (
+            paintingWrapDom.offsetWidth !== paintingWrapWidthPre.current ||
+            shouldFoceUpdate
+        ) {
+            const nextPaintScale = shouldFoceUpdate ? forceScale : (paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / 1920;
+            const nextPaintMinHeight = ((paintingWrapDom.offsetHeight - PaintBoxMargin) + 300) / nextPaintScale;
+            const nextPaintOffset = {
+                width: 1920 * nextPaintScale,
+                height: nextPaintMinHeight * nextPaintScale
+            };
+
+            paintingWrapWidthPre.current = paintingWrapDom.offsetWidth;
+
+            setPaintScale(nextPaintScale);
+            setPaintMinHeight(nextPaintMinHeight);
+            setPaintOffset(nextPaintOffset);
+        }
     };
 
     // 清空当前选中的编辑组件
@@ -95,7 +116,7 @@ const Board = () => {
             });
         } else if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
             e.preventDefault();
-            publishPage();
+            savePage();
         }
     };
 
@@ -243,7 +264,7 @@ const Board = () => {
     };
 
     // 保存页面配置
-    const publishPage = useCallback(() => {
+    const savePage = useCallback(() => new Promise((resolve) => {
         const { tree } = stateRef.current;
 
         fetch(DOMIN + '/savepage', {
@@ -252,33 +273,66 @@ const Board = () => {
             body: JSON.stringify(tree)
         }).then(response => response.json()).then(res => {
             if (res.error !== 0) {
-                console.warn(res.msg);
+                message.warning(res.msg);
                 return;
             }
-            if (window.location.search.match('debug=1')) {
-                alert('保存成功');
-            } else {
-                const confirmChoose = confirm('保存成功，是否立即预览？');
-
-                if (confirmChoose) {
-                    window.open(`${DOMIN}/page`, '_blank');
-                }
-            }
+            message.success('保存成功');
+            resolve();
         });
+    }), []);
+
+    // 在新窗口预览页面
+    const showPage = useCallback(async () => {
+        await savePage();
+        window.open(`${DOMIN}/page`, '_blank');
     }, []);
 
+    // 拖动顶部滑块强制改变画布尺寸
+    const changeSlider = useCallback((num) => {
+        repainting(num / 100);
+    });
+
+    // 响应compile.js中changeTab事件，实现拖动蒙版编辑组件尺寸、定位
+    const changeBoxSizeMove = (e) => {
+        const { changeCompBox } = state;
+
+        if (!changeCompBox) {
+            return;
+        }
+        const { key, dom } = changeCompBox;
+
+        console.log(key, dom);
+    };
+
+    const handleMouseUp = useCallback(() => {
+        dispatch({
+            type: 'EDIT_COMP_BOX',
+            payload: null
+        });
+    });
+
     return <Layout style={{ minWidth: 1100 }}>
-        <Sider theme="light" style={{ overflow: 'auto' }} onClick={clearChooseCmp}>
+        <Layout.Sider theme="light" style={{ overflow: 'auto' }} onClick={clearChooseCmp}>
             <CompMenu chooseDragComp={chooseDragComp}/>
-        </Sider>
+        </Layout.Sider>
         <Layout>
-            <Header className={style.header}>
-                <Button type="primary" onClick={publishPage}>保存</Button>
-            </Header>
+            <Layout.Header className={style.header}>
+                <div className={style.headerLeft}>
+                    <Slider
+                        marks={SliderMarks}
+                        className={style.headerSlider}
+                        tipFormatter={num => `${num}%`}
+                        value={paintScale * 100}
+                        onChange={changeSlider}
+                    />
+                </div>
+                <Button type="primary" className={style.headerBtn} onClick={savePage}>保存(Ctrl+S)</Button>
+                <Button type="primary" className={style.headerBtn} onClick={showPage}>预览</Button>
+            </Layout.Header>
             <Layout>
                 <Layout className={style.paintingLayout}>
                     <div className={style.paintingWrap} ref={paintingWrap}>
-                        <div style={{
+                        <div className={style.paintingBox} style={{
                             height: `${paintOffset.height}px`,
                             width: `${paintOffset.width}px`
                         }}>
@@ -293,6 +347,7 @@ const Board = () => {
                                 onDragOver={(e) => handleEventCallBack('in', EnumId.root, e)}
                                 onDragLeave={(e) => handleEventCallBack('out', EnumId.root, e)}
                                 onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
+                                onMouseMove={changeBoxSizeMove}
                             >
                                 <Page
                                     handleEventCallBack={handleEventCallBack}
@@ -302,9 +357,9 @@ const Board = () => {
                         </div>
                     </div>
                 </Layout>
-                <Sider width={300} theme="light" className={style.optionSlide}>
+                <Layout.Sider width={300} theme="light" className={style.optionSlide}>
                     <Option />
-                </Sider>
+                </Layout.Sider>
             </Layout>
         </Layout>
     </Layout>;

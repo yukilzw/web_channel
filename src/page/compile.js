@@ -3,12 +3,10 @@
  * 根据JSON配置树编译为React组件树
  */
 import React, { useContext, useState, useEffect } from 'react';
-import storeContext from './context';
+import storeContext from '../context';
+import { loadAsync } from '../global';
 
-const Page = ({
-    handleEventCallBack,
-    handleHoverCallBack
-}) => {
+const Page = () => {
     const { state } = useContext(storeContext);
     const { tree } = state;
     const [pageDom, setPage] = useState(null);
@@ -42,22 +40,7 @@ const Page = ({
         // 首先获取当前组件的构造函数
         let Comp = await loadAsync(name, hook);
 
-        let editEvent = {};
-
         let fillter = {};
-
-        if (window.ENV === 'edit') {
-            // 如果是编辑器内，将reducer里绑定的自定义event注入到每一个原始事件上
-            editEvent = {
-                onDragOver(e) {handleEventCallBack('in', el, e);},
-                onDragLeave(e) {handleEventCallBack('out', el, e);},
-                onDrop(e) {handleEventCallBack('drop', el, e);},
-                onClick(e) {handleEventCallBack('click', el, e);},
-                onMouseOver(e) {handleHoverCallBack('hover', el, e);},
-                onMouseLeave(e) {handleHoverCallBack('leave', el, e);}
-            };
-            Object.assign(fillter, { cursor: 'default' });
-        }
 
         // 过滤处理一些属性
         if (style.backgroundImage) {
@@ -69,7 +52,6 @@ const Page = ({
             key={el}
             id={el}
             style={Object.assign({}, style, fillter)}
-            {...editEvent}
         >
             <Comp {...props} env={window.ENV} >
                 {/* 递归检查当前节点的子节点配置 */}
@@ -80,27 +62,5 @@ const Page = ({
 
     return pageDom;
 };
-
-// 编译时按需加载组件js文件
-const loadAsync = (name, hook) => new Promise((resolve) => {
-    // 如果当前window.comp下有缓存对应的组件函数，就直接返回复用
-    if (name in window.comp) {
-        resolve(window.comp[name].default);
-        return;
-    }
-    // 否则就实时下载对应组件的js文件，并返回组件函数
-    const script = document.createElement('script');
-
-    script.type = 'text/javascript';
-    script.onload = () => {
-        // 由于在webpack.config.comp.js中打包的每个组件都挂载到window下
-        // 组件js加载执行完毕后，可以从window中取出构造函数存入window.comp
-        window.comp[name] = window[name];
-        delete window[name];
-        resolve(window.comp[name].default);
-    };
-    script.src = hook;
-    document.getElementsByTagName('head')[0].appendChild(script);
-});
 
 export default Page;

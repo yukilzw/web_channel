@@ -12,7 +12,6 @@ const getCompJSONconfig = require('./getCompJSONconfig');
 const { getPageJSON, setPageJSON } = require('./opPageJSON');
 
 const app = express();
-const isDev = process.argv.indexOf('-dev') !== -1;
 
 app.use(compression());
 app.use(express.static(path.join(__dirname, '../.build')));
@@ -88,11 +87,8 @@ app.post('/savePage', (req, res) => {
 
 app.listen(CONFIG.PORT);
 
-if (isDev) {
-    console.log(`\x1B[31m★\x1B[0m web_channel\x1B[31m★\x1B[0m  server start for debug Editor.`);
-    console.log(`编辑器（开发）：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug=1\x1B[0m`);
-} else {
-    console.log(`\x1B[32m★\x1B[0m web_channel\x1B[32m★\x1B[0m  server start.`);
-    console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit\x1B[0m`);
-    console.log(`页面预览：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page\x1B[0m`);
-}
+console.log(`\x1B[32m★\x1B[0mweb_channel\x1B[32m★\x1B[0m server start.`);
+console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit\x1B[0m`);
+console.log(`页面预览：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page\x1B[0m`);
+console.log(`\x1B[32m------------------------DEV--------------------------\x1B[0m`);
+console.log(`编辑器（开发模式）：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug=1\x1B[0m`);

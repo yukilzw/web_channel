@@ -32,10 +32,11 @@ const reducer = (state, action) => {
                 ...state,
                 tabIndex: action.payload
             };
-        case 'VV':
+        // 鼠标按下操作蒙版后，设置当前操作的组件，在root监听鼠标移动事件来改变组件容器的宽高、定位
+        case 'EDIT_COMP_BOX':
             return {
                 ...state,
-                vv: action.payload
+                changeCompBox: action.payload
             };
         default:
             return state;
@@ -47,12 +48,17 @@ const App = ({ tree, children }) => {
     const [state, dispatch] = useReducer(reducer, Object.assign(
         {
             tree            // 页面配置JSON树
-        }, window.ENV === 'edit' && {
+        }, window.ENV === 'edit' ? {
             choose: null,   // 当前选中的组件配置
+            // changeCompBox: {
+            //     key: null,   操作按下的是哪个蒙版，取自complie.js中的changeTabList数组
+            //     dom: null    要操作哪个组件容器
+            // },
+            changeCompBox: null,
             tabIndex: 0,    // 属性面板tab索引
             optionArr: [],  // 属性面板样式配置列表
             propsArr: []    // 属性面板自定义属性配置列表
-        }
+        } : {}
     ));
 
     return <Provider value={{ state, dispatch }}>

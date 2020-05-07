@@ -5,6 +5,7 @@
     "name": "View",
     "props": {},
     "style": {
+      "position": "relative",
       "width": "100%",
       "height": "400px",
       "backgroundColor": "",
@@ -21,6 +22,7 @@
           "fontSize": "50"
         },
         "style": {
+          "position": "relative",
           "color": "#fff",
           "fontSize": "20px",
           "textAlign": "center",
@@ -37,6 +39,7 @@
           "link": "https://www.douyu.com"
         },
         "style": {
+          "position": "relative",
           "width": "140px",
           "height": "100px",
           "marginLeft": "auto",
@@ -48,6 +51,7 @@
         "hook": "http://localhost:1235/comp/Text.js",
         "name": "Text",
         "style": {
+          "position": "relative",
           "width": "400px"
         },
         "props": {
@@ -68,26 +72,23 @@
     "props": {},
     "style": {
       "width": "50%",
-      "height": "300px",
+      "height": "1000px",
       "backgroundColor": "pink",
       "marginLeft": "auto",
-      "marginRight": "auto"
+      "marginRight": "auto",
+      "position": "relative"
     },
     "children": [
-      {
-        "hook": "http://localhost:1235/comp/Text.js",
-        "name": "Text",
-        "style": {},
-        "props": {},
-        "el": "bc2-1"
-      },
       {
         "hook": "http://localhost:1235/comp/View.js",
         "name": "View",
         "style": {
-          "width": "60%",
-          "height": "40px",
-          "backgroundColor": "red"
+          "position": "absolute",
+          "width": "400",
+          "height": "100px",
+          "backgroundColor": "red",
+          "left": "100",
+          "top": "300"
         },
         "props": {},
         "el": "bc2-2",

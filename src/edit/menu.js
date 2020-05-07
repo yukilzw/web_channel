@@ -4,7 +4,7 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { Headers, DOMIN } from '../global';
 import storeContext from '../context';
-import { Menu } from 'antd';
+import { Menu, message } from 'antd';
 
 const CompMenu = ({ chooseDragComp }) => {
     const { state, dispatch } = useContext(storeContext);
@@ -20,7 +20,7 @@ const CompMenu = ({ chooseDragComp }) => {
             headers: Headers.json
         }).then(response => response.json()).then(res => {
             if (res.error !== 0) {
-                console.warn(res.msg);
+                message.warning(res.msg);
                 return;
             }
             dispatch({

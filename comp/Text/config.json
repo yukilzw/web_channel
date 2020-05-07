@@ -23,6 +23,7 @@
         }
     ],
     "defaultStyles": {
+        "position": "relative",
         "width": "70px"
     },
     "defaultProps": {

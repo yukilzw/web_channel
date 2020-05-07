@@ -5,7 +5,7 @@ import { Headers, DOMIN } from '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
 import App from '../reducer';
-import Page from '../compile';
+import Page from './compile';
 import './index.less';
 
 window.ENV = 'page';
