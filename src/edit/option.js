@@ -65,7 +65,7 @@ const Option = () => {
     // 改变面板属性值的回调
     const changeInputStyle = (e, i, key) => {
         const { value } = e.target;
-        const nextTree = searchTree(tree, choose.el, EnumEdit.change, { tabIndex, key, value });
+        const nextTree = searchTree(tree, choose.el, EnumEdit.change, { tabIndex, items: [{ key, value }] });
 
         // 判断当前是要更新到样式面板，还是自定义属性面板
         if (tabIndex === 0) {

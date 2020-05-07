@@ -89,19 +89,32 @@ const Page = ({
         return <div className={styleBd.changeSizeMask}>
             {
                 changeTabList.map((key) => <div key={el + key} className={styleBd[key]}
-                    onMouseDown={(e) => changeTab(e, key)}
+                    onMouseDown={(e) => changeTab(e, key, el)}
                 ></div>)
             }
         </div>;
     };
 
-    const changeTab = useCallback((e, key) => {
-        if (e.type === 'mousedown') {
+    // 记录鼠标按下组件蒙版的各项数据，用于鼠标移动时计算更新组件样式
+    const changeTab = useCallback(({ type, clientX, clientY }, key, el) => {
+        if (type === 'mousedown') {
+            const elStyles = window.getComputedStyle(document.querySelector(`#${el}`), null);
+
             dispatch({
                 type: 'EDIT_COMP_BOX',
                 payload: {
-                    dom: e.target.parentNode.parentNode,
-                    key
+                    el,
+                    key,
+                    clientX,
+                    clientY,
+                    current: {
+                        width: parseFloat(elStyles.width),
+                        height: parseFloat(elStyles.height),
+                        position: {
+                            left: parseFloat(elStyles.left),
+                            top: parseFloat(elStyles.top)
+                        }
+                    }
                 }
             });
         }

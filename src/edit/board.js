@@ -32,6 +32,7 @@ const Board = () => {
     const stateRef = useRef();          // 暂存实时reducer
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
     const paintingWrapWidthPre = useRef();     // 上次改变画布大小时的画布所在DOM的宽度，用于鉴别容器是否变宽
+    const nextStylesbYChangeMask = useRef(null);    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
     const [paintOffset, setPaintOffset] = useState({ width: 0, height: 0 });    // 包裹真实画布的一层实际可视区域容器，用来触发paintingWrap滚动
     const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
@@ -293,23 +294,109 @@ const Board = () => {
     });
 
     // 响应compile.js中changeTab事件，实现拖动蒙版编辑组件尺寸、定位
-    const changeBoxSizeMove = (e) => {
+    const changeBoxByMask = (e) => {
         const { changeCompBox } = state;
 
         if (!changeCompBox) {
             return;
         }
-        const { key, dom } = changeCompBox;
+        const { key, el, clientY, clientX, current } = changeCompBox;
+        const container = document.querySelector(`#${el}`);
+        const changeX = (e.clientX - clientX) / paintScale;
+        const changeY = (e.clientY - clientY) / paintScale;
+        const nextStyles = {};
 
-        console.log(key, dom);
+        switch (key) {
+            case 'LT':
+                Object.assign(nextStyles, {
+                    width: (current.width - changeX).toFixed(0) + 'px',
+                    height: (current.height - changeY).toFixed(0) + 'px'
+                });
+                break;
+            case 'MT':
+                Object.assign(nextStyles, {
+                    height: (current.height - changeY).toFixed(0) + 'px'
+                });
+                break;
+            case 'RT':
+                Object.assign(nextStyles, {
+                    width: (current.width + changeX).toFixed(0) + 'px',
+                    height: (current.height - changeY).toFixed(0) + 'px'
+                });
+                break;
+            case 'LM':
+                Object.assign(nextStyles, {
+                    width: (current.width - changeX).toFixed(0) + 'px'
+                });
+                break;
+            case 'MM':
+                Object.assign(nextStyles, {
+                    left: (current.position.left + changeX).toFixed(0) + 'px',
+                    top: (current.position.top + changeY).toFixed(0) + 'px'
+                });
+                break;
+            case 'RM':
+                Object.assign(nextStyles, {
+                    width: (current.width + changeX).toFixed(0) + 'px'
+                });
+                break;
+            case 'LB':
+                Object.assign(nextStyles, {
+                    width: (current.width - changeX).toFixed(0) + 'px',
+                    height: (current.height + changeY).toFixed(0) + 'px'
+                });
+                break;
+            case 'MB':
+                Object.assign(nextStyles, {
+                    height: (current.height + changeY).toFixed(0) + 'px'
+                });
+                break;
+            case 'RB':
+                Object.assign(nextStyles, {
+                    width: (current.width + changeX).toFixed(0) + 'px',
+                    height: (current.height + changeY).toFixed(0) + 'px'
+                });
+                break;
+            default: break;
+        }
+        Object.assign(container.style, nextStyles);
+        nextStylesbYChangeMask.current = nextStyles;
     };
 
     const handleMouseUp = useCallback(() => {
+        const { tree, optionArr, changeCompBox } = stateRef.current;
+        const nsbcMask = nextStylesbYChangeMask.current;
+
+        if (nsbcMask && changeCompBox) {
+            const nextStyleItems = [];
+
+            for (let key in nsbcMask) {
+                nextStyleItems.push({
+                    key,
+                    value: nsbcMask[key]
+                });
+            }
+            const nextTree = searchTree(tree, changeCompBox.el, EnumEdit.change, {
+                tabIndex: 0,
+                items: nextStyleItems
+            });
+
+            optionArr.forEach(item => {
+                if (item.styleName in nsbcMask) {
+                    item.value = nsbcMask[item.styleName];
+                }
+            });
+
+            dispatch({
+                type: 'UPDATE_TREE',
+                payload: nextTree
+            });
+        }
         dispatch({
             type: 'EDIT_COMP_BOX',
             payload: null
         });
-    });
+    }, []);
 
     return <Layout style={{ minWidth: 1100 }}>
         <Layout.Sider theme="light" style={{ overflow: 'auto' }} onClick={clearChooseCmp}>
@@ -347,7 +434,7 @@ const Board = () => {
                                 onDragOver={(e) => handleEventCallBack('in', EnumId.root, e)}
                                 onDragLeave={(e) => handleEventCallBack('out', EnumId.root, e)}
                                 onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
-                                onMouseMove={changeBoxSizeMove}
+                                onMouseMove={changeBoxByMask}
                             >
                                 <Page
                                     handleEventCallBack={handleEventCallBack}

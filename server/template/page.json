@@ -71,8 +71,8 @@
     "name": "View",
     "props": {},
     "style": {
-      "width": "50%",
-      "height": "1000px",
+      "width": "1498px",
+      "height": "1537px",
       "backgroundColor": "pink",
       "marginLeft": "auto",
       "marginRight": "auto",

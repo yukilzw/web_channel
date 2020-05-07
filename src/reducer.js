@@ -51,8 +51,17 @@ const App = ({ tree, children }) => {
         }, window.ENV === 'edit' ? {
             choose: null,   // 当前选中的组件配置
             // changeCompBox: {
-            //     key: null,   操作按下的是哪个蒙版，取自complie.js中的changeTabList数组
-            //     dom: null    要操作哪个组件容器
+            //     el: string,    组件容器id
+            //     key: string,   操作按下的是哪个蒙版，取自complie.js中的changeTabList数组
+            //     e: Event,     鼠标按下后的事件对象
+            //     current: {
+            //           width: number,
+            //           height: number,
+            //           position: {
+            //               left: number,
+            //               top: number
+            //           }
+            //     }
             // },
             changeCompBox: null,
             tabIndex: 0,    // 属性面板tab索引

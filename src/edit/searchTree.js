@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 /* eslint-disable complexity */
 /**
  * @description 搜索页面配置树
@@ -38,13 +39,15 @@ const searchTree = (...arg) => {
                     case EnumEdit.choose:
                         return child;
                     case EnumEdit.change:
-                        var { tabIndex, key, value } = expand;
+                        var { tabIndex, items } = expand;
 
-                        if (tabIndex === 0) {
-                            child.style[key] = value;
-                        } else if (tabIndex === 1) {
-                            child.props[key] = value;
-                        }
+                        items.forEach(({ key, value }) => {
+                            if (tabIndex === 0) {
+                                child.style[key] = value;
+                            } else if (tabIndex === 1) {
+                                child.props[key] = value;
+                            }
+                        });
                         return arr;
                     case EnumEdit.delete:
                         children.splice(children.indexOf(child), 1);
