@@ -9,6 +9,7 @@ import { Headers, DOMIN } from '../global';
 import Page, { recordStack } from './compile';
 import CompMenu from './menu';
 import Option from './option';
+import PageTree from './pageTree';
 import { searchTree, EnumEdit } from './searchTree';
 import { Layout, Button, Slider, message } from 'antd';
 import style from './style/index.less';
@@ -395,8 +396,13 @@ const Board = () => {
     }, []);
 
     return <Layout className={style.main}>
-        <Layout.Sider theme="light" className={style.mainSider} onClick={clearChooseCmp}>
-            <CompMenu chooseDragComp={chooseDragComp}/>
+        <Layout.Sider theme="light" onClick={clearChooseCmp}>
+            <div className={[style.mainSider, style.menu].join(' ')}>
+                <CompMenu chooseDragComp={chooseDragComp}/>
+            </div>
+            <div className={style.mainSider}>
+                <PageTree />
+            </div>
         </Layout.Sider>
         <Layout>
             <Layout.Header className={style.header}>

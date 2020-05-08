@@ -5,8 +5,16 @@
     height: 100vh;
 }
 
+
 .mainSider {
     overflow: auto;
+    height: 50%;
+
+    &.menu {
+        overflow-x: hidden;
+        border-bottom: @common-border;
+        border-bottom-width: 2px;
+    }
 }
 
 .publicTextOverflow {
