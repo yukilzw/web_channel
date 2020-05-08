@@ -6,9 +6,9 @@
 import React, { useContext, useEffect, useRef, useCallback, useLayoutEffect, useState } from 'react';
 import storeContext from '../context';
 import { Headers, DOMIN } from '../global';
-import Page from './compile';
+import Page, { recordStack } from './compile';
 import CompMenu from './menu';
-import Option, { initStylesItemArr } from './option';
+import Option from './option';
 import { searchTree, EnumEdit } from './searchTree';
 import { Layout, Button, Slider, message } from 'antd';
 import style from './style/index.less';
@@ -36,6 +36,7 @@ const Board = () => {
     const [paintOffset, setPaintOffset] = useState({ width: 0, height: 0 });    // 包裹真实画布的一层实际可视区域容器，用来触发paintingWrap滚动
     const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
+    const optionInputHasFocus = useRef(false);
 
     useEffect(() => {
         // 由于hooks自带闭包机制，事件回调函数的异步触发只能最初拿到绑定事件时注入的state
@@ -103,7 +104,7 @@ const Board = () => {
         }
         dispatch({
             type: 'EDIT_CHOOSE_CMP',
-            payload: { choose: null }
+            payload: null
         });
     };
 
@@ -120,15 +121,44 @@ const Board = () => {
 
             dispatch({
                 type: 'EDIT_CHOOSE_CMP',
-                payload: { choose: null }
+                payload: null
             });
             dispatch({
                 type: 'UPDATE_TREE',
                 payload: nextTree
             });
-        } else if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
-            e.preventDefault();
-            savePage();
+        } else if (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) {
+            // `CTRL + S`保存
+            if (e.keyCode === 83) {
+                e.preventDefault();
+                savePage();
+            // `CTRL + Z`撤销
+            } else if (e.keyCode === 90) {
+                if (!optionInputHasFocus.current && recordStack.point > 0) {
+                    recordStack.point--;
+                    const lastPageTree = recordStack[recordStack.point];
+
+                    lastPageTree.rollBack = true;   // 标记此条页面配置为回滚数据
+
+                    dispatch({
+                        type: 'UPDATE_TREE',
+                        payload: lastPageTree
+                    });
+                }
+            // `CTRL + Z`恢复
+            } else if (e.keyCode === 89) {
+                if (!optionInputHasFocus.current && recordStack.point < recordStack.length - 1) {
+                    recordStack.point++;
+                    const lastPageTree = recordStack[recordStack.point];
+
+                    lastPageTree.rollBack = true;   // 标记此条页面配置为回滚数据
+
+                    dispatch({
+                        type: 'UPDATE_TREE',
+                        payload: lastPageTree
+                    });
+                }
+            }
         }
     };
 
@@ -170,51 +200,12 @@ const Board = () => {
 
     // 选择组件后，展示编辑面板区内容
     const chooseCurrentCmpOption = () => {
-        const { tree, menu } = stateRef.current;
-
+        const { tree } = stateRef.current;
         const config = searchTree(tree, targetCmpDom.id, EnumEdit.choose);
-
-        const optionArr = [];   // 固有样式面板style
-        const propsArr = [];    // 自定义属性面板props
-
-        // 通过菜单里对应组件类型的JSON配置，来渲染出属性面板
-        // 渲染时比对当前组件配置中的props，如果有值就把这个值赋给当前编辑项的默认值，没值就设为空字符串
-        menu[config.name].staticProps.forEach(item => {
-            if (config.props[item.prop]) {
-                propsArr.push({
-                    ...item,
-                    value: config.props[item.prop]
-                });
-            } else {
-                propsArr.push({
-                    ...item,
-                    value: ''
-                });
-            }
-        });
-
-        // 样式面板同理
-        initStylesItemArr.forEach(item => {
-            if (config.style[item.styleName]) {
-                optionArr.push({
-                    ...item,
-                    value: config.style[item.styleName]
-                });
-            } else {
-                optionArr.push({
-                    ...item,
-                    value: ''
-                });
-            }
-        });
 
         dispatch({
             type: 'EDIT_CHOOSE_CMP',
-            payload: {
-                choose: config,     // 将当前选中的组件配置缓存，方便其他操作直接读取
-                optionArr,
-                propsArr
-            }
+            payload: config     // 将当前选中的组件配置缓存，方便其他操作直接读取
         });
     };
 
@@ -375,7 +366,7 @@ const Board = () => {
     };
 
     const handleMouseUp = useCallback(() => {
-        const { tree, optionArr, changeCompBox } = stateRef.current;
+        const { tree, changeCompBox } = stateRef.current;
         const nsbcMask = nextStylesbYChangeMask.current;
 
         if (nsbcMask && changeCompBox) {
@@ -392,12 +383,6 @@ const Board = () => {
                 items: nextStyleItems
             });
 
-            optionArr.forEach(item => {
-                if (item.styleName in nsbcMask) {
-                    item.value = nsbcMask[item.styleName];
-                }
-            });
-
             dispatch({
                 type: 'UPDATE_TREE',
                 payload: nextTree
@@ -410,7 +395,7 @@ const Board = () => {
     }, []);
 
     return <Layout className={style.main}>
-        <Layout.Sider theme="light" style={{ overflow: 'auto' }} onClick={clearChooseCmp}>
+        <Layout.Sider theme="light" className={style.mainSider} onClick={clearChooseCmp}>
             <CompMenu chooseDragComp={chooseDragComp}/>
         </Layout.Sider>
         <Layout>
@@ -450,13 +435,14 @@ const Board = () => {
                                 <Page
                                     handleEventCallBack={handleEventCallBack}
                                     handleHoverCallBack={handleHoverCallBack}
+                                    optionInputHasFocus={optionInputHasFocus}
                                 />
                             </div>
                         </div>
                     </div>
                 </Layout>
                 <Layout.Sider width={300} theme="light">
-                    <Option />
+                    <Option optionInputHasFocus={optionInputHasFocus} />
                 </Layout.Sider>
             </Layout>
         </Layout>

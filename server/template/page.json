@@ -4,9 +4,11 @@
     "name": "View",
     "style": {
       "position": "relative",
-      "width": "100%",
-      "height": "620px",
-      "backgroundColor": "yellow"
+      "width": "1219px",
+      "height": "660px",
+      "backgroundColor": "pink",
+      "left": "278px",
+      "top": "563px"
     },
     "props": {},
     "el": "bc1",
@@ -15,18 +17,17 @@
         "hook": "http://localhost:1235/comp/Text.js",
         "name": "Text",
         "style": {
-          "position": "absolute",
-          "width": "536px",
-          "height": "77px",
-          "left": "158px",
-          "top": "180px"
+          "position": "relative",
+          "width": "522px",
+          "height": "100px",
+          "left": "103px",
+          "top": "85px"
         },
         "props": {
-          "text": "默认文本",
+          "text": "默认文本1",
           "fontSize": "40px",
-          "lineHeight": "77px",
-          "textAlign": "center",
-          "color": "red"
+          "lineHeight": "80px",
+          "textAlign": "center"
         },
         "el": "bc1-1"
       }

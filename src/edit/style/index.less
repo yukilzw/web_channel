@@ -5,6 +5,10 @@
     height: 100vh;
 }
 
+.mainSider {
+    overflow: auto;
+}
+
 .publicTextOverflow {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -33,7 +37,8 @@
     justify-content: flex-end;
     align-items: center;
     background-color: #fff !important;
-    box-shadow: 0 0 8px rgb(184, 181, 181);
+    border-left: @common-border;
+    border-bottom: @common-border;
     z-index: 1;
 
     .headerLeft {
@@ -68,6 +73,7 @@
     .paintingBox {
         display: inline-block;
         overflow: hidden;
+        box-shadow: @common-shadow;
     }
 
     .root {
@@ -77,7 +83,6 @@
         min-height: calc(100% - 30px);
         padding-bottom: 300px;
         background-color: #fff;
-        box-shadow: 0 0 10px rgb(184, 181, 181);
     }
 }
 

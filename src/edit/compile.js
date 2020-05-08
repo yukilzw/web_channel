@@ -7,10 +7,21 @@ import storeContext from '../context';
 import { loadAsync } from '../global';
 import styleBd from './style/changeBox.less';
 
+const recordStack = [];     // 记录成功触发编译的配置堆栈，指针recordStack.point指向当前展示存档
+
+recordStack.add = (tree) => {
+    if (recordStack.length >= 100) {
+        recordStack.shift();
+    }
+    recordStack.push(tree);
+    recordStack.point = recordStack.length - 1;
+};
+
 const updateTreeQueue = [];     // 触发编译的页面树缓存队列，保证在多个页面配置同时抵达时一个个被消费触发，避免在下载JS编译成REACT组件时渲染顺序的不稳定性
 const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   // 组件容器事件蒙层类名
 
 const Page = ({
+    optionInputHasFocus,
     handleEventCallBack,
     handleHoverCallBack
 }) => {
@@ -29,13 +40,25 @@ const Page = ({
         }
     }, [JSON.stringify(tree), choose]);
 
+    useEffect(() => {
+        // 组件操作存档
+        if (tree.rollBack || optionInputHasFocus.current) {
+            return;
+        }
+        if (recordStack.length >= 100) {
+            recordStack.shift();
+        }
+        recordStack.push(tree);
+        recordStack.point = recordStack.length - 1;
+    }, [JSON.stringify(tree)]);
+
     const upLoadTree = (tree) => {
         waitingBeforeTreeReturn.current = true;
         checkChildren(tree).then((page) => {
             setPage(page);
             // 检查队列里是否还有为消费的配置
             if (updateTreeQueue.length > 0) {
-                upLoadTree(updateTreeQueue.pop());
+                upLoadTree(updateTreeQueue.shift());
             } else {
                 waitingBeforeTreeReturn.current = false;
             }
@@ -142,3 +165,6 @@ const Page = ({
 };
 
 export default Page;
+export {
+    recordStack
+};

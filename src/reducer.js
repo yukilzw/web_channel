@@ -24,7 +24,7 @@ const reducer = (state, action) => {
         case 'EDIT_CHOOSE_CMP':
             return {
                 ...state,
-                ...action.payload
+                choose: action.payload
             };
         // 切换操作面板tab
         case 'EDIT_CHANGE_TABNAV':
@@ -64,9 +64,7 @@ const App = ({ tree, children }) => {
             //     }
             // },
             changeCompBox: null,
-            tabIndex: 0,    // 属性面板tab索引
-            optionArr: [],  // 属性面板样式配置列表
-            propsArr: []    // 属性面板自定义属性配置列表
+            tabIndex: 0    // 属性面板tab索引
         } : {}
     ));
 

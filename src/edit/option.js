@@ -4,13 +4,14 @@
 import React, { useContext, useCallback } from 'react';
 import storeContext from '../context';
 import { searchTree, EnumEdit } from './searchTree';
+import { recordStack } from './compile';
 import { Tabs, Layout, Input } from 'antd';
 import style from './style/index.less';
 
 const { TabPane } = Tabs;
 
 // 定义固有的样式属性配置项，后续可持续拓展（自定义属性配置项没有固有的，是根据每个组件JSON中staticProps动态渲染的）
-export const initStylesItemArr = [
+const initStylesItemArr = [
     { name: '宽度', styleName: 'width' },
     { name: '高度', styleName: 'height' },
     { name: '移除布局', styleName: 'overflow' },
@@ -30,9 +31,9 @@ export const initStylesItemArr = [
 
 const tab = ['样式', '属性'];
 
-const Option = () => {
+const Option = ({ optionInputHasFocus }) => {
     const { state, dispatch } = useContext(storeContext);
-    const { tabIndex, optionArr, propsArr, choose, tree, menu } = state;
+    const { tabIndex, choose, tree, menu } = state;
 
     // 渲染面板配置列表
     const renderOption = () => {
@@ -44,9 +45,13 @@ const Option = () => {
         if (tabIndex === 0) {
             return <div className={style.configWrap} key={0}>
                 {
-                    optionArr.map(({ name, styleName, value }, i) => <div className={style.config} key={styleName}>
+                    initStylesItemArr.map(({ name, styleName }) => <div className={style.config} key={styleName}>
                         <p>{name}</p>
-                        <Input value={value} onChange={(e) => changeInputStyle(e, i, styleName)}/>
+                        <Input value={choose.style[styleName] || ''}
+                            onFocus={() => changeOptionInputHasFocus(true)}
+                            onBlur={() => changeOptionInputHasFocus(false)}
+                            onChange={(e) => changeInputStyle(e, styleName)}
+                        />
                     </div>)
                 }
             </div>;
@@ -54,25 +59,38 @@ const Option = () => {
         // 属性面板
         return <div className={style.configWrap} key={1}>
             {
-                propsArr.map(({ name, prop, value }, i) => <div className={[style.config, style.long].join(' ')} key={prop}>
+                menu[choose.name].staticProps.map(({ name, prop }) => <div className={[style.config, style.long].join(' ')} key={prop}>
                     <p>{name}</p>
-                    <Input value={value} onChange={(e) => changeInputStyle(e, i, prop)}/>
+                    <Input value={choose.props[prop] || ''}
+                        onFocus={() => changeOptionInputHasFocus(true)}
+                        onBlur={() => changeOptionInputHasFocus(false)}
+                        onChange={(e) => changeInputStyle(e, prop)}
+                    />
                 </div>)
             }
         </div>;
     };
 
+
+    const changeOptionInputHasFocus = (type) => {
+        if (!type) {
+            // 只有输入框失去焦点时才算完成编辑，记录一次当前tree到堆栈
+            recordStack.add(tree);
+        }
+        // 释放当前编辑输入框状态，开启撤销、恢复快捷键权限
+        optionInputHasFocus.current = type;
+    };
+
     // 改变面板属性值的回调
-    const changeInputStyle = (e, i, key) => {
+    const changeInputStyle = (e, key) => {
         const { value } = e.target;
         const nextTree = searchTree(tree, choose.el, EnumEdit.change, { tabIndex, items: [{ key, value }] });
+        const curChoose = searchTree(nextTree, choose.el, EnumEdit.choose);
 
-        // 判断当前是要更新到样式面板，还是自定义属性面板
-        if (tabIndex === 0) {
-            optionArr[i].value = value;
-        } else if (tabIndex === 1) {
-            propsArr[i].value = value;
-        }
+        dispatch({
+            type: 'EDIT_CHOOSE_CMP',
+            payload: curChoose
+        });
 
         dispatch({
             type: 'UPDATE_TREE',
