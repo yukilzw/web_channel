@@ -2,21 +2,38 @@
  * @description 页面渲染组件
  * 根据JSON配置树编译为React组件树
  */
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import storeContext from '../context';
 import { loadAsync } from '../global';
+
+const updateTreeQueue = [];
 
 const Page = () => {
     const { state } = useContext(storeContext);
     const { tree } = state;
     const [pageDom, setPage] = useState(null);
+    const waitingBeforeTreeReturn = useRef(false);
 
-    // 当state更新时，只有在深比较当前tree与next tree不同时，才重新触发编译，提高性能
+    // 和编辑器内的区别是不需要监听选中组件的变化
     useEffect(() => {
+        if (!waitingBeforeTreeReturn.current) {
+            upLoadTree(tree);
+        } else {
+            updateTreeQueue.push(tree);
+        }
+    }, [JSON.stringify(tree)]);
+
+    const upLoadTree = (tree) => {
+        waitingBeforeTreeReturn.current = true;
         checkChildren(tree).then((page) => {
             setPage(page);
+            if (updateTreeQueue.length > 0) {
+                upLoadTree(updateTreeQueue.pop());
+            } else {
+                waitingBeforeTreeReturn.current = false;
+            }
         });
-    }, [JSON.stringify(tree)]);
+    };
 
     // 检查当前层级子节点
     const checkChildren = async (children) => {

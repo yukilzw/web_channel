@@ -54,7 +54,7 @@ const searchTree = (...arg) => {
                         return arr;
                     case EnumEdit.add:
                         // 如果插入的目标存在子元素数组
-                        if (Array.isArray(child.children)) {
+                        if (Array.isArray(child.children) && child.children.length > 0) {
                             const { el: lastEl } = child.children[child.children.length - 1];
                             const lastElArr = lastEl.split('-');
 

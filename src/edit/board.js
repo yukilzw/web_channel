@@ -38,8 +38,6 @@ const Board = () => {
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
 
     useEffect(() => {
-        repainting();
-
         // 由于hooks自带闭包机制，事件回调函数的异步触发只能最初拿到绑定事件时注入的state
         // 每次状态有改变，就将state存到静态变量stateRef，在事件触发时取改变量代替state
         stateRef.current = state;
@@ -49,6 +47,24 @@ const Board = () => {
     useLayoutEffect(() => {
         bindEditDomEvent();
     }, []);
+
+    // 渲染外层容器后再计算出最合适的比例
+    useLayoutEffect(() => {
+        repainting();
+    }, [paintingWrap.current]);
+
+    useEffect(() => {
+        const rootDom = document.querySelector(`#${EnumId.root}`);
+
+        if (rootDom) {
+            const nextPaintOffset = {
+                width: rootDom.getBoundingClientRect().width,
+                height: rootDom.getBoundingClientRect().height
+            };
+
+            setPaintOffset(nextPaintOffset);
+        }
+    }, [paintScale, state.tree]);
 
     // 绑定编辑器事件
     const bindEditDomEvent = () => {
@@ -71,16 +87,11 @@ const Board = () => {
         ) {
             const nextPaintScale = shouldFoceUpdate ? forceScale : (paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / 1920;
             const nextPaintMinHeight = ((paintingWrapDom.offsetHeight - PaintBoxMargin) + 300) / nextPaintScale;
-            const nextPaintOffset = {
-                width: 1920 * nextPaintScale,
-                height: nextPaintMinHeight * nextPaintScale
-            };
 
             paintingWrapWidthPre.current = paintingWrapDom.offsetWidth;
 
             setPaintScale(nextPaintScale);
             setPaintMinHeight(nextPaintMinHeight);
-            setPaintOffset(nextPaintOffset);
         }
     };
 
@@ -398,7 +409,7 @@ const Board = () => {
         });
     }, []);
 
-    return <Layout style={{ minWidth: 1100 }}>
+    return <Layout className={style.main}>
         <Layout.Sider theme="light" style={{ overflow: 'auto' }} onClick={clearChooseCmp}>
             <CompMenu chooseDragComp={chooseDragComp}/>
         </Layout.Sider>
@@ -416,8 +427,8 @@ const Board = () => {
                 <Button type="primary" className={style.headerBtn} onClick={savePage}>保存(Ctrl+S)</Button>
                 <Button type="primary" className={style.headerBtn} onClick={showPage}>预览</Button>
             </Layout.Header>
-            <Layout>
-                <Layout className={style.paintingLayout}>
+            <Layout className={style.paintingLayout}>
+                <Layout className={style.flex1}>
                     <div className={style.paintingWrap} ref={paintingWrap}>
                         <div className={style.paintingBox} style={{
                             height: `${paintOffset.height}px`,
@@ -444,7 +455,7 @@ const Board = () => {
                         </div>
                     </div>
                 </Layout>
-                <Layout.Sider width={300} theme="light" className={style.optionSlide}>
+                <Layout.Sider width={300} theme="light">
                     <Option />
                 </Layout.Sider>
             </Layout>

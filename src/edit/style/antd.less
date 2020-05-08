@@ -1,9 +1,9 @@
 @import '~antd/dist/antd.less';
 @import './var.less';
-// 此文件仅支持覆写antd样式，支持普通CSS样式名
+// 此文件仅支持覆写antd样式，以及全局样式重置，不要写页面内自定义样式，非CSS模块打包，样式名即为className
 #root {
-    ul,li,ol,dl,p,h1,h2,h3,h4,h5,h6,img,nav { margin: 0; padding: 0 }
-    ol,ul { list-style: none; }
+    ul, li, ol, dl, p, h1, h2, h3, h4, h5, h6, img, nav { margin: 0; padding: 0 }
+    ol, ul { list-style: none; }
 }
 
 ::-webkit-scrollbar {
@@ -26,10 +26,6 @@
 
 .ant-tabs-nav {
     margin-left: 10px;
-
-    .ant-tabs-tab {
-        height: auto;
-    }
 }
 
 .ant-tabs-top-bar {
