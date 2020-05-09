@@ -9,7 +9,7 @@ import { Headers, DOMIN } from '../global';
 import Page, { recordStack } from './compile';
 import CompMenu from './menu';
 import Option from './option';
-import PageTree from './pageTree';
+import PageTree from './tree';
 import { searchTree, EnumEdit } from './searchTree';
 import { Layout, Button, Slider, message } from 'antd';
 import style from './style/index.less';
@@ -24,13 +24,12 @@ const SliderMarks = {
     100: '100%'
 };
 
-let targetCmpDom;   // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
-
 let dragCmpConfig;  // 选取拖拽菜单内组件时，暂存该组件的默认配置
 
 const Board = () => {
     const { state, dispatch } = useContext(storeContext);
     const stateRef = useRef();          // 暂存实时reducer
+    const targetCmpDom = useRef();      // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
     const paintingWrapWidthPre = useRef();     // 上次改变画布大小时的画布所在DOM的宽度，用于鉴别容器是否变宽
     const nextStylesbYChangeMask = useRef(null);    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
@@ -99,9 +98,9 @@ const Board = () => {
 
     // 清空当前选中的编辑组件
     const clearChooseCmp = () => {
-        if (targetCmpDom) {
-            targetCmpDom.classList.remove(style.chooseIn);
-            targetCmpDom = null;
+        if (targetCmpDom.current) {
+            targetCmpDom.current.classList.remove(style.chooseIn);
+            targetCmpDom.current = null;
         }
         dispatch({
             type: 'EDIT_CHOOSE_CMP',
@@ -165,25 +164,25 @@ const Board = () => {
 
     // 事件回调
     const handleEventCallBack = (type, el, e) => {
-        targetCmpDom = document.querySelector(`#${el}`);
+        targetCmpDom.current = document.querySelector(`#${el}`);
 
         if (type === 'in') {
             e && e.stopPropagation();
             e && e.preventDefault();
-            targetCmpDom.classList.add(style.dragIn);
+            targetCmpDom.current.classList.add(style.dragIn);
         } else if (type === 'out') {
             e && e.stopPropagation();
-            targetCmpDom.classList.remove(style.dragIn);
+            targetCmpDom.current.classList.remove(style.dragIn);
         } else if (type === 'drop') {
             e && e.stopPropagation();
-            targetCmpDom.classList.remove(style.dragIn);
+            targetCmpDom.current.classList.remove(style.dragIn);
             putCmpIntoArea();
         } else if (type === 'click') {
             e && e.stopPropagation();
             const currentChoose = document.querySelector(`.${style.chooseIn}`);
 
             currentChoose && currentChoose.classList.remove(style.chooseIn);
-            targetCmpDom.classList.add(style.chooseIn);
+            targetCmpDom.current.classList.add(style.chooseIn);
 
             chooseCurrentCmpOption(el);
         }
@@ -202,7 +201,7 @@ const Board = () => {
     // 选择组件后，展示编辑面板区内容
     const chooseCurrentCmpOption = () => {
         const { tree } = stateRef.current;
-        const config = searchTree(tree, targetCmpDom.id, EnumEdit.choose);
+        const config = searchTree(tree, targetCmpDom.current.id, EnumEdit.choose);
 
         dispatch({
             type: 'EDIT_CHOOSE_CMP',
@@ -229,7 +228,7 @@ const Board = () => {
         let el;
 
         // 如果拖入的目标区域是根目录
-        if (targetCmpDom.id === EnumId.root) {
+        if (targetCmpDom.current.id === EnumId.root) {
             if (tree.length === 0) {
                 el = 'bc1';
                 tree.push(
@@ -245,7 +244,7 @@ const Board = () => {
             }
         // 如果拖入的目标区域的某个组件嵌套
         } else {
-            let promiseArr = searchTree(tree, targetCmpDom.id, EnumEdit.add, compJson);
+            let promiseArr = searchTree(tree, targetCmpDom.current.id, EnumEdit.add, compJson);
 
             nextTree = promiseArr[0];
             el = promiseArr[1];
@@ -396,12 +395,12 @@ const Board = () => {
     }, []);
 
     return <Layout className={style.main}>
-        <Layout.Sider theme="light" onClick={clearChooseCmp}>
-            <div className={[style.mainSider, style.menu].join(' ')}>
+        <Layout.Sider theme="light" >
+            <div className={[style.mainSider, style.menu].join(' ')} onClick={clearChooseCmp}>
                 <CompMenu chooseDragComp={chooseDragComp}/>
             </div>
             <div className={style.mainSider}>
-                <PageTree />
+                <PageTree handleEventCallBack={handleEventCallBack} />
             </div>
         </Layout.Sider>
         <Layout>
