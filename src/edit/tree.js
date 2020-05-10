@@ -1,42 +1,54 @@
 /**
  * @description 编辑器组件树视图
  */
-import React, { useContext, useEffect, useCallback, useRef } from 'react';
-import { Headers, DOMIN } from '../global';
+import React, { useContext, useCallback, useMemo } from 'react';
 import storeContext from '../context';
-import { Tree, message } from 'antd';
+import { searchTree, EnumEdit } from './searchTree';
+import { Tree } from 'antd';
 
 const PageTree = ({
-    handleEventCallBack
+    handleClick, checkedKeysList, expandedKeys
 }) => {
-    const { state, dispatch } = useContext(storeContext);
-    const { menu, choose } = state;
-    const lastTree = useRef([]);
-    const lastTreeMap = useRef();
-    const checkedKeysList = useRef([]);
-
-    let treeMap = JSON.parse(JSON.stringify(state.tree));
+    const { state, dispatch, forceUpdate } = useContext(storeContext);
+    const { choose, tree } = state;
 
     // 选中某个节点
     const selectNode = useCallback(([el], e) => {
-        handleEventCallBack('click', el);
+        handleClick(e.node.key);
     }, []);
 
-    // 显示隐藏某个节点（隐藏后编译时会忽略此组件以及其包裹的所有子孙组件）
-    const checkNode = useCallback((el, e) => {
-        console.log(el);
-    }, []);
+    // 显示隐藏某个节点（隐藏后编译时会忽略此组件以及其包裹的所有子孙组件，但在编辑器内扔可为其配置属性）
+    const checkNode = (el, e) => {
+        const nextTree = searchTree(tree, e.node.key, EnumEdit.hide);
 
-    if (!menu) {
-        return null;
-    }
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: nextTree
+        });
+    };
+
+    // 展开节点
+    const expendNode = useCallback((el, e) => {
+        const hasKey = expandedKeys.current.has(e.node.key);
+
+        if (hasKey) {
+            expandedKeys.current.delete(e.node.key);
+        } else {
+            expandedKeys.current.add(e.node.key);
+        }
+        expandedKeys.current = new Set(expandedKeys.current);
+        forceUpdate();
+    }, []);
 
     // 用于将页面原始tree字段映射为ANTD树组件所需字段
     const fixTreeKey = (children) => {
         for (let child of children) {
             child.key = child.el;
             child.title = state.menu[child.name].name + '(' + child.el.slice(2) + ')';
-            checkedKeysList.current.push(child.key);
+            if (!child.hide) {
+                checkedKeysList.current.add(child.key);
+            }
+
             delete child.el;
             delete child.hook;
             delete child.name;
@@ -50,24 +62,27 @@ const PageTree = ({
         }
     };
 
-    if (JSON.stringify(state.tree) !== JSON.stringify(lastTree.current)) {
-        checkedKeysList.current = [];
-        fixTreeKey(treeMap);
-        lastTree.current = state.tree;
-        lastTreeMap.current = treeMap;
-    } else {
-        treeMap = lastTreeMap.current;
-    }
+    // 缓存树组件，如果没有涉及到影响树组件展示的状态更新，直接渲染缓存树组件
+    const compTree = useMemo(() => {
+        const treeData = JSON.parse(JSON.stringify(tree));
 
-    return <Tree
-        checkable
-        checkStrictly
-        checkedKeys={checkedKeysList.current}
-        onCheck={checkNode}
-        selectedKeys={choose && [choose.el]}
-        onSelect={selectNode}
-        treeData={treeMap}
-    />;
+        checkedKeysList.current = new Set();
+        fixTreeKey(treeData);
+
+        return <Tree
+            checkable
+            checkStrictly
+            checkedKeys={Array.from(checkedKeysList.current)}
+            onCheck={checkNode}
+            selectedKeys={choose && [choose]}
+            onSelect={selectNode}
+            expandedKeys={Array.from(expandedKeys.current)}
+            onExpand={expendNode}
+            treeData={treeData}
+        />;
+    }, [tree, choose, expandedKeys.current, checkedKeysList.current]);
+
+    return compTree;
 };
 
 export default PageTree;

@@ -1,6 +1,10 @@
 @import '~antd/dist/antd.less';
 @import './var.less';
 // 此文件仅支持覆写antd样式，以及全局样式重置，不要写页面内自定义样式，非CSS模块打包，样式名即为className
+#edit {
+    overflow: hidden;
+}
+
 #root {
     ul, li, ol, dl, p, h1, h2, h3, h4, h5, h6, img, nav { margin: 0; padding: 0 }
     ol, ul { list-style: none; }
@@ -16,7 +20,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    border-radius: 0;
+    border-radius: 2px;
     background-color: rgba(0,0,0,.1);
 }
 
@@ -34,4 +38,8 @@
 
 .ant-menu-inline {
     border: none;
+}
+
+.ant-tree-title {
+    white-space: nowrap;
 }

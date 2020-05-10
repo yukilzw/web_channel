@@ -5,17 +5,8 @@
 import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import storeContext from '../context';
 import { loadAsync } from '../global';
+import { record } from './record';
 import styleBd from './style/changeBox.less';
-
-const recordStack = [];     // 记录成功触发编译的配置堆栈，指针recordStack.point指向当前展示存档
-
-recordStack.add = (tree) => {
-    if (recordStack.length >= 100) {
-        recordStack.shift();
-    }
-    recordStack.push(tree);
-    recordStack.point = recordStack.length - 1;
-};
 
 const updateTreeQueue = [];     // 触发编译的页面树缓存队列，保证在多个页面配置同时抵达时一个个被消费触发，避免在下载JS编译成REACT组件时渲染顺序的不稳定性
 const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   // 组件容器事件蒙层类名
@@ -23,7 +14,8 @@ const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   
 const Page = ({
     optionInputHasFocus,
     handleEventCallBack,
-    handleHoverCallBack
+    handleHoverCallBack,
+    handleClick
 }) => {
     const { state, dispatch } = useContext(storeContext);
     const { tree, choose } = state;
@@ -38,19 +30,16 @@ const Page = ({
         } else {
             updateTreeQueue.push(tree);
         }
-    }, [JSON.stringify(tree), choose]);
+    }, [tree, choose]);
 
+    // 记录编辑历史的钩子
     useEffect(() => {
-        // 组件操作存档
-        if (tree.rollBack || optionInputHasFocus.current) {
+        // 读取历史指针记录或者是在输入框输入时不计入历史
+        if (tree.isPoint || optionInputHasFocus.current) {
             return;
         }
-        if (recordStack.length >= 100) {
-            recordStack.shift();
-        }
-        recordStack.push(tree);
-        recordStack.point = recordStack.length - 1;
-    }, [JSON.stringify(tree)]);
+        record.add(tree);
+    }, [tree]);
 
     const upLoadTree = (tree) => {
         waitingBeforeTreeReturn.current = true;
@@ -83,17 +72,20 @@ const Page = ({
     };
 
     // 将每一个JSON节点编译为React组件节点
-    const compileJson2Comp = async ({ el, name, hook, style, props, children }) => {
+    const compileJson2Comp = async ({ hide, el, name, hook, style, props, children }) => {
+        if (hide) {
+            return null;
+        }
         // 首先获取当前组件的构造函数
         let Comp = await loadAsync(name, hook);
 
         const editEvent = {
-            onDragOver(e) {handleEventCallBack('in', el, e);},
-            onDragLeave(e) {handleEventCallBack('out', el, e);},
+            onDragOver(e) {handleEventCallBack('dragover', el, e);},
+            onDragLeave(e) {handleEventCallBack('dragout', el, e);},
             onDrop(e) {handleEventCallBack('drop', el, e);},
-            onClick(e) {handleEventCallBack('click', el, e);},
-            onMouseOver(e) {handleHoverCallBack('hover', el, e);},
-            onMouseLeave(e) {handleHoverCallBack('leave', el, e);}
+            onClick(e) {handleClick(el, e, true);},
+            onMouseOver(e) {handleHoverCallBack('mouseover', el, e);},
+            onMouseLeave(e) {handleHoverCallBack('mouseleave', el, e);}
         };
 
         let fillter = { cursor: 'default' };
@@ -124,7 +116,7 @@ const Page = ({
         if (['relative', 'fiexd', 'absolute'].indexOf(position) === -1) {
             return;
         }
-        if (!choose || choose.el !== el) {
+        if (choose !== el) {
             return;
         }
         return <div className={styleBd.changeSizeMask}>
@@ -165,6 +157,3 @@ const Page = ({
 };
 
 export default Page;
-export {
-    recordStack
-};

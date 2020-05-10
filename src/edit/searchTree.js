@@ -10,25 +10,23 @@ const EnumEdit = {
     add: 'add',         // 插入
     choose: 'choose',   // 选择
     change: 'change',   // 编辑
-    delete: 'delete'    // 删除
+    delete: 'delete',   // 删除
+    hide: 'hide'       // 隐藏
 };
 
 /**
- * @param {Array<Config>} arg[0] 页面配置tree
- * @param {String} arg[1] 要搜索的元素id
- * @param {EnumEdit} arg[2] 操作的枚举类型
- * @param {any} arg[3] 拓展参数，不同操作类型入参不同
+ * @param {Array<Config>} arr 页面配置tree
+ * @param {String} el 要搜索的元素id
+ * @param {EnumEdit} type 操作的枚举类型
+ * @param {any} expand 拓展参数，不同操作类型入参不同
  */
-const searchTree = (...arg) => {
-    // 深拷贝一份新的tree来操作，新tree能确保返回后dispatch触发React视图render
-    arg[0] = JSON.parse(JSON.stringify(arg[0]));
-    const [arr, el, type, expand] = arg;
+const searchTree = (arr, el, type, expand) => {
     const root = {
         children: arr
     };
     const queue = [root];
 
-    // 找到匹配元素后立即终止BFS
+    // 找到匹配元素后根据搜索类型返回对应结构
     while (queue.length > 0) {
         const config = queue.pop();
         const { children = [] } = config;
@@ -36,6 +34,13 @@ const searchTree = (...arg) => {
         for (let child of children) {
             if (child.el === el) {
                 switch (type) {
+                    case EnumEdit.hide:
+                        if (child.hide) {
+                            delete child.hide;
+                        } else {
+                            child.hide = true;
+                        }
+                        return arr;
                     case EnumEdit.choose:
                         return child;
                     case EnumEdit.change:
@@ -53,25 +58,12 @@ const searchTree = (...arg) => {
                         children.splice(children.indexOf(child), 1);
                         return arr;
                     case EnumEdit.add:
-                        // 如果插入的目标存在子元素数组
-                        if (Array.isArray(child.children) && child.children.length > 0) {
-                            const { el: lastEl } = child.children[child.children.length - 1];
-                            const lastElArr = lastEl.split('-');
+                        rangeKey(child, expand);
 
-                            lastElArr.splice(lastElArr.length - 1, 1, Number(lastElArr[lastElArr.length - 1]) + 1);
-                            const nextEl = lastElArr.join('-');
-
-                            child.children.push(
-                                Object.assign(expand, { el: nextEl })
-                            );
-                        // 如果插入的目标没有子元素
-                        } else {
-                            const { el: parentEl } = child;
-
-                            child.children = [
-                                Object.assign(expand, { el: `${parentEl}-1` })
-                            ];
+                        if (!Array.isArray(child.children)) {
+                            child.children = [];
                         }
+                        child.children.push(expand);
                         return [arr, expand.el];
                     default: return;
                 }
@@ -79,10 +71,52 @@ const searchTree = (...arg) => {
             queue.push(child);
         }
     }
+
+    return null;
 };
 
+// 递归新增的树片段，动态生成符合当前插入位置的el值(key)
+/**
+ * @param {targeNode} target 目标节点数
+ * @param {treeNode} node 要插入的节点数
+ * @param {number} index 内部递归标识符（外部调用勿传）
+ */
+const rangeKey = (target, node, index) => {
+    // 传入index则在递归内直接按照索引生成el
+    if (index) {
+        const { el: parentEl } = target;
+
+        Object.assign(node, { el: `${parentEl}-${index}` });
+    // 如果插入的目标存在子元素数组
+    } else if (Array.isArray(target.children) && target.children.length > 0) {
+        const { el: lastEl } = target.children[target.children.length - 1];
+        const lastElArr = lastEl.split('-');
+
+        let nextEl;
+
+        if (lastElArr.length === 1) {   // 目标位置为根节点
+            nextEl = `wc${Number(lastEl.replace(/^wc/, '')) + 1}`;
+        } else {
+            // 解析当前的el为数组，在末尾添加新的el，最后合并为el字符串
+            lastElArr.splice(lastElArr.length - 1, 1, Number(lastElArr[lastElArr.length - 1]) + 1);
+            nextEl = lastElArr.join('-');
+        }
+        Object.assign(node, { el: nextEl });
+    // 如果插入的目标没有子元素
+    } else {
+        const { el: parentEl } = target;
+
+        Object.assign(node, { el: parentEl ? `${parentEl}-1` : `wc1` });
+    }
+    if (Array.isArray(node.children)) {
+        node.children.forEach((child, i) => {
+            rangeKey(node, child, i + 1);
+        });
+    }
+};
 
 export {
     EnumEdit,
-    searchTree
+    searchTree,
+    rangeKey
 };

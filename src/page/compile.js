@@ -53,7 +53,10 @@ const Page = () => {
     };
 
     // 将每一个JSON节点编译为React组件节点
-    const compileJson2Comp = async ({ el, name, hook, style, props, children }) => {
+    const compileJson2Comp = async ({ hide, el, name, hook, style, props, children }) => {
+        if (!hide) {
+            return null;
+        }
         // 首先获取当前组件的构造函数
         let Comp = await loadAsync(name, hook);
 

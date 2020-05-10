@@ -10,15 +10,15 @@ const reducer = (state, action) => {
     switch (action.type) {
         // 更新页面配置树
         case 'UPDATE_TREE':
+            var newTree = JSON.parse(JSON.stringify(action.payload));
+
+            if (action.isPoint) {
+                newTree.isPoint = action.isPoint;
+            }
+
             return {
                 ...state,
-                tree: action.payload
-            };
-        // 更新组件菜单
-        case 'EDIT_MENU':
-            return {
-                ...state,
-                menu: action.payload
+                tree: newTree
             };
         // 编辑选中的组件配置
         case 'EDIT_CHOOSE_CMP':
@@ -43,12 +43,14 @@ const reducer = (state, action) => {
     }
 };
 
-const App = ({ tree, children }) => {
+const App = ({ tree, menu, children }) => {
+    const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
     // 预览页面只需要tree，不注入编辑器内的reducer
     const [state, dispatch] = useReducer(reducer, Object.assign(
         {
-            tree            // 页面配置JSON树
+            tree: JSON.parse(JSON.stringify(tree))           // 页面配置JSON树
         }, window.ENV === 'edit' ? {
+            menu: JSON.parse(JSON.stringify(menu)),
             choose: null,   // 当前选中的组件配置
             // changeCompBox: {
             //     el: string,    组件容器id
@@ -68,7 +70,7 @@ const App = ({ tree, children }) => {
         } : {}
     ));
 
-    return <Provider value={{ state, dispatch }}>
+    return <Provider value={{ state, dispatch, forceUpdate }}>
         {children}
     </Provider>;
 };

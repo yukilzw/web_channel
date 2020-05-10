@@ -1,10 +1,10 @@
 @import './var.less';
 // 此文件仅遵循CSS module编译
 .main {
-    min-width: 1100px;
+    overflow-x: hidden;
+    min-width: 700px;
     height: 100vh;
 }
-
 
 .mainSider {
     overflow: auto;
@@ -24,18 +24,18 @@
 }
 
 .hoverIn {
-    outline-offset: -1.5px;
-    outline: 1.5px solid #40a9ff;
+    outline-offset: -3px;
+    outline: 3px solid @primary-color;
 }
 
 .dragIn {
-    outline-offset: -3px;
-    outline: 3px solid #03d000;
+    outline-offset: -5px;
+    outline: 5px solid #03d000;
 }
 
 .chooseIn {
-    outline-offset: -3px;
-    outline: 3px solid #40a9ff;
+    outline-offset: -5px;
+    outline: 5px solid @primary-color;
 }
 
 .header {
@@ -78,10 +78,20 @@
     padding: 30px;
     text-align: center;
 
+    &::-webkit-scrollbar {
+        width: 7px;
+        height: 7px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 3.5px;
+    }
+
     .paintingBox {
         display: inline-block;
         overflow: hidden;
         box-shadow: @common-shadow;
+        background-color: #fff;
     }
 
     .root {

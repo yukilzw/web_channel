@@ -1,5 +1,5 @@
 {
-    "name": "图片组件",
+    "name": "图片",
     "staticProps": [
         {
             "name": "点击链接",
@@ -19,6 +19,6 @@
         "marginTop": "0px"
     },
     "defaultProps": {
-
+        "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
     }
 }

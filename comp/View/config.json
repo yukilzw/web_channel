@@ -1,5 +1,5 @@
 {
-    "name": "布局组件",
+    "name": "布局",
     "staticProps": [
 
     ],
@@ -10,5 +10,6 @@
     },
     "defaultProps": {
 
-    }
+    },
+    "hasChild": true
 }

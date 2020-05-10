@@ -1,36 +1,14 @@
 /**
  * @description 编辑器组件菜单
  */
-import React, { useContext, useEffect, useCallback } from 'react';
-import { Headers, DOMIN } from '../global';
+import React, { useContext } from 'react';
 import storeContext from '../context';
-import { Menu, message } from 'antd';
+import { Menu } from 'antd';
 
 const CompMenu = ({ chooseDragComp }) => {
-    const { state, dispatch } = useContext(storeContext);
+    const { state } = useContext(storeContext);
 
-    useEffect(() => {
-        getCompMenu();
-    }, []);
-
-    // 获取当前可选用的组件列表
-    const getCompMenu = useCallback(() => {
-        fetch(DOMIN + '/getCompMenu', {
-            method: 'POST',
-            headers: Headers.json
-        }).then(response => response.json()).then(res => {
-            if (res.error !== 0) {
-                message.warning(res.msg);
-                return;
-            }
-            dispatch({
-                type: 'EDIT_MENU',
-                payload: res.data
-            });
-        });
-    }, []);
-
-    return state.menu ? <Menu
+    return <Menu
         selectable={false}
         mode="inline"
         theme="light"
@@ -45,7 +23,7 @@ const CompMenu = ({ chooseDragComp }) => {
                 {config.name}
             </Menu.Item>)
         }
-    </Menu> : null;
+    </Menu>;
 };
 
 export default CompMenu;
