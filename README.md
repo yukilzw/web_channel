@@ -14,10 +14,10 @@
 <div>
 <img src="http://r.photo.store.qq.com/psc?/V14dALyK4PrHuj/WntOtr8rW56pbv0uxxE6de0e5mCdxFMyyJb7W8AOW0bHI*EqqFfZ3OLBAVpxKfdKA6easFAxL3c1yQNSJRRc6coleT*iqdOuXXbmY4ahnI4!/r" width="80%"/>
 </div>
-1. 将菜单中组件拖入画布的任意组件内
-2. 通过编辑输入框，或拉动组件外边调整宽高位置
-3. 为组件填入自定义配置与样式
-4. 点击选中节点，DEL删除节点，Ctrl+C复制，选中组件Ctrl+V粘贴，Ctrl+Z撤销，Ctrl+Y恢复，Crtl+S保存修改到服务端
+1. 将菜单中组件拖入画布的任意组件内<br>
+2. 通过编辑输入框，或拉动组件外边调整宽高位置<br>
+3. 为组件填入自定义配置与样式<br>
+4. 点击选中节点，DEL删除节点，Ctrl+C复制，选中组件Ctrl+V粘贴，Ctrl+Z撤销，Ctrl+Y恢复，Crtl+S保存修改到服务端<br>
 5. 滑动输入条调节画布缩放比例
 
 #### 工作流程
