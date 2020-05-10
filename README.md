@@ -8,7 +8,18 @@
 `npm i`后在项目根目录下运行`npm start`打包并启动服务<br/>
 编辑器：`http://localhost:1235/edit`<br/>
 预览页：`http://localhost:1235/page`<br/>
-编辑器开发者模式url后加`debug=1`
+编辑器开发者模式url后加`debug=1`<br>
+<div>
+<img src="http://r.photo.store.qq.com/psc?/V14dALyK4PrHuj/WntOtr8rW56pbv0uxxE6de0e5mCdxFMyyJb7W8AOW0bHI*EqqFfZ3OLBAVpxKfdKA6easFAxL3c1yQNSJRRc6coleT*iqdOuXXbmY4ahnI4!/r" width="60%"/>
+</div>
+```
+操作指南：
+1. 将菜单中组件拖入画布的任意组件内
+2. 通过编辑输入框，或拉动组件外边调整宽高位置
+3. 为组件填入自定义配置与样式
+4. 选中组件Ctrl+C复制，选中组件Ctrl+V粘贴，Ctrl+Z撤销，Ctrl+Y恢复，Crtl+S保存修改到服务端
+5. 滑动输入条调节画布缩放比例
+```
 
 #### 工作流程
 主要划分为4个部分：编辑器、预览页、服务端、组件仓库<br/>
@@ -65,6 +76,8 @@ web_channel:
     │  │  index.js			// 编辑器总入口
     │  │  menu.js			// 编辑器组件菜单
     │  │  option.js			// 编辑器属性操作面板
+    │  │  record.js			// 操作历史记录管理
+    │  │  tree.js			// 搭建树层级展示
     │  │  searchTree.js		// 搜索页面配置树方法
     │  │  
     │  └─style			// 编辑器样式
