@@ -61,22 +61,20 @@ const Board = () => {
     }, [paintingWrap.current]);
 
     useEffect(() => {
-        setTimeout(() => {
-            const rootDom = document.querySelector(`#${EnumId.root}`);
+        const rootDom = document.querySelector(`#${EnumId.root}`);
 
-            if (rootDom) {
-                const nextPaintOffset = {
-                    width: rootDom.getBoundingClientRect().width,
-                    height: rootDom.getBoundingClientRect().height
-                };
+        if (rootDom) {
+            const nextPaintOffset = {
+                width: rootDom.getBoundingClientRect().width,
+                height: rootDom.getBoundingClientRect().height
+            };
 
-                setPaintOffset(nextPaintOffset);
-            }
-        }, 0);
-        // if (dispatchCallBack.current instanceof Function) {
-        //     dispatchCallBack.current();
-        //     dispatchCallBack.current = null;
-        // }
+            setPaintOffset(nextPaintOffset);
+        }
+        if (dispatchCallBack.current instanceof Function) {
+            dispatchCallBack.current();
+            dispatchCallBack.current = null;
+        }
     }, [paintScale, state.tree]);
 
     // 绑定编辑器事件
@@ -332,43 +330,11 @@ const Board = () => {
             nextTree = res[0];
             el = res[1];
         }
-
-        // let nextTree = tree;    // 定义新组建加入后的tree
-
-        // 新组件的id，后面会根据层级结构动态生成
-        // 例如 #wc2-1-3，即该组件处于根目录下 -> 第二个元素 -> 第一个子元素 -> 第三个子元素
-        // let el;
-
-        // 如果拖入的目标区域是根目录
-        // if (targetCmpDom.current.id === EnumId.root) {
-        //     if (tree.length === 0) {
-        //         el = 'wc1';
-        //         tree.push(
-        //             Object.assign(compJson, { el })
-        //         );
-        //     } else {
-        //         const { el: lastEl } = tree[tree.length - 1];
-
-        //         el = `wc${Number(lastEl.slice(2)) + 1}`;
-        //         tree.push(
-        //             Object.assign(compJson, { el })
-        //         );
-        //     }
-        // // 如果拖入的目标区域的某个组件嵌套
-        // } else {
-        //     let promiseArr = searchTree(tree, targetCmpDom.current.id, EnumEdit.add, compJson);
-
-        //     nextTree = promiseArr[0];
-        //     el = promiseArr[1];
-        // }
-
         dispatch({
             type: 'UPDATE_TREE',
             payload: nextTree
         });
         dispatchCallBack.current = () => handleClick(el, null, true);
-        // 拖入成功后，等待页面DOM渲染，然后自动选中新组建编辑
-        // 这里无法得到新组件DOM生成的通知，目前使用定时器，此方法不稳定，待优化
     };
 
     // 选中菜单中的组件开始拖拽时

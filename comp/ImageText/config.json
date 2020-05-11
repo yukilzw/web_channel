@@ -11,6 +11,7 @@
 
     },
     "hasChild": true,
+    "canResizeByMouse": true,
     "defaultChildren": [
         {
             "compName": "Image",
@@ -23,11 +24,11 @@
         {
             "compName": "Text",
             "name": "文本子组件",
-            "defaultStyles": {
+            "mergeStyles": {
                 "position": "relative",
                 "width": "100%"
             },
-            "defaultProps": {
+            "mergeProps": {
                 "fontSize": "70px",
                 "fontWeight": "bold",
                 "lineHeight": "100px",

@@ -20,5 +20,7 @@
     },
     "defaultProps": {
         "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
-    }
+    },
+    "hasChild": false,
+    "canResizeByMouse": true
 }

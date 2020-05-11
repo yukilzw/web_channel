@@ -1,105 +1,5 @@
 [
   {
-    "hook": "http://localhost:1235/comp/View.js",
-    "name": "View",
-    "style": {
-      "position": "absolute",
-      "width": "1200px",
-      "height": "702px",
-      "backgroundColor": "#00d0b4",
-      "left": "278px",
-      "top": "563px",
-      "overflow": "hidden"
-    },
-    "props": {},
-    "el": "wc1",
-    "children": [
-      {
-        "hook": "http://localhost:1235/comp/Text.js",
-        "name": "Text",
-        "style": {
-          "position": "relative",
-          "width": "522px",
-          "height": "100px",
-          "left": "227px",
-          "top": "424px"
-        },
-        "props": {
-          "text": "默认文本1",
-          "fontSize": "40px",
-          "lineHeight": "80px",
-          "textAlign": "center"
-        },
-        "el": "wc1-1"
-      },
-      {
-        "hook": "http://localhost:1235/comp/View.js",
-        "name": "View",
-        "style": {
-          "position": "relative",
-          "width": "865px",
-          "height": "152px",
-          "backgroundColor": "#999",
-          "left": "65px",
-          "top": "92px",
-          "overflow": ""
-        },
-        "props": {},
-        "el": "wc1-2",
-        "children": [
-          {
-            "hook": "http://localhost:1235/comp/Image.js",
-            "name": "Image",
-            "style": {
-              "position": "relative",
-              "width": "167px",
-              "height": "139px",
-              "marginLeft": "auto",
-              "marginRight": "auto",
-              "marginTop": "0px"
-            },
-            "props": {
-              "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
-            },
-            "el": "wc1-2-1"
-          }
-        ]
-      }
-    ],
-    "hide": true
-  },
-  {
-    "hook": "http://localhost:1235/comp/View.js",
-    "name": "View",
-    "style": {
-      "position": "relative",
-      "width": "100%",
-      "height": "442px",
-      "backgroundImage": "https://shark2.douyucdn.cn/front-publish/butterfly-comp-diy-master/assets/sleep_f06043.png",
-      "backgroundSize": "100% 100%",
-      "backgroundRepeat": "no-repeat"
-    },
-    "props": {},
-    "el": "wc2",
-    "hide": true
-  },
-  {
-    "hook": "http://localhost:1235/comp/Text.js",
-    "name": "Text",
-    "style": {
-      "position": "relative",
-      "width": "70px"
-    },
-    "props": {
-      "text": "默认文本",
-      "fontSize": "12px",
-      "lineHeight": "16px",
-      "textAlign": "center"
-    },
-    "el": "wc3",
-    "hide": true
-  },
-  {
     "hook": "http://localhost:1235/comp/ImageText.js",
     "name": "ImageText",
     "style": {
@@ -113,8 +13,8 @@
         "name": "Image",
         "style": {
           "position": "relative",
-          "width": "360px",
-          "height": "360px",
+          "width": "180px",
+          "height": "180px",
           "marginLeft": "auto",
           "marginRight": "auto",
           "marginTop": "0px"
@@ -122,7 +22,7 @@
         "props": {
           "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
         },
-        "el": "wc4-1"
+        "el": "wc1-1"
       },
       {
         "hook": "http://localhost:1235/comp/Text.js",
@@ -138,9 +38,9 @@
           "textAlign": "center",
           "fontWeight": "bold"
         },
-        "el": "wc4-2"
+        "el": "wc1-2"
       }
     ],
-    "el": "wc4"
+    "el": "wc1"
   }
 ]

@@ -127,14 +127,18 @@ const rangeKey = (target, node, index) => {
 const creatPart = (initConfig, menu) => {
     const config = JSON.parse(JSON.stringify(menu[initConfig.compName]));
 
-    Object.assign(config.defaultProps, initConfig.defaultProps);
-    Object.assign(config.defaultStyles, initConfig.defaultStyles);
+    initConfig.defaultProps = Object.assign(config.defaultProps, initConfig.mergeProps);
+    initConfig.defaultStyles = Object.assign(config.defaultStyles, initConfig.mergeStyles);
+    Object.assign(config, initConfig);
+
+    const { compName, defaultStyles, defaultProps, defaultChildren } = config;
+
     return {
-        hook: DOMIN + `/comp/${config.compName}.js`,
-        name: config.compName,
-        style: config.defaultStyles,
-        props: config.defaultProps,
-        children: !Array.isArray(config.defaultChildren) ? undefined : config.defaultChildren.map((childConfig) => creatPart(childConfig, menu))
+        hook: DOMIN + `/comp/${compName}.js`,
+        name: compName,
+        style: defaultStyles,
+        props: defaultProps,
+        children: !Array.isArray(defaultChildren) ? undefined : defaultChildren.map((childConfig) => creatPart(childConfig, menu))
     };
 };
 

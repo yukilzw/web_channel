@@ -67,20 +67,24 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
                 <Comp.current {...props} env={window.ENV} >
                     {childrenComp}
                 </Comp.current>
-                {renderEditSizeTab(el, style, store)}
+                {renderEditSizeTab(name, el, style, store)}
             </>
         }
     </div>;
 };
 
 // 为每一个具有定位属性的组件添加九宫格操作蒙版区域，用来拖动改变组件尺寸、组件位置
-const renderEditSizeTab = (el, { position }, store) => {
+const renderEditSizeTab = (name, el, { position }, store) => {
     const { state } = store;
+    const { menu, choose } = state;
 
     if (['relative', 'fiexd', 'absolute'].indexOf(position) === -1) {
         return;
     }
-    if (state.choose !== el) {
+    if (choose !== el) {
+        return;
+    }
+    if (!menu[name].canResizeByMouse) {
         return;
     }
     return <div className={styleBd.changeSizeMask}>

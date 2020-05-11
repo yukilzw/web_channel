@@ -35,5 +35,7 @@
         "fontSize": "24px",
         "lineHeight": "36px",
         "textAlign": "center"
-    }
+    },
+    "hasChild": false,
+    "canResizeByMouse": false
 }
