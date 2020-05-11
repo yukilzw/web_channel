@@ -10,7 +10,7 @@ import Page from './compile';
 import CompMenu from './menu';
 import Option from './option';
 import PageTree from './tree';
-import { searchTree, rangeKey, EnumEdit } from './searchTree';
+import { searchTree, rangeKey, creatPart, EnumEdit } from './searchTree';
 import { record } from './record';
 import { Layout, Button, Slider, message } from 'antd';
 import style from './style/index.less';
@@ -25,16 +25,16 @@ const SliderMarks = {   // 缩放拖动条坐标轴
     100: '100%'
 };
 
-let dragCmpConfig;  // 选取拖拽菜单内组件时，暂存该组件的默认配置
-
 const Board = () => {
     const { state, dispatch } = useContext(storeContext);
     const stateRef = useRef();          // 暂存实时reducer
+    const dragCmpConfig = useRef();     // 选取拖拽菜单内组件时，暂存该组件的默认配置
     const targetCmpDom = useRef();      // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
     const paintingWrapWidthPre = useRef();     // 上次改变画布大小时的画布所在DOM的宽度，用于鉴别容器是否变宽
     const nextStylesbYChangeMask = useRef(null);    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
-    const copyCompEl = useRef();
+    const copyCompEl = useRef();          // 剪切板el存储
+    const dispatchCallBack = useRef();
     const [paintOffset, setPaintOffset] = useState({ width: 0, height: 0 });    // 包裹真实画布的一层实际可视区域容器，用来触发paintingWrap滚动
     const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
@@ -73,6 +73,10 @@ const Board = () => {
                 setPaintOffset(nextPaintOffset);
             }
         }, 0);
+        // if (dispatchCallBack.current instanceof Function) {
+        //     dispatchCallBack.current();
+        //     dispatchCallBack.current = null;
+        // }
     }, [paintScale, state.tree]);
 
     // 绑定编辑器事件
@@ -126,6 +130,10 @@ const Board = () => {
         if (e.keyCode === 46) {
             if (!choose) {
                 return;
+            }
+            // 如果删除的节点是复制剪切板的则情况剪切板
+            if (copyCompEl.current === choose) {
+                copyCompEl.current = null;
             }
             const nextTree = searchTree(tree, choose, EnumEdit.delete);
 
@@ -224,24 +232,37 @@ const Board = () => {
         }
     }, []);
 
-    // 事件回调
-    const handleEventCallBack = (type, el, e) => {
+    // 拖拽事件回调
+    const handleEventCallBack = (type, el, name, e) => {
+        const { menu } = stateRef.current;
+        const targetCanDragIn = (el === EnumId.root) || menu[name].hasChild;
+
+        let dragClassName = style.dragIn;
+
+        if (!targetCanDragIn) {     // 如果目标组件不能有子组件，标红提示
+            dragClassName = style.dragInUnable;
+        }
         targetCmpDom.current = document.querySelector(`#${el}`);
 
         if (type === 'dragover') {
             e && e.stopPropagation();
             e && e.preventDefault();
-            targetCmpDom.current.classList.add(style.dragIn);
+            targetCmpDom.current.classList.add(dragClassName);
         } else if (type === 'dragout') {
             e && e.stopPropagation();
-            targetCmpDom.current.classList.remove(style.dragIn);
+            targetCmpDom.current.classList.remove(dragClassName);
         } else if (type === 'drop') {
             e && e.stopPropagation();
-            targetCmpDom.current.classList.remove(style.dragIn);
+            targetCmpDom.current.classList.remove(dragClassName);
+            if (!targetCanDragIn) {
+                message.warn('目标位置不允许有子节点');
+                return;
+            }
             putCmpIntoArea();
         }
     };
 
+    // 移入事件回调
     const handleHoverCallBack = (type, el) => {
         const hoverCmpDom = document.querySelector(`#${el}`);
 
@@ -252,6 +273,7 @@ const Board = () => {
         }
     };
 
+    // 点击事件回调
     const handleClick = (el, e, expanded) => {
         e && e.stopPropagation();
         const currentChoose = document.querySelector(`.${style.chooseIn}`);
@@ -269,7 +291,7 @@ const Board = () => {
 
         dispatch({
             type: 'EDIT_CHOOSE_CMP',
-            payload: el     // 将当前选中的组件配置缓存，方便其他操作直接读取
+            payload: el     // 将当前选中的组件配置el记录，需要的时候直接通过el搜索对应的配置对象
         });
     };
 
@@ -291,59 +313,68 @@ const Board = () => {
 
     // 释放拖拽，将新组建加入页面配置
     const putCmpIntoArea = () => {
-        const { tree } = stateRef.current;
-
+        const { tree, menu } = stateRef.current;
         // 生成新组件的配置
-        const compJson = {
-            hook: DOMIN + `/comp/${dragCmpConfig.compName}.js`,
-            name: dragCmpConfig.compName,
-            style: dragCmpConfig.defaultStyles,
-            props: dragCmpConfig.defaultProps
-        };
+        const compObj = creatPart(dragCmpConfig.current, menu);
 
-        let nextTree = tree;    // 定义新组建加入后的tree
+        let nextTree = tree;
+
+        let el;
+
+        console.log(compObj);
+        if (targetCmpDom.current.id === EnumId.root) {   // 插入的是根节点
+            rangeKey({ children: tree }, compObj);
+            nextTree.push(compObj);
+            el = compObj.el;
+        } else {       // 插入内部节点
+            const res = searchTree(tree, targetCmpDom.current.id, EnumEdit.add, compObj);
+
+            nextTree = res[0];
+            el = res[1];
+        }
+
+        // let nextTree = tree;    // 定义新组建加入后的tree
 
         // 新组件的id，后面会根据层级结构动态生成
         // 例如 #wc2-1-3，即该组件处于根目录下 -> 第二个元素 -> 第一个子元素 -> 第三个子元素
-        let el;
+        // let el;
 
         // 如果拖入的目标区域是根目录
-        if (targetCmpDom.current.id === EnumId.root) {
-            if (tree.length === 0) {
-                el = 'wc1';
-                tree.push(
-                    Object.assign(compJson, { el })
-                );
-            } else {
-                const { el: lastEl } = tree[tree.length - 1];
+        // if (targetCmpDom.current.id === EnumId.root) {
+        //     if (tree.length === 0) {
+        //         el = 'wc1';
+        //         tree.push(
+        //             Object.assign(compJson, { el })
+        //         );
+        //     } else {
+        //         const { el: lastEl } = tree[tree.length - 1];
 
-                el = `wc${Number(lastEl.slice(2)) + 1}`;
-                tree.push(
-                    Object.assign(compJson, { el })
-                );
-            }
-        // 如果拖入的目标区域的某个组件嵌套
-        } else {
-            let promiseArr = searchTree(tree, targetCmpDom.current.id, EnumEdit.add, compJson);
+        //         el = `wc${Number(lastEl.slice(2)) + 1}`;
+        //         tree.push(
+        //             Object.assign(compJson, { el })
+        //         );
+        //     }
+        // // 如果拖入的目标区域的某个组件嵌套
+        // } else {
+        //     let promiseArr = searchTree(tree, targetCmpDom.current.id, EnumEdit.add, compJson);
 
-            nextTree = promiseArr[0];
-            el = promiseArr[1];
-        }
+        //     nextTree = promiseArr[0];
+        //     el = promiseArr[1];
+        // }
 
         dispatch({
             type: 'UPDATE_TREE',
             payload: nextTree
         });
+        dispatchCallBack.current = () => handleClick(el, null, true);
         // 拖入成功后，等待页面DOM渲染，然后自动选中新组建编辑
         // 这里无法得到新组件DOM生成的通知，目前使用定时器，此方法不稳定，待优化
-        setTimeout(() => handleClick(el, null, true), 200);
     };
 
     // 选中菜单中的组件开始拖拽时
-    const chooseDragComp = (compName, config) => {
+    const chooseDragComp = (config) => {
         clearChooseCmp();
-        // 暂存当前拖拽的组件配置，方便释放的时候直接引用
-        dragCmpConfig = Object.assign(config, { compName });
+        dragCmpConfig.current = config;
     };
 
     // 保存页面配置
@@ -516,9 +547,9 @@ const Board = () => {
                                 id={EnumId.root}
                                 className={style.root}
                                 onClick={clearChooseCmp}
-                                onDragOver={(e) => handleEventCallBack('dragover', EnumId.root, e)}
-                                onDragLeave={(e) => handleEventCallBack('dragout', EnumId.root, e)}
-                                onDrop={(e) => handleEventCallBack('drop', EnumId.root, e)}
+                                onDragOver={(e) => handleEventCallBack('dragover', EnumId.root, null, e)}
+                                onDragLeave={(e) => handleEventCallBack('dragout', EnumId.root, null, e)}
+                                onDrop={(e) => handleEventCallBack('drop', EnumId.root, null, e)}
                                 onMouseMove={changeBoxByMask}
                             >
                                 <Page

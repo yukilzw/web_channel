@@ -14,6 +14,10 @@
             "prop": "fontSize"
         },
         {
+            "name": "文字加粗",
+            "prop": "fontWeight"
+        },
+        {
             "name": "行高",
             "prop": "lineHeight"
         },
@@ -24,12 +28,12 @@
     ],
     "defaultStyles": {
         "position": "relative",
-        "width": "70px"
+        "width": "200px"
     },
     "defaultProps": {
         "text": "默认文本",
-        "fontSize": "12px",
-        "lineHeight": "16px",
+        "fontSize": "24px",
+        "lineHeight": "36px",
         "textAlign": "center"
     }
 }

@@ -65,7 +65,8 @@
           }
         ]
       }
-    ]
+    ],
+    "hide": true
   },
   {
     "hook": "http://localhost:1235/comp/View.js",
@@ -75,11 +76,12 @@
       "width": "100%",
       "height": "442px",
       "backgroundImage": "https://shark2.douyucdn.cn/front-publish/butterfly-comp-diy-master/assets/sleep_f06043.png",
-      "backgroundSize": "contain",
+      "backgroundSize": "100% 100%",
       "backgroundRepeat": "no-repeat"
     },
     "props": {},
-    "el": "wc2"
+    "el": "wc2",
+    "hide": true
   },
   {
     "hook": "http://localhost:1235/comp/Text.js",
@@ -98,14 +100,47 @@
     "hide": true
   },
   {
-    "hook": "http://localhost:1235/comp/View.js",
-    "name": "View",
+    "hook": "http://localhost:1235/comp/ImageText.js",
+    "name": "ImageText",
     "style": {
       "position": "relative",
-      "width": "100%",
-      "height": "120px"
+      "width": "500px"
     },
     "props": {},
+    "children": [
+      {
+        "hook": "http://localhost:1235/comp/Image.js",
+        "name": "Image",
+        "style": {
+          "position": "relative",
+          "width": "360px",
+          "height": "360px",
+          "marginLeft": "auto",
+          "marginRight": "auto",
+          "marginTop": "0px"
+        },
+        "props": {
+          "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
+        },
+        "el": "wc4-1"
+      },
+      {
+        "hook": "http://localhost:1235/comp/Text.js",
+        "name": "Text",
+        "style": {
+          "position": "relative",
+          "width": "100%"
+        },
+        "props": {
+          "text": "内容",
+          "fontSize": "70px",
+          "lineHeight": "100px",
+          "textAlign": "center",
+          "fontWeight": "bold"
+        },
+        "el": "wc4-2"
+      }
+    ],
     "el": "wc4"
   }
 ]

@@ -44,7 +44,7 @@ const PageTree = ({
     const fixTreeKey = (children) => {
         for (let child of children) {
             child.key = child.el;
-            child.title = state.menu[child.name].name + '(' + child.el.slice(2) + ')';
+            child.title = state.menu[child.name].name + '(' + child.el.replace(/^wc/, '') + ')';
             if (!child.hide) {
                 checkedKeysList.current.add(child.key);
             }

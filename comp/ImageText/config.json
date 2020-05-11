@@ -1,0 +1,38 @@
+{
+    "name": "图文混合",
+    "staticProps": [
+
+    ],
+    "defaultStyles": {
+        "position": "relative",
+        "width": "500px"
+    },
+    "defaultProps": {
+
+    },
+    "hasChild": true,
+    "defaultChildren": [
+        {
+            "compName": "Image",
+            "name": "图片子组件",
+            "defaultStyles": {
+                "width": "360px",
+                "height": "360px"
+            }
+        },
+        {
+            "compName": "Text",
+            "name": "文本子组件",
+            "defaultStyles": {
+                "position": "relative",
+                "width": "100%"
+            },
+            "defaultProps": {
+                "fontSize": "70px",
+                "fontWeight": "bold",
+                "lineHeight": "100px",
+                "text": "内容"
+            }
+        }
+    ]
+}

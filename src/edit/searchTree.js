@@ -6,6 +6,8 @@
  * 此方法根据id，搜索当前操作的目标节点的位置，根据不同的操作返回所需要的值
  * 考虑到日常搭建中组件嵌套层级不会过深，采用广度优先搜索
  */
+import { DOMIN } from '../global';
+
 const EnumEdit = {
     add: 'add',         // 插入
     choose: 'choose',   // 选择
@@ -75,7 +77,7 @@ const searchTree = (arr, el, type, expand) => {
     return null;
 };
 
-// 递归新增的树片段，动态生成符合当前插入位置的el值(key)
+// 插入树片段签名算法，动态生成符合当前插入位置的el值(key)
 /**
  * @param {targeNode} target 目标节点数
  * @param {treeNode} node 要插入的节点数
@@ -115,8 +117,30 @@ const rangeKey = (target, node, index) => {
     }
 };
 
+// 根据组件JSON配置生成组件数片段
+// 新组件的id，后面会根据层级结构动态生成
+// 例如 #wc2-1-3，即该组件处于根目录下 -> 第二个元素 -> 第一个子元素 -> 第三个子元素
+/**
+ * @param {compConfigJSON} initConfig 目标节点对应菜单的静态JSON配置
+ * @param {menu} menu 菜单数据
+ */
+const creatPart = (initConfig, menu) => {
+    const config = JSON.parse(JSON.stringify(menu[initConfig.compName]));
+
+    Object.assign(config.defaultProps, initConfig.defaultProps);
+    Object.assign(config.defaultStyles, initConfig.defaultStyles);
+    return {
+        hook: DOMIN + `/comp/${config.compName}.js`,
+        name: config.compName,
+        style: config.defaultStyles,
+        props: config.defaultProps,
+        children: !Array.isArray(config.defaultChildren) ? undefined : config.defaultChildren.map((childConfig) => creatPart(childConfig, menu))
+    };
+};
+
 export {
     EnumEdit,
     searchTree,
-    rangeKey
+    rangeKey,
+    creatPart
 };

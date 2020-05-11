@@ -80,9 +80,9 @@ const Page = ({
         let Comp = await loadAsync(name, hook);
 
         const editEvent = {
-            onDragOver(e) {handleEventCallBack('dragover', el, e);},
-            onDragLeave(e) {handleEventCallBack('dragout', el, e);},
-            onDrop(e) {handleEventCallBack('drop', el, e);},
+            onDragOver(e) {handleEventCallBack('dragover', el, name, e);},
+            onDragLeave(e) {handleEventCallBack('dragout', el, name, e);},
+            onDrop(e) {handleEventCallBack('drop', el, name, e);},
             onClick(e) {handleClick(el, e, true);},
             onMouseOver(e) {handleHoverCallBack('mouseover', el, e);},
             onMouseLeave(e) {handleHoverCallBack('mouseleave', el, e);}

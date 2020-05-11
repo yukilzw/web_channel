@@ -18,7 +18,7 @@ const CompMenu = ({ chooseDragComp }) => {
                 key={compName}
                 style={{ cursor: 'grab' }}
                 draggable="true"
-                onDragStart={() => chooseDragComp(compName, config)}
+                onDragStart={() => chooseDragComp(config)}
             >
                 {config.name}
             </Menu.Item>)
