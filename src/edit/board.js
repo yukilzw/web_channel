@@ -319,7 +319,6 @@ const Board = () => {
 
         let el;
 
-        console.log(compObj);
         if (targetCmpDom.current.id === EnumId.root) {   // 插入的是根节点
             rangeKey({ children: tree }, compObj);
             nextTree.push(compObj);

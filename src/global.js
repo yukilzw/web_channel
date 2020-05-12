@@ -17,23 +17,27 @@ export const Headers = {
 };
 
 // 编译时按需加载组件js文件
-export const loadAsync = (name, hook) => new Promise((resolve) => {
-    // 如果当前window.comp下有缓存对应的组件函数，就直接返回复用
-    if (name in window.comp) {
-        resolve(window.comp[name].default);
-        return;
-    }
-    // 否则就实时下载对应组件的js文件，并返回组件函数
-    const script = document.createElement('script');
+/**
+ * window.comp[name]可能为三种状态：
+ * 尚未请求组件js：undefined
+ * 正在请求组件js：Prmise
+ * 已经缓存组件js：component Object
+ */
+export const loadAsync = (name, hook) => {
+    if (!window.comp[name]) {
+        window.comp[name] = new Promise((resolve) => {
+            const script = document.createElement('script');
 
-    script.type = 'text/javascript';
-    script.onload = () => {
-        // 由于在webpack.config.comp.js中打包的每个组件都挂载到window下
-        // 组件js加载执行完毕后，可以从window中取出构造函数存入window.comp
-        window.comp[name] = window[name];
-        delete window[name];
-        resolve(window.comp[name].default);
-    };
-    script.src = hook;
-    document.getElementsByTagName('head')[0].appendChild(script);
-});
+            script.type = 'text/javascript';
+            script.onload = () => {
+                window.comp[name] = window[name];
+                delete window[name];
+                resolve(window.comp[name]);
+            };
+            script.src = hook;
+            document.getElementsByTagName('head')[0].appendChild(script);
+        });
+    }
+    // 这里既有可能返回请求Promise，也有可能返回已缓存组件对象，调用loadAsync时使用await不需要区分，自动包裹成Proimse
+    return window.comp[name];
+};

@@ -85,4 +85,13 @@
 .container {
     user-select: none;
     z-index: 1;
+    pointer-events: auto;
+
+    >* {
+        pointer-events: none;
+    }
+
+    >.changeSizeMask {
+        pointer-events: auto;
+    }
 }

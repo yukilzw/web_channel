@@ -27,7 +27,9 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
     }, []);
 
     const loadComp = async () => {
-        Comp.current = await loadAsync(name, hook);
+        const compModule = await loadAsync(name, hook);
+
+        Comp.current = compModule.default;
         setCompHasLoad(true);
     };
 
@@ -54,7 +56,7 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
         return null;
     }
 
-    // 对渲染组件包裹一层div元素，用来处理编辑器内事件，以及将编辑器配置的样式渲染到视图
+    // 对渲染组件包裹一层div元素，用来占位并绑定编辑器鼠标事件，以及将编辑器配置的样式渲染到视图
     return <div
         key={el}
         id={el}
@@ -63,6 +65,7 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
         {...editEvent}
     >
         {
+            // 下载完成后再加载组件
             !compHasLoad ? null :  <>
                 <Comp.current {...props} env={window.ENV} >
                     {childrenComp}
@@ -75,8 +78,9 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
 
 // 为每一个具有定位属性的组件添加九宫格操作蒙版区域，用来拖动改变组件尺寸、组件位置
 const renderEditSizeTab = (name, el, { position }, store) => {
-    const { state } = store;
-    const { menu, choose } = state;
+    const { state: {
+        menu, choose
+    } } = store;
 
     if (['relative', 'fiexd', 'absolute'].indexOf(position) === -1) {
         return;
@@ -106,9 +110,7 @@ const checkChildren = (children) => {
 };
 
 // 记录鼠标按下组件蒙版的各项数据，用于鼠标移动时计算更新组件样式
-const changeTab = ({ type, clientX, clientY }, key, el, store) => {
-    const { dispatch } = store;
-
+const changeTab = ({ type, clientX, clientY }, key, el, { dispatch }) => {
     if (type === 'mousedown') {
         const elStyles = window.getComputedStyle(document.querySelector(`#${el}`), null);
 
@@ -138,8 +140,7 @@ const Page = ({
     handleHoverCallBack,
     handleClick
 }) => {
-    const { state } = useContext(storeContext);
-    const { tree } = state;
+    const { state: { tree } } = useContext(storeContext);
 
     useEffect(() => {
         EventObj = {
