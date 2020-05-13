@@ -388,23 +388,28 @@ const Board = () => {
             case 'LT':
                 Object.assign(nextStyles, {
                     width: (current.width - changeX).toFixed(0) + 'px',
-                    height: (current.height - changeY).toFixed(0) + 'px'
+                    height: (current.height - changeY).toFixed(0) + 'px',
+                    left: (current.position.left + changeX).toFixed(0) + 'px',
+                    top: (current.position.top + changeY).toFixed(0) + 'px'
                 });
                 break;
             case 'MT':
                 Object.assign(nextStyles, {
-                    height: (current.height - changeY).toFixed(0) + 'px'
+                    height: (current.height - changeY).toFixed(0) + 'px',
+                    top: (current.position.top + changeY).toFixed(0) + 'px'
                 });
                 break;
             case 'RT':
                 Object.assign(nextStyles, {
                     width: (current.width + changeX).toFixed(0) + 'px',
-                    height: (current.height - changeY).toFixed(0) + 'px'
+                    height: (current.height - changeY).toFixed(0) + 'px',
+                    top: (current.position.top + changeY).toFixed(0) + 'px'
                 });
                 break;
             case 'LM':
                 Object.assign(nextStyles, {
-                    width: (current.width - changeX).toFixed(0) + 'px'
+                    width: (current.width - changeX).toFixed(0) + 'px',
+                    left: (current.position.left + changeX).toFixed(0) + 'px'
                 });
                 break;
             case 'MM':
@@ -421,7 +426,8 @@ const Board = () => {
             case 'LB':
                 Object.assign(nextStyles, {
                     width: (current.width - changeX).toFixed(0) + 'px',
-                    height: (current.height + changeY).toFixed(0) + 'px'
+                    height: (current.height + changeY).toFixed(0) + 'px',
+                    left: (current.position.left + changeX).toFixed(0) + 'px'
                 });
                 break;
             case 'MB':

@@ -4,7 +4,10 @@
     "name": "ImageText",
     "style": {
       "position": "relative",
-      "width": "500px"
+      "width": "616px",
+      "left": "597px",
+      "top": "1017px",
+      "height": "486px"
     },
     "props": {},
     "children": [
