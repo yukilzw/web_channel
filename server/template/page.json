@@ -1,16 +1,30 @@
 [
   {
-    "hook": "http://localhost:1235/comp/ImageText.js",
-    "name": "ImageText",
+    "hook": "http://localhost:1235/comp/View.js",
+    "name": "View",
     "style": {
       "position": "relative",
-      "width": "616px",
-      "left": "597px",
-      "top": "1017px",
-      "height": "486px"
+      "width": "100%",
+      "height": "120px"
     },
     "props": {},
+    "el": "wc1",
     "children": [
+      {
+        "hook": "http://localhost:1235/comp/Text.js",
+        "name": "Text",
+        "style": {
+          "position": "relative",
+          "width": "200px"
+        },
+        "props": {
+          "text": "默认文本",
+          "fontSize": "24px",
+          "lineHeight": "36px",
+          "textAlign": "center"
+        },
+        "el": "wc3"
+      },
       {
         "hook": "http://localhost:1235/comp/Image.js",
         "name": "Image",
@@ -25,25 +39,23 @@
         "props": {
           "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
         },
-        "el": "wc1-1"
-      },
-      {
-        "hook": "http://localhost:1235/comp/Text.js",
-        "name": "Text",
-        "style": {
-          "position": "relative",
-          "width": "100%"
-        },
-        "props": {
-          "text": "内容",
-          "fontSize": "70px",
-          "lineHeight": "100px",
-          "textAlign": "center",
-          "fontWeight": "bold"
-        },
-        "el": "wc1-2"
+        "el": "wc4"
       }
-    ],
-    "el": "wc1"
+    ]
+  },
+  {
+    "hook": "http://localhost:1235/comp/Text.js",
+    "name": "Text",
+    "style": {
+      "position": "relative",
+      "width": "200px"
+    },
+    "props": {
+      "text": "默认文本",
+      "fontSize": "24px",
+      "lineHeight": "36px",
+      "textAlign": "center"
+    },
+    "el": "wc2"
   }
 ]

@@ -4,7 +4,7 @@
  * 此根组件定义了大部分编辑器内通用事件与函数
  */
 import React, { useContext, useEffect, useRef, useCallback, useState } from 'react';
-import storeContext from '../context';
+import storeContext, { EditFuncContext } from '../context';
 import { Headers, DOMIN } from '../global';
 import Page from './compile';
 import CompMenu from './menu';
@@ -20,21 +20,25 @@ const PaintBoxMargin = 30;  // 画布边距
 const SliderMarks = {   // 缩放拖动条坐标轴
     0: '0%',
     25: '26%',
-    50: '75%',
+    50: '50%',
     75: '75%',
     100: '100%'
 };
 
 const Board = () => {
-    const { state, dispatch } = useContext(storeContext);
+    const { state, dispatch, forceUpdate } = useContext(storeContext);
     const stateRef = useRef();          // 暂存实时reducer
+    const paintScaleRef = useRef();
     const dragCmpConfig = useRef();     // 选取拖拽菜单内组件时，暂存该组件的默认配置
     const targetCmpDom = useRef();      // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
     const paintingWrapWidthPre = useRef();     // 上次改变画布大小时的画布所在DOM的宽度，用于鉴别容器是否变宽
-    const nextStylesbYChangeMask = useRef(null);    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
+    const nextStylesbYChangeMask = useRef();    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
     const copyCompEl = useRef();          // 剪切板el存储
-    const dispatchCallBack = useRef();
+    const dispatchCallBack = useRef();      // 重新渲染完成后触发回调
+    const spaceDown = useRef();            // 空格键是否按下
+    const mouseWheelTimmer = useRef();          // 鼠标滚轮缩放画布函数节流定时器
+    const paintMaskMove = useRef();          // 按住蒙层后方可移动画布坐标
     const [paintOffset, setPaintOffset] = useState({ width: 0, height: 0 });    // 包裹真实画布的一层实际可视区域容器，用来触发paintingWrap滚动
     const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
@@ -48,9 +52,9 @@ const Board = () => {
         // 由于hooks自带闭包机制，事件回调函数的异步触发只能最初拿到绑定事件时注入的state
         // 每次状态有改变，就将state存到静态变量stateRef，在事件触发时取改变量代替state
         stateRef.current = state;
+        paintScaleRef.current = paintScale;
     });
 
-    // 进入编辑器后，对全局事件进行绑定注册
     useEffect(() => {
         bindEditDomEvent();
     }, []);
@@ -78,17 +82,20 @@ const Board = () => {
     }, [paintScale, state.tree]);
 
     // 绑定编辑器事件
-    const bindEditDomEvent = () => {
+    let bindEditDomEvent = useCallback(() => {
         // 键盘快捷键自定义
         document.addEventListener(`keydown`, handlekeyDown, false);
+        document.addEventListener(`keyup`, handlekeyUp, false);
+        // 鼠标滚轮
+        document.addEventListener(`wheel`, handlewheel, false);
         // 浏览器窗口改变
         window.addEventListener('resize', repainting, false);
         // 鼠标抬起置空拖动编辑组件对象
         document.addEventListener(`mouseup`, handleMouseUp, false);
-    };
+    }, []);
 
     // 重新计算画布尺寸
-    const repainting = (forceScale) => {
+    const repainting = useCallback((forceScale) => {
         const paintingWrapDom = paintingWrap.current;
         const shouldFoceUpdate = typeof forceScale === 'number';
 
@@ -105,10 +112,10 @@ const Board = () => {
             setPaintScale(nextPaintScale);
             setPaintMinHeight(nextPaintMinHeight);
         }
-    };
+    }, []);
 
     // 清空当前选中的编辑组件
-    const clearChooseCmp = () => {
+    const clearChooseCmp = useCallback(() => {
         if (targetCmpDom.current) {
             targetCmpDom.current.classList.remove(style.chooseIn);
             targetCmpDom.current = null;
@@ -118,31 +125,51 @@ const Board = () => {
             type: 'EDIT_CHOOSE_CMP',
             payload: null
         });
-    };
+    }, []);
 
-    // 键盘事件
-    const handlekeyDown = (e) => {
-        const { choose, tree, menu } = stateRef.current;
-
-        // `DEL`键删除选中的可视区组件
-        if (e.keyCode === 46) {
-            if (!choose) {
+    // 空格+滚轮缩放画布
+    const handlewheel = useCallback((e) => {
+        if (spaceDown.current) {
+            e.preventDefault();
+            if (mouseWheelTimmer.current) {
                 return;
             }
-            // 如果删除的节点是复制剪切板的则情况剪切板
-            if (copyCompEl.current === choose) {
-                copyCompEl.current = null;
-            }
-            const nextTree = searchTree(tree, choose, EnumEdit.delete);
+            mouseWheelTimmer.current = setTimeout(() => {
+                clearTimeout(mouseWheelTimmer.current);
+                mouseWheelTimmer.current = null;
+            }, 20);
 
-            dispatch({
-                type: 'EDIT_CHOOSE_CMP',
-                payload: null
-            });
-            dispatch({
-                type: 'UPDATE_TREE',
-                payload: nextTree
-            });
+            const scale = Math.min(1, Math.max(0.1, paintScaleRef.current - e.deltaY / 1000));
+
+            repainting(scale);
+        }
+    }, []);
+
+    // 键盘事件
+    const handlekeyDown = useCallback((e) => {
+        const { choose } = stateRef.current;
+
+        // `空格`键
+        if (e.keyCode === 32 && !optionInputHasFocus.current) {
+            e.preventDefault();
+            spaceDown.current = true;
+            forceUpdate();
+        // `DEL`键删除选中的可视区组件
+        } else if (e.keyCode === 46) {
+            e.preventDefault();
+            deleteNode();
+        // `↑`向上箭头
+        } else if (e.keyCode === 38) {
+            if (choose) {
+                e.preventDefault();
+                changePosNode(-1);
+            }
+        // `↓`向下箭头
+        } else if (e.keyCode === 40) {
+            if (choose) {
+                e.preventDefault();
+                changePosNode(1);
+            }
         } else if (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) {
             // `CTRL + S`保存
             if (e.keyCode === 83) {
@@ -151,71 +178,169 @@ const Board = () => {
             // `CTRL + C`复制节点
             } else if (e.keyCode === 67 && !optionInputHasFocus.current) {
                 e.preventDefault();
-                if (!choose) {
-                    message.warn('请先选中再复制');
-                } else {
-                    copyCompEl.current = choose;
-                    message.success('复制成功');
-                }
+                copeNode();
+            // `CTRL + X`剪切节点
+            } else if (e.keyCode === 88 && !optionInputHasFocus.current) {
+                e.preventDefault();
+                cutNode();
             // `CTRL + V`粘贴节点
             } else if (e.keyCode === 86 && !optionInputHasFocus.current) {
                 e.preventDefault();
-                if (!copyCompEl.current) {
-                    message.warn('请先复制再粘贴');
-                    return;
-                }
-                const copyObj = JSON.parse(JSON.stringify(
-                    searchTree(tree, copyCompEl.current, EnumEdit.choose)
-                ));
-                const chooseObj = searchTree(tree, choose, EnumEdit.choose);
-
-                let nextTree = tree;
-
-                if (!choose) {   // 插入的是根节点
-                    rangeKey({ children: tree }, copyObj);
-                    nextTree.push(copyObj);
-                } else if (!menu[chooseObj.name].hasChild) {  // 不允许插入的位置
-                    message.warn('目标位置不能有子组件');
-                    return;
-                }  else {       // 插入内部节点
-                    nextTree = searchTree(tree, choose, EnumEdit.add, copyObj)[0];
-                }
-                dispatch({
-                    type: 'UPDATE_TREE',
-                    payload: nextTree
-                });
-                message.success('粘贴成功');
+                pasteNode();
             // `CTRL + Z`撤销
             } else if (e.keyCode === 90 && !optionInputHasFocus.current) {
                 e.preventDefault();
-                const lastPageTree = record.roll();
-
-                if (lastPageTree === false) {
-                    return;
-                }
-                checkCurChooseExist(lastPageTree);
-                dispatch({
-                    type: 'UPDATE_TREE',
-                    payload: lastPageTree,
-                    isPoint: true          // 标记此条页面配置为指针移动而不是新建数据
-                });
+                returnEdit();
             // `CTRL + Y`恢复
             } else if (e.keyCode === 89 && !optionInputHasFocus.current) {
                 e.preventDefault();
-                const lastPageTree = record.recover();
-
-                if (lastPageTree === false) {
-                    return;
-                }
-                checkCurChooseExist(lastPageTree);
-                dispatch({
-                    type: 'UPDATE_TREE',
-                    payload: lastPageTree,
-                    isPoint: true
-                });
+                resumeEdit();
             }
         }
-    };
+    }, []);
+
+    const handlekeyUp = useCallback((e) => {
+        // `空格`键
+        if (e.keyCode === 32) {
+            e.preventDefault();
+            spaceDown.current = false;
+            forceUpdate();
+        }
+    }, []);
+
+    // 删除节点方法
+    const deleteNode = useCallback(() => {
+        const { choose, tree } = stateRef.current;
+
+        if (!choose) {
+            return;
+        }
+        // 如果删除的节点是复制剪切板的则情况剪切板
+        if (copyCompEl.current === choose) {
+            copyCompEl.current = null;
+        }
+        const nextTree = searchTree(tree, choose, EnumEdit.delete);
+
+        dispatch({
+            type: 'EDIT_CHOOSE_CMP',
+            payload: null
+        });
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: nextTree
+        });
+    }, []);
+
+    // 拷贝节点方法
+    const copeNode = useCallback(() => {
+        const { choose } = stateRef.current;
+
+        if (!choose) {
+            message.warn('请先选中再复制');
+        } else {
+            copyCompEl.current = choose;
+            message.success('复制成功');
+        }
+    }, []);
+
+    // 剪切节点方法
+    const cutNode = useCallback(() => {
+        const { choose, tree } = stateRef.current;
+
+        if (!choose) {
+            message.warn('请先选中再剪切');
+        } else {
+            // 先拷贝剪切的对象再删除
+            copyCompEl.current = JSON.parse(JSON.stringify(
+                searchTree(tree, choose, EnumEdit.choose)
+            ));
+
+            deleteNode();
+            message.success('剪切成功');
+        }
+    }, []);
+
+    // 粘贴节点方法
+    const pasteNode = useCallback(() => {
+        const { choose, tree, menu } = stateRef.current;
+
+        if (!copyCompEl.current) {
+            message.warn('请先复制/剪切再粘贴');
+            return;
+        }
+        let copyObj = copyCompEl.current;
+
+        if (typeof copyCompEl.current === 'string') {
+            copyObj = JSON.parse(JSON.stringify(
+                searchTree(tree, copyCompEl.current, EnumEdit.choose)
+            ));
+        } else {
+            copyCompEl.current = null;
+        }
+        const chooseObj = searchTree(tree, choose, EnumEdit.choose);
+
+        let nextTree = tree;
+
+        if (!choose) {   // 插入的是根节点
+            rangeKey(copyObj);
+            nextTree.push(copyObj);
+        } else if (!menu[chooseObj.name].hasChild) {  // 不允许插入的位置
+            message.warn('目标位置不能有子组件');
+            return;
+        }  else {       // 插入内部节点
+            nextTree = searchTree(tree, choose, EnumEdit.add, copyObj)[0];
+        }
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: nextTree
+        });
+        message.success('粘贴成功');
+    }, []);
+
+    // 撤销方法
+    const returnEdit = useCallback(() => {
+        const lastPageTree = record.roll();
+
+        if (lastPageTree === false) {
+            return;
+        }
+        checkCurChooseExist(lastPageTree);
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: lastPageTree,
+            isPoint: true          // 标记此条页面配置为指针移动而不是新建数据
+        });
+    }, []);
+
+    // 恢复方法
+    const resumeEdit = useCallback(() => {
+        const lastPageTree = record.recover();
+
+        if (lastPageTree === false) {
+            return;
+        }
+        checkCurChooseExist(lastPageTree);
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: lastPageTree,
+            isPoint: true
+        });
+    }, []);
+
+    // 上下交换节点位置
+    const changePosNode = useCallback((type) => {
+        const { choose, tree } = stateRef.current;
+
+        if (!choose) {
+            return;
+        }
+        const nextTree = searchTree(tree, choose, EnumEdit.move, type);
+
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: nextTree
+        });
+    }, []);
 
     // 指针切换历史记录时，校验当前选中组件是否还存在，不存在就把选中框去掉
     const checkCurChooseExist = useCallback((tree) => {
@@ -231,7 +356,7 @@ const Board = () => {
     }, []);
 
     // 拖拽事件回调
-    const handleEventCallBack = (type, el, name, e) => {
+    const handleEventCallBack = useCallback((type, el, name, e) => {
         const { menu } = stateRef.current;
         const targetCanDragIn = (el === EnumId.root) || menu[name].hasChild;
 
@@ -258,10 +383,10 @@ const Board = () => {
             }
             putCmpIntoArea();
         }
-    };
+    }, []);
 
     // 移入事件回调
-    const handleHoverCallBack = (type, el) => {
+    const handleHoverCallBack = useCallback((type, el) => {
         const hoverCmpDom = document.querySelector(`#${el}`);
 
         if (type === 'mouseover') {
@@ -269,10 +394,10 @@ const Board = () => {
         } else if (type === 'mouseleave') {
             hoverCmpDom.classList.remove(style.hoverIn);
         }
-    };
+    }, []);
 
     // 点击事件回调
-    const handleClick = (el, e, expanded) => {
+    const handleClick = useCallback((el, e, expanded) => {
         e && e.stopPropagation();
         const currentChoose = document.querySelector(`.${style.chooseIn}`);
 
@@ -291,7 +416,7 @@ const Board = () => {
             type: 'EDIT_CHOOSE_CMP',
             payload: el     // 将当前选中的组件配置el记录，需要的时候直接通过el搜索对应的配置对象
         });
-    };
+    }, []);
 
     // 递归向上查询该节点的所有祖先节点数组
     const expandedParentsNode = useCallback((dom) => {
@@ -310,7 +435,7 @@ const Board = () => {
     }, []);
 
     // 释放拖拽，将新组建加入页面配置
-    const putCmpIntoArea = () => {
+    const putCmpIntoArea = useCallback(() => {
         const { tree, menu } = stateRef.current;
         // 生成新组件的配置
         const compObj = creatPart(dragCmpConfig.current, menu);
@@ -320,7 +445,7 @@ const Board = () => {
         let el;
 
         if (targetCmpDom.current.id === EnumId.root) {   // 插入的是根节点
-            rangeKey({ children: tree }, compObj);
+            rangeKey(compObj);
             nextTree.push(compObj);
             el = compObj.el;
         } else {       // 插入内部节点
@@ -334,13 +459,13 @@ const Board = () => {
             payload: nextTree
         });
         dispatchCallBack.current = () => handleClick(el, null, true);
-    };
+    }, []);
 
     // 选中菜单中的组件开始拖拽时
-    const chooseDragComp = (config) => {
+    const chooseDragComp = useCallback((config) => {
         clearChooseCmp();
         dragCmpConfig.current = config;
-    };
+    }, []);
 
     // 保存页面配置
     const savePage = useCallback(() => new Promise((resolve) => {
@@ -369,11 +494,11 @@ const Board = () => {
     // 拖动顶部滑块强制改变画布尺寸
     const changeSlider = useCallback((num) => {
         repainting(num / 100);
-    });
+    }, []);
 
     // 响应compile.js中changeTab事件，实现拖动蒙版编辑组件尺寸、定位
-    const changeBoxByMask = (e) => {
-        const { changeCompBox } = state;
+    const changeBoxByMask = useCallback((e) => {
+        const { changeCompBox } = stateRef.current;
 
         if (!changeCompBox) {
             return;
@@ -445,9 +570,11 @@ const Board = () => {
         }
         Object.assign(container.style, nextStyles);
         nextStylesbYChangeMask.current = nextStyles;
-    };
+    }, []);
 
-    const handleMouseUp = useCallback(() => {
+    // 画布内编辑释放鼠标
+    const handleMouseUp = useCallback((e) => {
+        e.preventDefault();
         const { tree, changeCompBox } = stateRef.current;
         const nsbcMask = nextStylesbYChangeMask.current;
 
@@ -475,6 +602,35 @@ const Board = () => {
             payload: null
         });
         nextStylesbYChangeMask.current = null;
+        paintMaskMove.current = false;
+    }, []);
+
+    // 拖动画布
+    const dragPaintMaskDown = useCallback((e) => {
+        const { clientX, clientY } = e;
+
+        paintMaskMove.current = {
+            clientX, clientY
+        };
+    }, []);
+
+    const dragPaintMaskMove = useCallback((e) => {
+        e.preventDefault();
+        if (paintMaskMove.current) {
+            const { clientX, clientY } = paintMaskMove.current;
+            const changeX = e.clientX - clientX;
+            const changeY = e.clientY - clientY;
+            const paintingWrapDom =  document.querySelector(`.${style.paintingWrap}`);
+            const nextScrollTop =  paintingWrapDom.scrollTop - changeY;
+            const nextScrollLeft =  paintingWrapDom.scrollLeft - changeX;
+
+            paintingWrapDom.scrollTop = nextScrollTop;
+            paintingWrapDom.scrollLeft = nextScrollLeft;
+            paintMaskMove.current = {
+                clientX: e.clientX,
+                clientY: e.clientY
+            };
+        }
     }, []);
 
     return <Layout className={style.main}>
@@ -510,6 +666,10 @@ const Board = () => {
                             height: `${paintOffset.height}px`,
                             width: `${paintOffset.width}px`
                         }}>
+                            {!!spaceDown.current && <div className={style.moveMask}
+                                onMouseDown={dragPaintMaskDown}
+                                onMouseMove={dragPaintMaskMove}
+                            ></div>}
                             <div
                                 style={{
                                     transform: `scale(${paintScale})`,
@@ -533,8 +693,10 @@ const Board = () => {
                         </div>
                     </div>
                 </Layout>
-                <Layout.Sider width={300} theme="light">
-                    <Option optionInputHasFocus={optionInputHasFocus} />
+                <Layout.Sider width={350} theme="light" className={style.option}>
+                    <EditFuncContext.Provider value={{ savePage, deleteNode, copeNode, pasteNode, cutNode, returnEdit, resumeEdit, changePosNode }}>
+                        <Option optionInputHasFocus={optionInputHasFocus} />
+                    </EditFuncContext.Provider>
                 </Layout.Sider>
             </Layout>
         </Layout>

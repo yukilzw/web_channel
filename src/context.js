@@ -4,5 +4,9 @@
 import { createContext } from 'react';
 
 const storeContext = createContext();
+const EditFuncContext = createContext();
 
 export default storeContext;
+export {
+    EditFuncContext
+};

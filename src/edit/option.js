@@ -1,11 +1,13 @@
 /**
  * @description 编辑器属性操作面板
  */
-import React, { useContext, useCallback, useRef, useEffect, useMemo } from 'react';
-import storeContext from '../context';
+import React, { useContext, useCallback, useRef, useMemo } from 'react';
+import storeContext, { EditFuncContext } from '../context';
 import { searchTree, EnumEdit } from './searchTree';
 import { record } from './record';
-import { Tabs, Layout, Input } from 'antd';
+import { Tabs, Layout, Input, Tooltip, message } from 'antd';
+import { FolderTwoTone, LeftCircleTwoTone, RightCircleTwoTone, DeleteTwoTone,
+    CopyTwoTone, PieChartTwoTone, BookTwoTone, EyeTwoTone, FileTextTwoTone, UpSquareTwoTone, DownSquareTwoTone } from '@ant-design/icons';
 import style from './style/index.less';
 
 const { TabPane } = Tabs;
@@ -108,20 +110,87 @@ const Option = ({ optionInputHasFocus }) => {
         return <Tabs activeKey={tabIndex.toString()} onChange={changeTab}>
             <TabPane tab={tab[0]} key="0">
                 {choose && <Layout className={style.tabPane}>
-                    <p className={style.compName}>{menu[chooseObj.current.name].name}({chooseObj.current.name})：#{chooseObj.current.el}</p>
+                    <p className={style.compName}>{menu[chooseObj.current.name].name}({chooseObj.current.name}) ID:{chooseObj.current.el.replace(/^wc/, '')}</p>
                     {renderOption()}
                 </Layout>}
             </TabPane>
             <TabPane tab={tab[1]} key="1">
                 {choose && <Layout className={style.tabPane}>
-                    <p className={style.compName}>{menu[chooseObj.current.name].name}({chooseObj.current.name})：#{chooseObj.current.el}</p>
+                    <p className={style.compName}>{menu[chooseObj.current.name].name}({chooseObj.current.name}) ID:{chooseObj.current.el.replace(/^wc/, '')}</p>
                     {renderOption()}
                 </Layout>}
             </TabPane>
         </Tabs>;
     }, [tree, choose, tabIndex]);
 
-    return comp;
+    return <>
+        <Edit />
+        <div className={style.opt}>
+            {comp}
+        </div>
+    </>;
+};
+
+const Edit = () => {
+    const { savePage, deleteNode, copeNode, pasteNode, cutNode, returnEdit, resumeEdit, changePosNode } = useContext(EditFuncContext);
+
+    return <div className={style.edt}>
+        <a onClick={savePage}>
+            <Tooltip placement="left" title={<span>保存(Ctrl+S)</span>}>
+                <FolderTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={returnEdit}>
+            <Tooltip placement="left" title={<span>撤销(Ctrl+Z)</span>}>
+                <LeftCircleTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={resumeEdit}>
+            <Tooltip placement="left" title={<span>恢复(Ctrl+Y)</span>}>
+                <RightCircleTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={deleteNode}>
+            <Tooltip placement="left" title={<span>删除(DEL)</span>}>
+                <DeleteTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={copeNode}>
+            <Tooltip placement="left" title={<span>复制(Ctrl+C)</span>}>
+                <CopyTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={cutNode}>
+            <Tooltip placement="left" title={<span>剪切(Ctrl+X)</span>}>
+                <PieChartTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={pasteNode}>
+            <Tooltip placement="left" title={<span>粘贴(Ctrl+V)</span>}>
+                <BookTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={() => changePosNode(-1)}>
+            <Tooltip placement="left" title={<span>上移节点(↑)</span>}>
+                <UpSquareTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={() => changePosNode(1)}>
+            <Tooltip placement="left" title={<span>下移节点(↓)</span>}>
+                <DownSquareTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a onClick={() => message.warn('请按住空格后拖动画布、鼠标滚轮')}>
+            <Tooltip placement="left" title={<span>移动画布(Space+滚动+左键)</span>}>
+                <EyeTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+        <a href="/template/page.json" download>
+            <Tooltip placement="left" title={<span>导出页面JSON配置</span>}>
+                <FileTextTwoTone className={style.icons}/>
+            </Tooltip>
+        </a>
+    </div>;
 };
 
 export default Option;
