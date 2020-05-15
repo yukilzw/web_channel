@@ -107,18 +107,20 @@ const Option = ({ optionInputHasFocus }) => {
 
     const comp = useMemo(() => {
         chooseObj.current = searchTree(tree, choose, EnumEdit.choose);
+        const content = choose && <Layout className={style.tabPane}>
+            <p className={style.compName}>
+                <span>{menu[chooseObj.current.name].name}({chooseObj.current.name})</span>
+                <span>ID:{chooseObj.current.el.replace(/^wc/, '')}</span>
+            </p>
+            {renderOption()}
+        </Layout>;
+
         return <Tabs activeKey={tabIndex.toString()} onChange={changeTab}>
             <TabPane tab={tab[0]} key="0">
-                {choose && <Layout className={style.tabPane}>
-                    <p className={style.compName}>{menu[chooseObj.current.name].name}({chooseObj.current.name}) ID:{chooseObj.current.el.replace(/^wc/, '')}</p>
-                    {renderOption()}
-                </Layout>}
+                {content}
             </TabPane>
             <TabPane tab={tab[1]} key="1">
-                {choose && <Layout className={style.tabPane}>
-                    <p className={style.compName}>{menu[chooseObj.current.name].name}({chooseObj.current.name}) ID:{chooseObj.current.el.replace(/^wc/, '')}</p>
-                    {renderOption()}
-                </Layout>}
+                {content}
             </TabPane>
         </Tabs>;
     }, [tree, choose, tabIndex]);

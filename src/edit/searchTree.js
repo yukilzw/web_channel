@@ -6,11 +6,10 @@
  * 此方法根据id，搜索当前操作的目标节点的位置，根据不同的操作返回所需要的值
  * 考虑到日常搭建中组件嵌套层级不会过深，采用广度优先搜索
  */
-import { DOMIN } from '../global';
-
 const EnumEdit = {
     add: Symbol(),         // 插入
     choose: Symbol(),   // 选择
+    drag: Symbol(),     // 拖拽（树组件内部，并非菜单）
     move: Symbol(),       // 移动
     change: Symbol(),   // 编辑
     delete: Symbol(),   // 删除
@@ -64,7 +63,7 @@ const searchTree = (arr, el, type, expand) => {
                         return arr;
                     case EnumEdit.delete:
                         children.splice(children.indexOf(child), 1);
-                        return arr;
+                        return [arr, child];
                     case EnumEdit.add:
                         rangeKey(expand);
 
@@ -79,6 +78,20 @@ const searchTree = (arr, el, type, expand) => {
                         var [moveChild] = children.splice(index, 1);
 
                         children.splice(Math.min(Math.max(0, index + expand), length - 1), 0, moveChild);
+                        return arr;
+                    case EnumEdit.drag:
+                        var { dragNodeObj, relaPos } = expand;
+
+                        if (relaPos === 0) {
+                            if (!Array.isArray(child.children)) {
+                                child.children = [];
+                            }
+                            child.children.push(dragNodeObj);
+                        } else if (relaPos === -1) {
+                            children.splice(children.indexOf(child), 0, dragNodeObj);
+                        } else if (relaPos === 1) {
+                            children.splice(children.indexOf(child) + 1, 0, dragNodeObj);
+                        }
                         return arr;
                     default: return;
                 }
@@ -127,7 +140,6 @@ const creatPart = (initConfig, menu) => {
     const { compName, defaultStyles, defaultProps, defaultChildren } = config;
 
     return {
-        hook: DOMIN + `/comp/${compName}.js`,
         name: compName,
         style: defaultStyles,
         props: defaultProps,

@@ -227,7 +227,7 @@
         // 禁用 with 语句
         "no-with": 2,
         // 强制在parseInt()使用基数参数
-        "radix": 2,
+        "radix": 0,
         // 要求所有的 var 声明出现在它们所在的作用域顶部
         "vars-on-top": 0,
         // 要求 IIFE 使用括号括起来

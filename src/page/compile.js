@@ -6,7 +6,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import storeContext from '../context';
 import { loadAsync } from '../global';
 
-const CompBox = ({ hide, el, name, hook, style, props, children }) => {
+const CompBox = ({ hide, el, name, style, props, children }) => {
     const [compHasLoad, setCompHasLoad] = useState(false);
     const Comp = useRef();
 
@@ -15,7 +15,7 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
     }, []);
 
     const loadComp = async () => {
-        const compModule = await loadAsync(name, hook);
+        const compModule = await loadAsync(name);
 
         Comp.current = compModule.default;
         setCompHasLoad(true);

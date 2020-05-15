@@ -24,8 +24,8 @@ const config = {
         // 配置library与libraryTarget，让组件加载后挂载到window[name]下
         library: '[name]',
         libraryTarget: 'this',
-        filename: '[name].js',
-        chunkFilename: '[name].js'
+        filename: '[name]_[chunkhash:6].js',
+        chunkFilename: '[name]_[chunkhash:6].js'
     },
     module: {
         rules: [

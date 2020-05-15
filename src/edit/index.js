@@ -1,7 +1,7 @@
 /**
  * @description 编辑器打包总入口
  */
-import { Headers, DOMIN } from '../global';
+import { Headers, DOMIN, hookMap } from '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
 import Board from './board';
@@ -34,10 +34,13 @@ Promise.all([
         message.error(resMenu.msg);
         return;
     }
-    searchTree(resPage.data, null, EnumEdit.maxKeyNum);
+    const { tree, hook } = resPage.data;
+
+    Object.assign(hookMap, hook);
+    searchTree(tree, null, EnumEdit.maxKeyNum);
     ReactDom.render(
         <App
-            tree={resPage.data}
+            tree={tree}
             menu={resMenu.data}
         >
             <Board />

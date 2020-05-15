@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const compression = require('compression');
 const { CONFIG } = require('../config');
 const getCompJSONconfig = require('./getCompJSONconfig');
+const getCompUrlHook = require('./getCompUrlHook');
 const { getPageJSON, setPageJSON } = require('./opPageJSON');
 
 const app = express();
@@ -30,19 +31,24 @@ app.all('*', (req, res, next) => {
 
 // 预览页面路由模板
 app.get('/page', (req, res) => {
+    const { debug_comp } = req.query;
+    const commonsDebug = debug_comp ? [`${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons-dev.js`] : [];
+
     res.render(path.join(__dirname, './template/index.ejs'), {
         id: 'app',
         title: '预览页',
         js: [
             `${CONFIG.HOST}:${CONFIG.PORT}/page/commons.js`,
-            `${CONFIG.HOST}:${CONFIG.PORT}/page/main.js`
+            `${CONFIG.HOST}:${CONFIG.PORT}/page/main.js`,
+            ...commonsDebug
         ]
     });
 });
 
 // 编辑器路由模板
 app.get('/edit', (req, res) => {
-    const { debug } = req.query;
+    const { debug, debug_comp } = req.query;
+    const commonsDebug = debug_comp ? [`${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons-dev.js`] : [];
 
     res.render(path.join(__dirname, './template/index.ejs'), {
         id: 'edit',
@@ -52,7 +58,8 @@ app.get('/edit', (req, res) => {
             `${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/main.js`
         ] : [
             `${CONFIG.HOST}:${CONFIG.PORT}/edit/commons.js`,
-            `${CONFIG.HOST}:${CONFIG.PORT}/edit/main.js`
+            `${CONFIG.HOST}:${CONFIG.PORT}/edit/main.js`,
+            ...commonsDebug
         ]
     });
 });
@@ -71,7 +78,10 @@ app.post('/loadPage', (req, res) => {
     res.send({
         error: 0,
         msg: 'succ',
-        data: getPageJSON()
+        data: {
+            tree: getPageJSON(),
+            hook: getCompUrlHook()
+        }
     });
 });
 
@@ -87,8 +97,13 @@ app.post('/savePage', (req, res) => {
 
 app.listen(CONFIG.PORT);
 
-console.log(`\x1B[32m★\x1B[0mweb_channel\x1B[32m★\x1B[0m server start.`);
+console.log(`\x1B[32m★\x1B[0m web_channel\x1B[32m★\x1B[0m server start.`);
 console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit\x1B[0m`);
 console.log(`页面预览：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page\x1B[0m`);
-console.log(`\x1B[32m------------------------DEV--------------------------\x1B[0m`);
-console.log(`编辑器（开发模式）：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug=1\x1B[0m`);
+console.log(`\x1B[32m----------------DEV--开发者模式----------------\x1B[0m`);
+console.log(`页面预览组件调试(XXX为组件文件夹名称，逗号隔开)：`);
+console.log(`'npm run dev:comp debug=XXX,YYY'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page?debug_comp=XXX,YYY\x1B[0m`);
+console.log(`编辑器预览组件调试：`);
+console.log(`'npm run dev:comp debug=XXX,YYY'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug_comp=XXX,YYY\x1B[0m`);
+console.log(`编辑器功能开发：`);
+console.log(`'npm run dev:edit'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug=1\x1B[0m`);

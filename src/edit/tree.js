@@ -4,14 +4,14 @@
 import React, { useContext, useCallback, useMemo } from 'react';
 import storeContext from '../context';
 import { searchTree, EnumEdit } from './searchTree';
-import { Tree } from 'antd';
+import { Tree, message } from 'antd';
 import style from './style/index.less';
 
 const PageTree = ({
     handleClick, checkedKeysList, expandedKeys
 }) => {
     const { state, dispatch, forceUpdate } = useContext(storeContext);
-    const { choose, tree } = state;
+    const { choose, tree, menu } = state;
 
     // 选中某个节点
     const selectNode = useCallback(([el], e) => {
@@ -47,7 +47,7 @@ const PageTree = ({
     }, []);
 
     // 用于将页面原始tree字段映射为ANTD树组件所需字段
-    const fixTreeKey = (children) => {
+    const fixTreeKey = useCallback((children) => {
         for (let child of children) {
             child.key = child.el;
             child.title = state.menu[child.name].name + '(' + child.el.replace(/^wc/, '') + ')';
@@ -56,7 +56,6 @@ const PageTree = ({
             }
 
             delete child.el;
-            delete child.hook;
             delete child.name;
             delete child.props;
             delete child.style;
@@ -66,7 +65,32 @@ const PageTree = ({
                 delete child.children;
             }
         }
-    };
+    }, []);
+
+    // 拖拽数组件移动节点
+    const dropNodeTree = useCallback(({ dragNode, dropPosition, node }) => {
+        const { key: dragNodeKey } = dragNode;
+        const { pos: posStr, key: targetKey } = node;
+        const posArr = posStr.split('-');
+        const pos = Number(posArr[posArr.length - 1]);
+        const relaPos = dropPosition - pos;
+        const chooseNode = searchTree(tree, targetKey, EnumEdit.choose);
+
+        if (relaPos === 0 && !menu[chooseNode.name].hasChild) {
+            message.warn('目标位置不允许有子节点');
+            return;
+        }
+
+        const [, dragNodeObj] = searchTree(tree, dragNodeKey, EnumEdit.delete);
+        const nextTree = searchTree(tree, targetKey, EnumEdit.drag, {
+            dragNodeObj, relaPos
+        });
+
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: nextTree
+        });
+    }, [tree, menu]);
 
     // 缓存树组件，如果没有涉及到影响树组件展示的状态更新，直接渲染缓存树组件
     const compTree = useMemo(() => {
@@ -84,6 +108,8 @@ const PageTree = ({
             onSelect={selectNode}
             expandedKeys={Array.from(expandedKeys.current)}
             onExpand={expendNode}
+            draggable
+            onDrop={dropNodeTree}
             treeData={treeData}
         />;
     }, [tree, choose, expandedKeys.current, checkedKeysList.current]);

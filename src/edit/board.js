@@ -14,6 +14,7 @@ import { searchTree, rangeKey, creatPart, EnumEdit } from './searchTree';
 import { record } from './record';
 import { Layout, Button, Slider, message } from 'antd';
 import style from './style/index.less';
+import styleBd from './style/changeBox.less';
 
 const EnumId = { root: 'root' };    // 画布id
 const PaintBoxMargin = 30;  // 画布边距
@@ -49,7 +50,7 @@ const Board = () => {
     const expandedKeys = useRef(new Set());         // 侧边栏树组件展开的集合
 
     useEffect(() => {
-        // 由于hooks自带闭包机制，事件回调函数的异步触发只能最初拿到绑定事件时注入的state
+        // 由于hooks自带闭包机制，浏览器全局事件回调函数的异步触发只能最初拿到绑定事件时注入的state
         // 每次状态有改变，就将state存到静态变量stateRef，在事件触发时取改变量代替state
         stateRef.current = state;
         paintScaleRef.current = paintScale;
@@ -219,7 +220,7 @@ const Board = () => {
         if (copyCompEl.current === choose) {
             copyCompEl.current = null;
         }
-        const nextTree = searchTree(tree, choose, EnumEdit.delete);
+        const [nextTree] = searchTree(tree, choose, EnumEdit.delete);
 
         dispatch({
             type: 'EDIT_CHOOSE_CMP',
@@ -570,7 +571,11 @@ const Board = () => {
         }
         Object.assign(container.style, nextStyles);
         nextStylesbYChangeMask.current = nextStyles;
-    }, []);
+        document.querySelector(`.${styleBd.topLeftTip}`).innerHTML = `${parseInt(container.style.left)},${parseInt(container.style.top)}`;
+        document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(container.style.width);
+        document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(container.style.height);
+
+    }, [state.changeCompBox]);
 
     // 画布内编辑释放鼠标
     const handleMouseUp = useCallback((e) => {
@@ -603,7 +608,7 @@ const Board = () => {
         });
         nextStylesbYChangeMask.current = null;
         paintMaskMove.current = false;
-    }, []);
+    }, [state.changeCompBox]);
 
     // 拖动画布
     const dragPaintMaskDown = useCallback((e) => {

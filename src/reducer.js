@@ -12,6 +12,7 @@ const reducer = (state, action) => {
         case 'UPDATE_TREE':
             var newTree = JSON.parse(JSON.stringify(action.payload));
 
+            // 如果新的配置被标记为一条撤销恢复类型，就在这个配置的属性中注明，compile渲染时不将其加入历史记录
             if (action.isPoint) {
                 newTree.isPoint = action.isPoint;
             }
@@ -52,16 +53,17 @@ const App = ({ tree, menu, children }) => {
         }, window.ENV === 'edit' ? {
             menu: JSON.parse(JSON.stringify(menu)),
             choose: null,   // 当前选中的组件配置
-            // changeCompBox: {
-            //     el: string,    组件容器id
-            //     key: string,   操作按下的是哪个蒙版，取自complie.js中的changeTabList数组
-            //     e: Event,     鼠标按下后的事件对象
+            // type changeCompBox = {
+            //     el: string;    组件容器id
+            //     key: string;   操作按下的是哪个蒙版，取自complie.js中的changeTabList数组
+            //     clientX: number;
+            //     clientY: number;
             //     current: {
-            //           width: number,
-            //           height: number,
+            //           width: number;
+            //           height: number;
             //           position: {
-            //               left: number,
-            //               top: number
+            //               left: number;
+            //               top: number;
             //           }
             //     }
             // },

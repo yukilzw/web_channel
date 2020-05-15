@@ -1,7 +1,7 @@
 /**
  * @description 页面打包总入口
  */
-import { Headers, DOMIN } from '../global';
+import { Headers, DOMIN, hookMap } from '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
 import App from '../reducer';
@@ -19,10 +19,12 @@ fetch(DOMIN + '/loadPage', {
         console.warn(res.msg);
         return;
     }
-    // 这里直接通过compile渲染页面，无需加载编辑器edit内任何组件，减小打包体积
+    const { tree, hook } = res.data;
+
+    Object.assign(hookMap, hook);
     ReactDom.render(
         <App
-            tree={res.data}
+            tree={tree}
         >
             <Page />
         </App>

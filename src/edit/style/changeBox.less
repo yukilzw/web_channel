@@ -1,8 +1,16 @@
 // 此文件仅遵循CSS module编译
 .changeSizeMask {
-    >div {
+    >div, >span {
         position: absolute;
         z-index: 0;
+    }
+
+    >span {
+        background-color: rgba(0, 0, 0, .8);
+        color: #fff;
+        font-size: 48px;
+        line-height: 59px;
+        padding: 0 10px;
     }
 
     .LT, .RT, .LB, .RB {
@@ -79,6 +87,23 @@
     .RB {
         right: 0;
         bottom: 0;
+    }
+
+    .topLeftTip {
+        left: 0;
+        top: 0;
+    }
+    
+    .rightTip {
+        right: 0;
+        top: 50%;
+        margin-top: -30px;
+    }
+    
+    .topTip {
+        top: -59px;
+        left: 50%;
+        margin-left: -45px;
     }
 }
 

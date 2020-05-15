@@ -12,7 +12,7 @@ const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   
 
 let EventObj = {};
 
-const CompBox = ({ hide, el, name, hook, style, props, children }) => {
+const CompBox = ({ hide, el, name, style, props, children }) => {
     const {
         handleClick,
         handleEventCallBack,
@@ -27,7 +27,7 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
     }, []);
 
     const loadComp = async () => {
-        const compModule = await loadAsync(name, hook);
+        const compModule = await loadAsync(name);
 
         Comp.current = compModule.default;
         setCompHasLoad(true);
@@ -79,7 +79,7 @@ const CompBox = ({ hide, el, name, hook, style, props, children }) => {
 // 为每一个具有定位属性的组件添加九宫格操作蒙版区域，用来拖动改变组件尺寸、组件位置
 const renderEditSizeTab = (name, el, { position }, store) => {
     const { state: {
-        menu, choose
+        menu, choose, changeCompBox
     } } = store;
 
     if (['relative', 'fiexd', 'absolute'].indexOf(position) === -1) {
@@ -92,6 +92,13 @@ const renderEditSizeTab = (name, el, { position }, store) => {
         return;
     }
     return <div className={styleBd.changeSizeMask}>
+        {
+            changeCompBox && <>
+                <span className={styleBd.topLeftTip}></span>
+                <span className={styleBd.topTip}></span>
+                <span className={styleBd.rightTip}></span>
+            </>
+        }
         {
             changeTabList.map((key) => <div key={el + key} className={styleBd[key]}
                 onMouseDown={(e) => changeTab(e, key, el, store)}

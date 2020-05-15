@@ -14,8 +14,6 @@
         "position": "relative",
         "width": "180px",
         "height": "180px",
-        "marginLeft": "auto",
-        "marginRight": "auto",
         "marginTop": "0px"
     },
     "defaultProps": {

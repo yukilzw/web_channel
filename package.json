@@ -10,7 +10,7 @@
         "build:edit": "webpack --progress --config ./script/webpack.config.edit.js",
         "build:page": "webpack --progress --config ./script/webpack.config.page.js",
         "build:comp": "webpack --progress --config ./script/webpack.config.comp.js",
-        "dev:server": "node ./server/index.js -dev",
+        "dev": "node ./script/debugComp.js -dev",
         "dev:edit": "webpack-dev-server --config ./script/webpack.config.edit.js -dev"
     },
     "dependencies": {
@@ -54,6 +54,7 @@
         "url": "git+https://github.com/yukilzw/web_channel.git"
     },
     "keywords": [
+        "web",
         "editor",
         "channel"
     ],
