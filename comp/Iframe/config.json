@@ -3,7 +3,8 @@
     "staticProps": [
         {
             "name": "内嵌页链接",
-            "prop": "src"
+            "prop": "src",
+            "size": "long"
         }
     ],
     "defaultStyles": {

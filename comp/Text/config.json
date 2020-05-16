@@ -3,11 +3,13 @@
     "staticProps": [
         {
             "name": "文本",
-            "prop": "text"
+            "prop": "text",
+            "size": "long"
         },
         {
             "name": "文字颜色",
-            "prop": "color"
+            "prop": "color",
+            "type": "color"
         },
         {
             "name": "文字大小",
@@ -15,7 +17,18 @@
         },
         {
             "name": "文字加粗",
-            "prop": "fontWeight"
+            "prop": "fontWeight",
+            "type": "select",
+            "option": [
+                {
+                    "label": "加粗",
+                    "value": "bold"
+                },
+                {
+                    "label": "常规",
+                    "value": "normal"
+                }
+            ]
         },
         {
             "name": "行高",
@@ -23,7 +36,22 @@
         },
         {
             "name": "对齐方式",
-            "prop": "textAlign"
+            "prop": "textAlign",
+            "type": "select",
+            "option": [
+                {
+                    "label": "居中",
+                    "value": "center"
+                },
+                {
+                    "label": "左对齐",
+                    "value": "left"
+                },
+                {
+                    "label": "右对齐",
+                    "value": "right"
+                }
+            ]
         }
     ],
     "defaultStyles": {

@@ -21,7 +21,7 @@
       "height": "1215px",
       "backgroundImage": "http://r.photo.store.qq.com/psb?/V14dALyK4bMoWS/3agoOGyqxp54l6IblFypUUsYktKrX0eamXfei**NuXU!/r/dN4AAAAAAAAA",
       "backgroundRepeat": "no-repeat",
-      "backgroundSize": "100%"
+      "backgroundSize": "100% 100%"
     },
     "props": {},
     "el": "wc8",
@@ -47,10 +47,14 @@
               "height": "360px",
               "marginTop": "0px",
               "marginLeft": "auto",
-              "marginRight": "auto"
+              "marginRight": "auto",
+              "display": "block",
+              "overflow": "hidden"
             },
             "props": {
-              "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
+              "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA",
+              "blank": true,
+              "link": "https://lol.qq.com"
             },
             "el": "wc6"
           },
@@ -66,7 +70,7 @@
               "fontSize": "70px",
               "lineHeight": "100px",
               "textAlign": "center",
-              "fontWeight": "bold",
+              "fontWeight": "normal",
               "color": "#fff"
             },
             "el": "wc7"

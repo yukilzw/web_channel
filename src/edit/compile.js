@@ -12,6 +12,7 @@ const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   
 
 let EventObj = {};
 
+// 初次渲染每个站位容器，同时加载组件JS，并递归查找子组件重复此步骤
 const CompBox = ({ hide, el, name, style, props, children }) => {
     const {
         handleClick,

@@ -5,7 +5,7 @@ import { Headers, DOMIN, hookMap } from '../global';
 import React from 'react';
 import ReactDom from 'react-dom';
 import Board from './board';
-import { searchTree, EnumEdit } from './searchTree';
+import { searchTree, EnumEdit } from './common';
 import App from '../reducer';
 import { message } from 'antd';
 import { setTwoToneColor } from '@ant-design/icons';

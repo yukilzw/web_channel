@@ -1,0 +1,120 @@
+[{
+    "name": "宽度",
+    "prop": "width",
+    "type": "text"
+}, {
+    "name": "高度",
+    "prop": "height",
+    "type": "text"
+}, {
+    "name": "溢出布局",
+    "prop": "overflow",
+    "type": "select",
+    "option": [{
+        "label": "显示",
+        "value": "visible"
+    }, {
+        "label": "隐藏",
+        "value": "hidden"
+    }]
+}, {
+    "name": "定位方式",
+    "prop": "position",
+    "type": "select",
+    "option": [{
+        "label": "默认",
+        "value": "static"
+    }, {
+        "label": "相对",
+        "value": "relative"
+    }, {
+        "label": "绝对",
+        "value": "absolute"
+    }, {
+        "label": "屏幕",
+        "value": "fixed"
+    }]
+}, {
+    "name": "左定位",
+    "prop": "left",
+    "type": "text"
+}, {
+    "name": "右定位",
+    "prop": "right",
+    "type": "text"
+}, {
+    "name": "上定位",
+    "prop": "top",
+    "type": "text"
+}, {
+    "name": "下定位",
+    "prop": "bottom",
+    "type": "text"
+}, {
+    "name": "左外距",
+    "prop": "marginLeft",
+    "type": "text"
+}, {
+    "name": "右外距",
+    "prop": "marginRight",
+    "type": "text"
+}, {
+    "name": "上外距",
+    "prop": "marginTop",
+    "type": "text"
+}, {
+    "name": "下外距",
+    "prop": "marginBottom",
+    "type": "text"
+}, {
+    "name": "层级",
+    "prop": "zIndex",
+    "type": "number"
+}, {
+    "name": "显示布局",
+    "prop": "display",
+    "type": "switch",
+    "mirrorValue": {
+        "true": "block",
+        "false": "none",
+        "init": true
+    }
+}, {
+    "name": "背景图",
+    "prop": "backgroundImage",
+    "type": "text",
+    "size": "long"
+}, {
+    "name": "背景色",
+    "prop": "backgroundColor",
+    "type": "text"
+}, {
+    "name": "背景尺寸",
+    "prop": "backgroundSize",
+    "type": "select",
+    "option": [{
+        "label": "cover模式",
+        "value": "cover"
+    }, {
+        "label": "contain模式",
+        "value": "contain"
+    }, {
+        "label": "填满拉伸",
+        "value": "100% 100%"
+    }, {
+        "label": "高度自适应",
+        "value": "100%"
+    }, {
+        "label": "宽度自适应",
+        "value": "auto 100%"
+    }]
+}, {
+    "name": "背景循环",
+    "prop": "backgroundRepeat",
+    "type": "switch",
+    "mirrorValue": {
+        "true": "repeat",
+        "false": "no-repeat",
+        "init": true
+    }
+}]

@@ -6,12 +6,12 @@ import './index.less';
 
 export default class Image extends React.PureComponent {
     openLink() {
-        const { link, env } = this.props;
+        const { link, blank, env } = this.props;
 
         if (env === 'edit') {
             return;
         }
-        window.open(link, '_blank');
+        window.open(link, blank ? '_blank' : '_self');
     }
 
     render() {

@@ -10,7 +10,7 @@ import Page from './compile';
 import CompMenu from './menu';
 import Option from './option';
 import PageTree from './tree';
-import { searchTree, rangeKey, creatPart, EnumEdit } from './searchTree';
+import { searchTree, rangeKey, creatPart, EnumEdit } from './common';
 import { record } from './record';
 import { Layout, Button, Slider, message } from 'antd';
 import style from './style/index.less';

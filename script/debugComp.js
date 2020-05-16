@@ -1,3 +1,6 @@
+/**
+ * @description 组件的调试启动脚本
+ */
 const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -8,12 +11,15 @@ let debugComp = {};
 
 let debugCompArr = [];
 
-process.argv.forEach((item) => {
-    if (item.match(/^debug=/)) {
+process.argv.some((item) => {
+    const debugArg = item.match(/^debug=/);
+
+    if (debugArg) {
         const compStr = item.replace(/^debug=/, '');
 
         debugCompArr = compStr.split(',');
     }
+    return debugArg;
 });
 
 debugCompArr.forEach((item) => {

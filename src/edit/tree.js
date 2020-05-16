@@ -3,7 +3,7 @@
  */
 import React, { useContext, useCallback, useMemo } from 'react';
 import storeContext from '../context';
-import { searchTree, EnumEdit } from './searchTree';
+import { searchTree, EnumEdit } from './common';
 import { Tree, message } from 'antd';
 import style from './style/index.less';
 
