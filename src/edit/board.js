@@ -1,7 +1,7 @@
 /**
- * @description 编辑器面板
- * 包含四个模块（组件菜单、组件结构树图、搭建可视区、属性配置面板）
- * 此根组件定义了大部分编辑器内通用事件与函数
+ * @description 编辑器主面板
+ * 包含四个模块（组件菜单、组件结构树图、搭建可视区、操作属性面板）
+ * 此根组件处理画布渲染逻辑，以及定义了编辑器内全局通用事件与函数
  */
 import React, { useContext, useEffect, useRef, useCallback, useState } from 'react';
 import storeContext, { EditFuncContext } from '../context';

@@ -1,10 +1,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable complexity */
 /**
- * @description 搜索页面配置树
- * 编辑器内各种操作，都是对当前json tree的修改，然后触发compile重新渲染视图
- * 此方法根据id，搜索当前操作的目标节点的位置，根据不同的操作返回所需要的值
- * 考虑到日常搭建中组件嵌套层级不会过深，采用广度优先搜索
+ * @description 数据结构处理相关方法
  */
 const EnumEdit = {
     add: Symbol(),         // 插入
@@ -14,12 +11,15 @@ const EnumEdit = {
     change: Symbol(),   // 编辑
     delete: Symbol(),   // 删除
     hide: Symbol(),       // 隐藏
-    maxKeyNum: Symbol()
+    maxKeyNum: Symbol()     // 首次加载计算当前页面配置key递增最大值
 };
 
-let maxKey;
+let maxKey;    // 记录全局生成的递增key(el)值
 
 /**
+ * 编辑器内各种操作(EnumEdit)，都是对当前json tree的修改，然后触发compile重新渲染视图
+ * 此方法根据节点key(el)，搜索当前操作的目标节点的位置，根据不同的操作返回所需要的值
+ * 考虑到日常搭建中组件嵌套层级不会过深，采用广度优先搜索
  * @param {Array<Config>} arr 页面配置tree
  * @param {String} el 要搜索的元素id
  * @param {EnumEdit} type 操作的枚举类型
@@ -33,7 +33,7 @@ const searchTree = (arr, el, type, expand) => {
 
     let maxKeyNum = 0;
 
-    // 找到匹配元素后根据搜索类型返回对应结构
+    // 找到匹配元素后根据搜索类型返回对应数据结构
     while (queue.length > 0) {
         const config = queue.pop();
         const { children = [] } = config;
@@ -109,8 +109,8 @@ const searchTree = (arr, el, type, expand) => {
     return null;
 };
 
-// 插入树片段签名的el值(key)
 /**
+ * 插入前为片段树生成签名的el值(key)
  * @param {targeNode} target 目标节点数
  * @param {treeNode} node 要插入的节点
  */
@@ -125,8 +125,8 @@ const rangeKey = (node) => {
     }
 };
 
-// 根据组件JSON配置生成组件片段
 /**
+ * 根据组件JSON配置生成组件片段树
  * @param {compConfigJSON} initConfig 目标节点对应菜单的静态JSON配置
  * @param {menu} menu 菜单数据
  */
