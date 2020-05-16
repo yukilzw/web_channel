@@ -4,7 +4,7 @@
 import React from 'react';
 import './index.less';
 
-export default class Image extends React.Component {
+export default class Image extends React.PureComponent {
     openLink() {
         const { link, env } = this.props;
 

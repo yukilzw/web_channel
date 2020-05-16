@@ -3,7 +3,7 @@
  */
 import React from 'react';
 
-export default class Text extends React.Component {
+export default class Text extends React.PureComponent {
     render() {
         const { text, color, fontSize, lineHeight, textAlign, fontWeight } = this.props;
 

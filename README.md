@@ -5,10 +5,7 @@
 编辑器属于强交互WEB应用，存在各种状态的存储比对更新，`react hooks`非常适合。每一个模块文件都在代码内有详细的功能注释
 
 #### 快速体验
-`npm i`后在项目根目录下运行`npm start`打包并启动服务<br/>
-编辑器：`http://localhost:1235/edit`<br/>
-预览页：`http://localhost:1235/page`<br/>
-编辑器开发者模式url后加`debug=1`<br>
+`npm i`后在项目根目录下运行`npm start`一键打包并启动服务<br/>
 
 #### 操作指南：
 <div>

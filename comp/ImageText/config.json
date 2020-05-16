@@ -16,9 +16,11 @@
         {
             "compName": "Image",
             "name": "图片子组件",
-            "defaultStyles": {
+            "mergeStyles": {
                 "width": "360px",
-                "height": "360px"
+                "height": "360px",
+                "marginLeft": "auto",
+                "marginRight": "auto"
             }
         },
         {

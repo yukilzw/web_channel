@@ -1,33 +1,79 @@
 [
   {
-    "name": "Image",
-    "style": {
-      "position": "absolute",
-      "width": "1037px",
-      "height": "1058px",
-      "marginLeft": "auto",
-      "marginRight": "auto",
-      "marginTop": "0px",
-      "left": "486px",
-      "top": "806px"
-    },
-    "props": {
-      "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
-    },
-    "el": "wc1"
-  },
-  {
-    "name": "Text",
+    "name": "Iframe",
     "style": {
       "position": "relative",
-      "width": "200px"
+      "width": "",
+      "height": "1153px",
+      "top": "",
+      "left": ""
     },
     "props": {
-      "text": "默认文本",
-      "fontSize": "24px",
-      "lineHeight": "36px",
-      "textAlign": "center"
+      "src": "https://lol.qq.com/act/a20200424fpxskin/index.html"
     },
-    "el": "wc2"
+    "el": "wc3"
+  },
+  {
+    "name": "View",
+    "style": {
+      "position": "relative",
+      "width": "100%",
+      "height": "1215px",
+      "backgroundImage": "http://r.photo.store.qq.com/psb?/V14dALyK4bMoWS/3agoOGyqxp54l6IblFypUUsYktKrX0eamXfei**NuXU!/r/dN4AAAAAAAAA",
+      "backgroundRepeat": "no-repeat",
+      "backgroundSize": "100%"
+    },
+    "props": {},
+    "el": "wc8",
+    "children": [
+      {
+        "name": "ImageText",
+        "style": {
+          "position": "relative",
+          "width": "771px",
+          "marginLeft": "auto",
+          "marginRight": "auto",
+          "left": "24px",
+          "top": "56px",
+          "height": "500px"
+        },
+        "props": {},
+        "children": [
+          {
+            "name": "Image",
+            "style": {
+              "position": "relative",
+              "width": "360px",
+              "height": "360px",
+              "marginTop": "0px",
+              "marginLeft": "auto",
+              "marginRight": "auto"
+            },
+            "props": {
+              "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA"
+            },
+            "el": "wc6"
+          },
+          {
+            "name": "Text",
+            "style": {
+              "position": "relative",
+              "width": "100%",
+              "height": "110px"
+            },
+            "props": {
+              "text": "内容",
+              "fontSize": "70px",
+              "lineHeight": "100px",
+              "textAlign": "center",
+              "fontWeight": "bold",
+              "color": "#fff"
+            },
+            "el": "wc7"
+          }
+        ],
+        "el": "wc5"
+      }
+    ]
   }
 ]

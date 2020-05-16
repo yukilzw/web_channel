@@ -4,7 +4,7 @@
  */
 import React from 'react';
 
-export default class ImageText extends React.Component {
+export default class ImageText extends React.PureComponent {
     render() {
         const { children } = this.props;
 

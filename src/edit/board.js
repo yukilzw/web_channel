@@ -488,8 +488,10 @@ const Board = () => {
 
     // 在新窗口预览页面
     const showPage = useCallback(async () => {
+        const pageWindow = window.open('about:blank', '_blank');
+
         await savePage();
-        window.open(`${DOMIN}/page`, '_blank');
+        pageWindow.location.href = `${DOMIN}/page`;
     }, []);
 
     // 拖动顶部滑块强制改变画布尺寸
@@ -571,9 +573,11 @@ const Board = () => {
         }
         Object.assign(container.style, nextStyles);
         nextStylesbYChangeMask.current = nextStyles;
-        document.querySelector(`.${styleBd.topLeftTip}`).innerHTML = `${parseInt(container.style.left)},${parseInt(container.style.top)}`;
-        document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(container.style.width);
-        document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(container.style.height);
+        const computedStyle = window.getComputedStyle(container);
+
+        document.querySelector(`.${styleBd.topLeftTip}`).innerHTML = `${parseInt(computedStyle.left)},${parseInt(computedStyle.top)}`;
+        document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(computedStyle.width);
+        document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(computedStyle.height);
 
     }, [state.changeCompBox]);
 
@@ -666,7 +670,7 @@ const Board = () => {
             </Layout.Header>
             <Layout className={style.paintingLayout}>
                 <Layout className={style.flex1}>
-                    <div className={style.paintingWrap} ref={paintingWrap}>
+                    <div className={style.paintingWrap} ref={paintingWrap} onClick={clearChooseCmp}>
                         <div className={style.paintingBox} style={{
                             height: `${paintOffset.height}px`,
                             width: `${paintOffset.width}px`
@@ -682,7 +686,6 @@ const Board = () => {
                                 }}
                                 id={EnumId.root}
                                 className={style.root}
-                                onClick={clearChooseCmp}
                                 onDragOver={(e) => handleEventCallBack('dragover', EnumId.root, null, e)}
                                 onDragLeave={(e) => handleEventCallBack('dragout', EnumId.root, null, e)}
                                 onDrop={(e) => handleEventCallBack('drop', EnumId.root, null, e)}

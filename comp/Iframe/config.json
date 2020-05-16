@@ -1,0 +1,19 @@
+{
+    "name": "内嵌页",
+    "staticProps": [
+        {
+            "name": "内嵌页链接",
+            "prop": "src"
+        }
+    ],
+    "defaultStyles": {
+        "position": "relative",
+        "width": "500px",
+        "height": "600px"
+    },
+    "defaultProps": {
+
+    },
+    "hasChild": false,
+    "canResizeByMouse": true
+}
