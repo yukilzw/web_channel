@@ -5,7 +5,7 @@
       "position": "relative",
       "width": "100%",
       "height": "1215px",
-      "backgroundImage": "http://r.photo.store.qq.com/psb?/V14dALyK4bMoWS/3agoOGyqxp54l6IblFypUUsYktKrX0eamXfei**NuXU!/r/dN4AAAAAAAAA",
+      "backgroundImage": "http://r.photo.store.qq.com/psb?/V14dALyK4bMoWS/cfA9nq49UyTIPQjesI0SktmLGS373fN4SUQSr6klDsM!/r/dDwBAAAAAAAA",
       "backgroundRepeat": "no-repeat",
       "backgroundSize": "100% 100%"
     },
@@ -18,12 +18,12 @@
         "name": "ImageText",
         "style": {
           "position": "relative",
-          "width": "771px",
+          "width": "888px",
           "marginLeft": "auto",
           "marginRight": "auto",
-          "left": "24px",
-          "top": "56px",
-          "height": "500px"
+          "left": "56px",
+          "top": "321px",
+          "height": "494px"
         },
         "props": {},
         "children": [
@@ -51,7 +51,8 @@
             "style": {
               "position": "relative",
               "width": "100%",
-              "height": "110px"
+              "height": "110px",
+              "backgroundColor": "rgba(0,0,0,1)"
             },
             "props": {
               "text": "内容",
@@ -82,16 +83,17 @@
       "lazy": true,
       "scrolling": false
     },
-    "el": "wc3"
+    "el": "wc3",
+    "hide": true
   },
   {
     "name": "View",
     "style": {
       "position": "relative",
       "width": "100%",
-      "height": "1971px",
-      "backgroundColor": "rgba(134,154,233,0.76)",
-      "top": "-2px",
+      "height": "1122px",
+      "backgroundColor": "rgba(74,226,93,0.3)",
+      "top": "",
       "overflow": "hidden"
     },
     "props": {
@@ -118,6 +120,20 @@
           "fontWeight": "bold"
         },
         "el": "wc11"
+      },
+      {
+        "name": "View",
+        "style": {
+          "position": "relative",
+          "width": "1089px",
+          "height": "820px"
+        },
+        "props": {
+          "lazy": true
+        },
+        "el": "wc12",
+        "children": [],
+        "hide": true
       }
     ]
   }

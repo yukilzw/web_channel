@@ -100,7 +100,7 @@ app.listen(CONFIG.PORT);
 console.log(`\x1B[32m★\x1B[0m web_channel\x1B[32m★\x1B[0m server start.`);
 console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit\x1B[0m`);
 console.log(`页面预览：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page\x1B[0m`);
-console.log(`\x1B[32m----------------DEV--开发者模式----------------\x1B[0m`);
+console.log(`\x1B[32m----------↓ DEV模式 ↓(请勿退出进程,否则'npm run server'重启服务)--------------\x1B[0m`);
 console.log(`页面预览组件调试(XXX为组件文件夹名称，逗号隔开)：`);
 console.log(`'npm run dev:comp debug=XXX,YYY'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page?debug_comp=XXX,YYY\x1B[0m`);
 console.log(`编辑器预览组件调试：`);

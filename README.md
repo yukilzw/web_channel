@@ -9,7 +9,7 @@
 
 #### 操作指南：
 <div>
-<img src="http://r.photo.store.qq.com/psc?/V14dALyK4PrHuj/WntOtr8rW56pbv0uxxE6de0e5mCdxFMyyJb7W8AOW0bHI*EqqFfZ3OLBAVpxKfdKA6easFAxL3c1yQNSJRRc6coleT*iqdOuXXbmY4ahnI4!/r" width="80%"/>
+<img src="https://upload-images.jianshu.io/upload_images/19675139-97e33b952b24485c.png" width="80%"/>
 </div>
 1. 将菜单中组件拖入画布的任意组件内<br>
 2. 通过编辑输入框，或拉动组件外边调整宽高位置<br>
@@ -48,13 +48,15 @@ web_channel:
 │       ...
 │          
 ├─script				// 配置脚本
+│      debugComp.js		            // 组件调试脚本
 │      webpack.config.comp.js		// 组件打包配置
 │      webpack.config.edit.js		// 编辑器打包配置
 │      webpack.config.page.js		// 预览页打包配置
 │      
 ├─server				// 建站平台服务端
+│  │  getCompUrlHook.js		// 生成组件js文件哈希映射
 │  │  getCompJSONconfig.js		// 查询组件仓库内当前所有存在的组件配置
-│  │  index.js			// 服务端总入口
+│  │  index.js			// 服务端总入口 
 │  │  opPageJSON.js		// 存取页面对应的配置JSON树
 │  │  
 │  └─template			// 模板
@@ -74,7 +76,7 @@ web_channel:
     │  │  option.js			// 编辑器属性操作面板
     │  │  record.js			// 操作历史记录管理
     │  │  tree.js			// 搭建树层级展示
-    │  │  searchTree.js		// 搜索页面配置树方法
+    │  │  search.js		// 搜索页面配置树方法
     │  │  
     │  └─style			// 编辑器样式
     │          
