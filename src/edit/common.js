@@ -133,7 +133,7 @@ const rangeKey = (node) => {
 const creatPart = (initConfig, menu) => {
     const config = JSON.parse(JSON.stringify(menu[initConfig.compName]));
 
-    initConfig.defaultProps = Object.assign(config.defaultProps, initConfig.mergeProps);
+    initConfig.defaultProps = Object.assign(config.defaultProps, { lazy: true }, initConfig.mergeProps);
     initConfig.defaultStyles = Object.assign(config.defaultStyles, initConfig.mergeStyles);
     Object.assign(config, initConfig);
 

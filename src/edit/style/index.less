@@ -137,7 +137,7 @@
 
 .compName {
     color: @primary-color;
-    margin: 0 10px;
+    margin: 0 10px 8px;
     display: flex;
     justify-content: space-between;
     .publicTextOverflow();
@@ -149,11 +149,41 @@
 
     &.long {
         width: 260px;
+
+        .longSwitch {
+            display: flex;
+            align-items: center;
+
+            >p {
+                display: inline-block;
+                margin-right: 10px;
+                margin-bottom: 0;
+                white-space: normal;
+            }
+        }
     }
 
     p {
         .publicTextOverflow();
         margin-bottom: 5px;
+
+        .colorBlock {
+            display: block;
+            width: 20px;
+            height: 20px;
+            float: right;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+
+            i {
+                width: 14px;
+                height: 14px;
+                display: block;
+                margin: 2px;
+                border-radius: 2px;
+            }
+        }
     }
 }
 .option {

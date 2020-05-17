@@ -1,19 +1,5 @@
 [
   {
-    "name": "Iframe",
-    "style": {
-      "position": "relative",
-      "width": "",
-      "height": "1153px",
-      "top": "",
-      "left": ""
-    },
-    "props": {
-      "src": "https://lol.qq.com/act/a20200424fpxskin/index.html"
-    },
-    "el": "wc3"
-  },
-  {
     "name": "View",
     "style": {
       "position": "relative",
@@ -23,7 +9,9 @@
       "backgroundRepeat": "no-repeat",
       "backgroundSize": "100% 100%"
     },
-    "props": {},
+    "props": {
+      "lazy": true
+    },
     "el": "wc8",
     "children": [
       {
@@ -71,12 +59,65 @@
               "lineHeight": "100px",
               "textAlign": "center",
               "fontWeight": "normal",
-              "color": "#fff"
+              "color": "rgba(248,231,28,1)"
             },
             "el": "wc7"
           }
         ],
         "el": "wc5"
+      }
+    ]
+  },
+  {
+    "name": "Iframe",
+    "style": {
+      "position": "relative",
+      "width": "",
+      "height": "1180px",
+      "top": "0px",
+      "left": "0px"
+    },
+    "props": {
+      "src": "https://lol.qq.com/act/a20200424fpxskin/index.html",
+      "lazy": true,
+      "scrolling": false
+    },
+    "el": "wc3"
+  },
+  {
+    "name": "View",
+    "style": {
+      "position": "relative",
+      "width": "100%",
+      "height": "1971px",
+      "backgroundColor": "rgba(134,154,233,0.76)",
+      "top": "-2px",
+      "overflow": "hidden"
+    },
+    "props": {
+      "lazy": true
+    },
+    "el": "wc9",
+    "children": [
+      {
+        "name": "Text",
+        "style": {
+          "position": "relative",
+          "width": "auto",
+          "marginLeft": "auto",
+          "marginRight": "auto",
+          "marginTop": "30px"
+        },
+        "props": {
+          "text": "这是下面这个元素的标题",
+          "fontSize": "50px",
+          "lineHeight": "100px",
+          "textAlign": "center",
+          "lazy": true,
+          "color": "rgba(182,36,54,1)",
+          "fontWeight": "bold"
+        },
+        "el": "wc11"
       }
     ]
   }

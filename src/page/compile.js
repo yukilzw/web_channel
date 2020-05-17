@@ -3,6 +3,7 @@
  * 根据JSON配置树编译为React组件树
  */
 import React, { useContext, useState, useEffect, useRef } from 'react';
+import LazyLoad from 'react-lazyload';
 import storeContext from '../context';
 import { loadAsync } from '../global';
 
@@ -58,7 +59,16 @@ const checkChildren = (children) => {
         return null;
     }
     // 遍历每个子节点
-    return children.map(config => <CompBox key={config.el} {...config} />);
+    return children.map(config => {
+        const compBox = <CompBox key={config.el} {...config} />;
+
+        if (!config.props.lazy) {
+            return compBox;
+        }
+        return <LazyLoad height={parseFloat(config.style.height) || 1}>
+            {compBox}
+        </LazyLoad>;
+    });
 };
 
 const Page = () => {

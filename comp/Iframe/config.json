@@ -5,6 +5,12 @@
             "name": "内嵌页链接",
             "prop": "src",
             "size": "long"
+        },
+        {
+            "name": "开启滚动",
+            "prop": "scrolling",
+            "type": "switch",
+            "size": "long"
         }
     ],
     "defaultStyles": {
@@ -13,7 +19,7 @@
         "height": "600px"
     },
     "defaultProps": {
-
+        "scrolling": true
     },
     "hasChild": false,
     "canResizeByMouse": true

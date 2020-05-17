@@ -5,9 +5,12 @@ import React, { useContext, useCallback, useRef, useMemo } from 'react';
 import storeContext, { EditFuncContext } from '../context';
 import { searchTree, EnumEdit } from './common';
 import { record } from './record';
-import { Tabs, Layout, Input, Select, Switch, Tooltip, message } from 'antd';
+import { Tabs, Layout, Input, Select, Switch, Tooltip, Popover, message } from 'antd';
 import { FolderTwoTone, LeftCircleTwoTone, RightCircleTwoTone, DeleteTwoTone,
-    CopyTwoTone, PieChartTwoTone, SnippetsTwoTone, EyeTwoTone, WalletTwoTone, UpSquareTwoTone, DownSquareTwoTone } from '@ant-design/icons';
+    CopyTwoTone, PieChartTwoTone, SnippetsTwoTone, EyeTwoTone, WalletTwoTone,
+    UpSquareTwoTone, DownSquareTwoTone
+} from '@ant-design/icons';
+import { SketchPicker } from 'react-color';
 import style from './style/index.less';
 
 const { TabPane } = Tabs;
@@ -90,7 +93,15 @@ const OptionBoard = ({ optionInputHasFocus }) => {
             return null;
         }
         // 面板操作类型，样式还是自定义属性
-        const optionList = tabIndex === 0 ? initStylesItemArr : menu[chooseObj.current.name].staticProps;
+        const optionList = tabIndex === 0 ? initStylesItemArr : [
+            {
+                name: '开启懒加载',
+                prop: 'lazy',
+                type: 'switch',
+                size: 'long'
+            },
+            ...menu[chooseObj.current.name].staticProps
+        ];
         const optionName = tabIndex === 0 ? 'style' : 'props';
 
         return <div className={style.configWrap}>
@@ -99,14 +110,13 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                     className={[style.config, item.size === 'long' ? style.long : ''].join(' ')}
                     key={item.prop} key={item.prop}
                 >
-                    <p>{item.name}</p>
                     {renderItemByType(item, optionName)}
                 </div>)
             }
         </div>;
     }, [menu, tree, choose, tabIndex]);
 
-    const renderItemByType = useCallback(({ prop, type = 'text', option, mirrorValue }, optionName) => {
+    const renderItemByType = useCallback(({ name, prop, type = 'text', option, mirrorValue }, optionName) => {
         const curValue = chooseObj.current[optionName][prop];
 
         switch (type) {
@@ -127,23 +137,49 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                     }
                 }
 
-                return <Switch checked={swtichValue}
-                    onChange={(checked) => changeValue({ checked, mirrorValue }, prop, type)} />;
+                return <div className={style.longSwitch}>
+                    <p>{name}</p>
+                    <Switch checked={swtichValue}
+                        onChange={(checked) => changeValue({ checked, mirrorValue }, prop, type)}
+                    />
+                </div>;
             case 'select':
-                return <Select
-                    value={curValue || ''}
-                    onChange={(value) => changeValue(value, prop, type)}
-                >
-                    {
-                        option.map(({ value, label }) => <Option value={value} key={value}>{label}</Option>)
-                    }
-                </Select>;
+                return  <>
+                    <p>{name}</p>
+                    <Select
+                        value={curValue || ''}
+                        onChange={(value) => changeValue(value, prop, type)}
+                    >
+                        {
+                            option.map(({ value, label }) => <Option value={value} key={value}>{label}</Option>)
+                        }
+                    </Select>
+                </>;
+            case 'color':
+                return  <>
+                    <p>{name}
+                        <Popover id="antd-colorPop" content={<SketchPicker
+                            color={curValue}
+                            onChangeComplete={(color) => changeValue(color.rgb, prop, type)}
+                        />} trigger="click">
+                            <span className={style.colorBlock}><i style={{ backgroundColor: curValue }}></i></span>
+                        </Popover>
+                    </p>
+                    <Input value={curValue || ''}
+                        onFocus={() => changeOptionInputHasFocus(true)}
+                        onBlur={() => changeOptionInputHasFocus(false)}
+                        onChange={(e) => changeValue(e, prop, 'text')}
+                    />
+                </>;
             default:
-                return <Input value={curValue || ''}
-                    onFocus={() => changeOptionInputHasFocus(true)}
-                    onBlur={() => changeOptionInputHasFocus(false)}
-                    onChange={(e) => changeValue(e, prop, type)}
-                />;
+                return  <>
+                    <p>{name}</p>
+                    <Input value={curValue || ''}
+                        onFocus={() => changeOptionInputHasFocus(true)}
+                        onBlur={() => changeOptionInputHasFocus(false)}
+                        onChange={(e) => changeValue(e, prop, type)}
+                    />
+                </>;
         }
     }, [menu, tree, choose, tabIndex]);
 
@@ -172,6 +208,11 @@ const OptionBoard = ({ optionInputHasFocus }) => {
             } else {
                 value = mirrorValue[checked.toString()];
             }
+        } else if (type === 'color') {
+            console.log(dynamic);
+            const { r, g, b, a } = dynamic;
+
+            value = `rgba(${r},${g},${b},${a})`;
         }
         const nextTree = searchTree(tree, choose, EnumEdit.change, { tabIndex, items: [{ key, value }] });
 

@@ -22,9 +22,6 @@
     "prop": "position",
     "type": "select",
     "option": [{
-        "label": "默认",
-        "value": "static"
-    }, {
         "label": "相对",
         "value": "relative"
     }, {
@@ -33,6 +30,9 @@
     }, {
         "label": "屏幕",
         "value": "fixed"
+    }, {
+        "label": "默认(不推荐)",
+        "value": "static"
     }]
 }, {
     "name": "左定位",
@@ -87,7 +87,7 @@
 }, {
     "name": "背景色",
     "prop": "backgroundColor",
-    "type": "text"
+    "type": "color"
 }, {
     "name": "背景尺寸",
     "prop": "backgroundSize",
@@ -112,6 +112,7 @@
     "name": "背景循环",
     "prop": "backgroundRepeat",
     "type": "switch",
+    "size": "long",
     "mirrorValue": {
         "true": "repeat",
         "false": "no-repeat",
