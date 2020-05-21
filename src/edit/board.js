@@ -80,7 +80,7 @@ const Board = () => {
             dispatchCallBack.current();
             dispatchCallBack.current = null;
         }
-    }, [paintScale, state.tree]);
+    }, [paintScale, paintMinHeight, state.tree]);
 
     // 绑定编辑器事件
     let bindEditDomEvent = useCallback(() => {
