@@ -218,8 +218,15 @@
 
         a:hover {
             .icons {
-                font-size: 25px;
                 transform: scale(1.2);
+            }
+        }
+
+        a.unable {
+            cursor: not-allowed;
+            opacity: .37;
+            &:hover .icons {
+                transform: scale(1);
             }
         }
     }

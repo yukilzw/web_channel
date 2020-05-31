@@ -236,10 +236,9 @@ const Board = () => {
     const copeNode = useCallback(() => {
         const { choose } = stateRef.current;
 
-        if (!choose) {
-            message.warn('请先选中再复制');
-        } else {
+        if (choose) {
             copyCompEl.current = choose;
+            forceUpdate();
             message.success('复制成功');
         }
     }, []);
@@ -248,9 +247,7 @@ const Board = () => {
     const cutNode = useCallback(() => {
         const { choose, tree } = stateRef.current;
 
-        if (!choose) {
-            message.warn('请先选中再剪切');
-        } else {
+        if (choose) {
             // 先拷贝剪切的对象再删除
             copyCompEl.current = JSON.parse(JSON.stringify(
                 searchTree(tree, choose, EnumEdit.choose)
@@ -266,7 +263,6 @@ const Board = () => {
         const { choose, tree, menu } = stateRef.current;
 
         if (!copyCompEl.current) {
-            message.warn('请先复制/剪切再粘贴');
             return;
         }
         let copyObj = copyCompEl.current;
@@ -702,7 +698,7 @@ const Board = () => {
                     </div>
                 </Layout>
                 <Layout.Sider width={350} theme="light" className={style.option}>
-                    <EditFuncContext.Provider value={{ savePage, deleteNode, copeNode, pasteNode, cutNode, returnEdit, resumeEdit, changePosNode }}>
+                    <EditFuncContext.Provider value={{ savePage, deleteNode, copeNode, pasteNode, cutNode, returnEdit, resumeEdit, changePosNode, copyCompEl }}>
                         <Option optionInputHasFocus={optionInputHasFocus} />
                     </EditFuncContext.Provider>
                 </Layout.Sider>

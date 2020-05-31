@@ -19,62 +19,75 @@ const tab = ['样式', '属性'];
 // 定义固有的样式属性配置项，后续可持续拓展（自定义属性配置项没有固有的，是根据每个组件JSON中staticProps动态渲染的）
 const initStylesItemArr = require('./_style.json');
 
+const TooltipProps = {
+    mouseLeaveDelay: 0,
+    placement: 'left'
+};
+
 const Edit = () => {
-    const { savePage, deleteNode, copeNode, pasteNode, cutNode, returnEdit, resumeEdit, changePosNode } = useContext(EditFuncContext);
+    const { state: {
+        choose
+    } } = useContext(storeContext);
+    const { savePage, deleteNode, copeNode, pasteNode, cutNode, returnEdit, resumeEdit, changePosNode, copyCompEl } = useContext(EditFuncContext);
+    const canReturnEdit = record.point > 0;
+    const canResumeEdit = record.point < record.stack.length - 1;
+    const canPaste = !!copyCompEl.current;
+
+    const fillUnable = useCallback((can) => can ? undefined : style.unable);
 
     return <div className={style.edt}>
         <a onClick={savePage}>
-            <Tooltip placement="left" title={<span>保存(Ctrl+S)</span>}>
+            <Tooltip {...TooltipProps} title={<span>保存(Ctrl+S)</span>}>
                 <FolderTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={returnEdit}>
-            <Tooltip placement="left" title={<span>撤销(Ctrl+Z)</span>}>
+        <a onClick={canReturnEdit ? returnEdit : undefined} className={fillUnable(canReturnEdit)}>
+            <Tooltip {...TooltipProps} title={<span>撤销(Ctrl+Z)</span>}>
                 <LeftCircleTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={resumeEdit}>
-            <Tooltip placement="left" title={<span>恢复(Ctrl+Y)</span>}>
+        <a onClick={canResumeEdit ? resumeEdit : undefined} className={fillUnable(canResumeEdit)}>
+            <Tooltip {...TooltipProps} title={<span>恢复(Ctrl+Y)</span>}>
                 <RightCircleTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={deleteNode}>
-            <Tooltip placement="left" title={<span>删除(DEL)</span>}>
+        <a onClick={choose ? deleteNode : undefined} className={fillUnable(choose)}>
+            <Tooltip {...TooltipProps} title={<span>删除(DEL)</span>}>
                 <DeleteTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={copeNode}>
-            <Tooltip placement="left" title={<span>复制(Ctrl+C)</span>}>
+        <a onClick={choose ? copeNode : undefined} className={fillUnable(choose)}>
+            <Tooltip {...TooltipProps} title={<span>复制(Ctrl+C)</span>}>
                 <CopyTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={cutNode}>
-            <Tooltip placement="left" title={<span>剪切(Ctrl+X)</span>}>
+        <a onClick={choose ? cutNode : undefined} className={fillUnable(choose)}>
+            <Tooltip {...TooltipProps} title={<span>剪切(Ctrl+X)</span>}>
                 <PieChartTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={pasteNode}>
-            <Tooltip placement="left" title={<span>粘贴(Ctrl+V)</span>}>
+        <a onClick={canPaste ? pasteNode : undefined} className={fillUnable(canPaste)}>
+            <Tooltip {...TooltipProps} title={<span>粘贴(Ctrl+V)</span>}>
                 <SnippetsTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={() => changePosNode(-1)}>
-            <Tooltip placement="left" title={<span>上移节点(↑)</span>}>
+        <a onClick={() => choose && changePosNode(-1)} className={fillUnable(choose)}>
+            <Tooltip {...TooltipProps} title={<span>上移节点(↑)</span>}>
                 <UpSquareTwoTone className={style.icons}/>
             </Tooltip>
         </a>
-        <a onClick={() => changePosNode(1)}>
-            <Tooltip placement="left" title={<span>下移节点(↓)</span>}>
+        <a onClick={() => choose && changePosNode(1)} className={fillUnable(choose)}>
+            <Tooltip {...TooltipProps} title={<span>下移节点(↓)</span>}>
                 <DownSquareTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a onClick={() => message.warn('请按住空格后拖动画布、鼠标滚轮')}>
-            <Tooltip placement="left" title={<span>移动画布(Space+滚动+左键)</span>}>
+            <Tooltip {...TooltipProps} title={<span>移动画布(Space+滚动+左键)</span>}>
                 <EyeTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a href="/template/page.json" download>
-            <Tooltip placement="left" title={<span>导出页面JSON配置</span>}>
+            <Tooltip {...TooltipProps} title={<span>导出页面JSON配置</span>}>
                 <WalletTwoTone className={style.icons}/>
             </Tooltip>
         </a>

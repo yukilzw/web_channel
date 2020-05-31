@@ -11,7 +11,7 @@
         "build:page": "webpack --progress --config ./script/webpack.config.page.js",
         "build:comp": "webpack --progress --config ./script/webpack.config.comp.js",
         "dev": "node ./script/debugComp.js -dev",
-        "dev:edit": "webpack-dev-server --config ./script/webpack.config.edit.js -dev"
+        "dev:edit": "webpack-dev-server --progress --config ./script/webpack.config.edit.js -dev"
     },
     "dependencies": {
         "@babel/core": "^7.7.4",
