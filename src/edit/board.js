@@ -13,7 +13,7 @@ import Option from './option';
 import PageTree from './tree';
 import { searchTree, rangeKey, creatPart, EnumEdit } from './common';
 import { record } from './record';
-import { Layout, Button, Slider, Menu, Dropdown, message } from 'antd';
+import { Layout, Button, Slider, Menu, message } from 'antd';
 import style from './style/index.less';
 import styleBd from './style/changeBox.less';
 
