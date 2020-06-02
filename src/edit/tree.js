@@ -8,7 +8,7 @@ import { Tree, message } from 'antd';
 import style from './style/index.less';
 
 const PageTree = ({
-    handleClick, checkedKeysList, expandedKeys
+    handleClick, checkedKeysList, expandedKeys, triggerShowEl
 }) => {
     const { state, dispatch, forceUpdate } = useContext(storeContext);
     const { choose, tree, menu } = state;
@@ -23,18 +23,11 @@ const PageTree = ({
         paintingWrapDom.scrollTop = nextScrollTop;
     }, []);
 
-    // 显示隐藏某个节点（隐藏后编译时会忽略此组件以及其包裹的所有子孙组件，但在编辑器内扔可为其配置属性）
-    const checkNode = (el, e) => {
-        const nextTree = searchTree(tree, e.node.key, EnumEdit.hide);
-
-        dispatch({
-            type: 'UPDATE_TREE',
-            payload: nextTree
-        });
-    };
+    // 显示隐藏某个节点
+    const checkNode = useCallback((_, e) => triggerShowEl(e.node.key), []);
 
     // 展开节点
-    const expendNode = useCallback((el, e) => {
+    const expendNode = useCallback((_, e) => {
         const hasKey = expandedKeys.current.has(e.node.key);
 
         if (hasKey) {

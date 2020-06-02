@@ -17,6 +17,7 @@ const CompBox = ({ hide, el, name, style, props, children }) => {
     const {
         handleClick,
         handleEventCallBack,
+        handleRightClickCallBack,
         handleHoverCallBack
     } = EventObj;
     const store = useContext(storeContext);
@@ -40,7 +41,8 @@ const CompBox = ({ hide, el, name, style, props, children }) => {
         onDrop(e) {handleEventCallBack('drop', el, name, e);},
         onClick(e) {handleClick(el, e, true);},
         onMouseOver(e) {handleHoverCallBack('mouseover', el, e);},
-        onMouseLeave(e) {handleHoverCallBack('mouseleave', el, e);}
+        onMouseLeave(e) {handleHoverCallBack('mouseleave', el, e);},
+        onContextMenu(e) {handleRightClickCallBack(el, e);}
     };
 
     let fillter = { cursor: 'default' };
@@ -118,8 +120,8 @@ const checkChildren = (children) => {
 };
 
 // 记录鼠标按下组件蒙版的各项数据，用于鼠标移动时计算更新组件样式
-const changeTab = ({ type, clientX, clientY }, key, el, { dispatch }) => {
-    if (type === 'mousedown') {
+const changeTab = ({ button, clientX, clientY }, key, el, { dispatch }) => {
+    if (button === 0) {
         const elStyles = window.getComputedStyle(document.querySelector(`#${el}`), null);
 
         dispatch({
@@ -146,6 +148,7 @@ const Page = ({
     optionInputHasFocus,
     handleEventCallBack,
     handleHoverCallBack,
+    handleRightClickCallBack,
     handleClick
 }) => {
     const { state: { tree } } = useContext(storeContext);
@@ -154,7 +157,8 @@ const Page = ({
         EventObj = {
             handleClick,
             handleEventCallBack,
-            handleHoverCallBack
+            handleHoverCallBack,
+            handleRightClickCallBack
         };
     }, []);
 

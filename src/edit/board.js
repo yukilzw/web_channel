@@ -3,6 +3,7 @@
  * 包含四个模块（组件菜单、组件结构树图、搭建可视区、操作属性面板）
  * 此根组件处理画布渲染逻辑，以及定义了编辑器内全局通用事件与函数
  */
+import ReactDom from 'react-dom';
 import React, { useContext, useEffect, useRef, useCallback, useState } from 'react';
 import storeContext, { EditFuncContext } from '../context';
 import { Headers, DOMIN } from '../global';
@@ -12,7 +13,7 @@ import Option from './option';
 import PageTree from './tree';
 import { searchTree, rangeKey, creatPart, EnumEdit } from './common';
 import { record } from './record';
-import { Layout, Button, Slider, message } from 'antd';
+import { Layout, Button, Slider, Menu, Dropdown, message } from 'antd';
 import style from './style/index.less';
 import styleBd from './style/changeBox.less';
 
@@ -43,6 +44,7 @@ const Board = () => {
     const [paintOffset, setPaintOffset] = useState({ width: 0, height: 0 });    // 包裹真实画布的一层实际可视区域容器，用来触发paintingWrap滚动
     const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
+    const [contextMenu, setContextMenu] = useState(false);     // 右键菜单展示
 
     // 子组件渲染需要使用的实时常量，在父组件dispatch前设置好，便于子组件重新渲染时直接读取
     const optionInputHasFocus = useRef(false);      // 编辑区输入框聚焦开关（避免键盘事件与输入框默认快捷键冲突）
@@ -84,16 +86,23 @@ const Board = () => {
 
     // 绑定编辑器事件
     let bindEditDomEvent = useCallback(() => {
+        document.addEventListener('click', handleBodyClick, false);
         // 键盘快捷键自定义
         document.addEventListener(`keydown`, handlekeyDown, false);
         document.addEventListener(`keyup`, handlekeyUp, false);
         // 鼠标滚轮
-        document.addEventListener(`wheel`, handlewheel, false);
+        document.addEventListener('wheel', handlewheel, false);
         // 浏览器窗口改变
         window.addEventListener('resize', repainting, false);
         // 鼠标抬起置空拖动编辑组件对象
-        document.addEventListener(`mouseup`, handleMouseUp, false);
+        document.addEventListener('mouseup', handleMouseUp, false);
+        // 鼠标右键
+        document.addEventListener('contextmenu', handleRightClick, false);
     }, []);
+
+    const handleBodyClick = useCallback(() => {
+        setContextMenu(false);
+    });
 
     // 重新计算画布尺寸
     const repainting = useCallback((forceScale) => {
@@ -116,7 +125,10 @@ const Board = () => {
     }, []);
 
     // 清空当前选中的编辑组件
-    const clearChooseCmp = useCallback(() => {
+    const clearChooseCmp = useCallback((e) => {
+        if (e && e.button !== 0) {
+            return;
+        }
         if (targetCmpDom.current) {
             targetCmpDom.current.classList.remove(style.chooseIn);
             targetCmpDom.current = null;
@@ -145,6 +157,11 @@ const Board = () => {
             repainting(scale);
         }
     }, []);
+
+    // 鼠标右键
+    const handleRightClick = useCallback((e) => {
+        e.preventDefault();
+    });
 
     // 键盘事件
     const handlekeyDown = useCallback((e) => {
@@ -350,6 +367,26 @@ const Board = () => {
                 clearChooseCmp();
             }
         }
+    }, []);
+
+    // 移入事件回调
+    const handleRightClickCallBack = useCallback((el, e) => {
+        e.stopPropagation();
+        handleClick(el, e, true);
+        setContextMenu({
+            left: e.clientX + 5,
+            top: e.clientY + 5
+        });
+    }, []);
+
+    // 显示隐藏某个节点（隐藏后编译时会忽略此组件以及其包裹的所有子孙组件，但在编辑器内扔可为其配置属性）
+    const triggerShowEl = useCallback((el) => {
+        const nextTree = searchTree(stateRef.current.tree, el, EnumEdit.hide);
+
+        dispatch({
+            type: 'UPDATE_TREE',
+            payload: nextTree
+        });
     }, []);
 
     // 拖拽事件回调
@@ -579,6 +616,9 @@ const Board = () => {
 
     // 画布内编辑释放鼠标
     const handleMouseUp = useCallback((e) => {
+        if (e.button !== 0) {
+            return;
+        }
         e.preventDefault();
         const { tree, changeCompBox } = stateRef.current;
         const nsbcMask = nextStylesbYChangeMask.current;
@@ -648,6 +688,7 @@ const Board = () => {
                     handleClick={handleClick}
                     checkedKeysList={checkedKeysList}
                     expandedKeys={expandedKeys}
+                    triggerShowEl={triggerShowEl}
                 />
             </div>
         </Layout.Sider>
@@ -690,6 +731,7 @@ const Board = () => {
                                 <Page
                                     handleEventCallBack={handleEventCallBack}
                                     handleClick={handleClick}
+                                    handleRightClickCallBack={handleRightClickCallBack}
                                     handleHoverCallBack={handleHoverCallBack}
                                     optionInputHasFocus={optionInputHasFocus}
                                 />
@@ -704,6 +746,19 @@ const Board = () => {
                 </Layout.Sider>
             </Layout>
         </Layout>
+        {
+            ReactDom.createPortal(contextMenu && <Menu id="contextMenu" style={contextMenu}>
+                <Menu.Item key="0" onClick={deleteNode}>删除</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key="1" onClick={() => triggerShowEl(state.choose)}>隐藏</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key="2" onClick={copeNode}>复制</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key="3" onClick={cutNode}>剪切</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key="4" onClick={pasteNode} disabled={!copyCompEl.current}>粘贴</Menu.Item>
+            </Menu>, document.body)
+        }
     </Layout>;
 };
 
