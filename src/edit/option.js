@@ -13,6 +13,7 @@ import { FolderTwoTone, LeftCircleTwoTone, RightCircleTwoTone, DeleteTwoTone,
 import { SketchPicker } from 'react-color';
 import style from './style/index.less';
 
+const IsMacOS = navigator.platform.match('Mac');
 const { TabPane } = Tabs;
 const { Option } = Select;
 const tab = ['样式', '属性'];
@@ -37,37 +38,37 @@ const Edit = () => {
 
     return <div className={style.edt}>
         <a onClick={savePage}>
-            <Tooltip {...TooltipProps} title={<span>保存(Ctrl+S)</span>}>
+            <Tooltip {...TooltipProps} title={<span>保存({IsMacOS ? 'Command' : 'Ctrl'}+S)</span>}>
                 <FolderTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a onClick={canReturnEdit ? returnEdit : undefined} className={fillUnable(canReturnEdit)}>
-            <Tooltip {...TooltipProps} title={<span>撤销(Ctrl+Z)</span>}>
+            <Tooltip {...TooltipProps} title={<span>撤销({IsMacOS ? 'Command' : 'Ctrl'}+Z)</span>}>
                 <LeftCircleTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a onClick={canResumeEdit ? resumeEdit : undefined} className={fillUnable(canResumeEdit)}>
-            <Tooltip {...TooltipProps} title={<span>恢复(Ctrl+Y)</span>}>
+            <Tooltip {...TooltipProps} title={<span>恢复({IsMacOS ? 'Command' : 'Ctrl'}+Y)</span>}>
                 <RightCircleTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a onClick={choose ? deleteNode : undefined} className={fillUnable(choose)}>
-            <Tooltip {...TooltipProps} title={<span>删除(DEL)</span>}>
+            <Tooltip {...TooltipProps} title={<span>删除({IsMacOS ? '删除键' : 'DEL'})</span>}>
                 <DeleteTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a onClick={choose ? copeNode : undefined} className={fillUnable(choose)}>
-            <Tooltip {...TooltipProps} title={<span>复制(Ctrl+C)</span>}>
+            <Tooltip {...TooltipProps} title={<span>复制({IsMacOS ? 'Command' : 'Ctrl'}+C)</span>}>
                 <CopyTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a onClick={choose ? cutNode : undefined} className={fillUnable(choose)}>
-            <Tooltip {...TooltipProps} title={<span>剪切(Ctrl+X)</span>}>
+            <Tooltip {...TooltipProps} title={<span>剪切({IsMacOS ? 'Command' : 'Ctrl'}+X)</span>}>
                 <PieChartTwoTone className={style.icons}/>
             </Tooltip>
         </a>
         <a onClick={canPaste ? pasteNode : undefined} className={fillUnable(canPaste)}>
-            <Tooltip {...TooltipProps} title={<span>粘贴(Ctrl+V)</span>}>
+            <Tooltip {...TooltipProps} title={<span>粘贴({IsMacOS ? 'Command' : 'Ctrl'}+V)</span>}>
                 <SnippetsTwoTone className={style.icons}/>
             </Tooltip>
         </a>

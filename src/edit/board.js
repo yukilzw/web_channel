@@ -17,6 +17,7 @@ import { Layout, Button, Slider, Menu, message } from 'antd';
 import style from './style/index.less';
 import styleBd from './style/changeBox.less';
 
+const IsMacOS = navigator.platform.match('Mac');
 const EnumId = { root: 'root' };    // 画布id
 const PaintBoxMargin = 30;  // 画布边距
 const SliderMarks = {   // 缩放拖动条坐标轴
@@ -172,8 +173,12 @@ const Board = () => {
             e.preventDefault();
             spaceDown.current = true;
             forceUpdate();
-        // `DEL`键删除选中的可视区组件
-        } else if (e.keyCode === 46) {
+        // windows下`DEL`键删除选中的可视区组件
+        } else if (!IsMacOS && e.keyCode === 46) {
+            e.preventDefault();
+            deleteNode();
+        // mac下`删除键`删除选中的可视区组件
+        } else if (IsMacOS && e.keyCode === 8) {
             e.preventDefault();
             deleteNode();
         // `↑`向上箭头
@@ -188,7 +193,7 @@ const Board = () => {
                 e.preventDefault();
                 changePosNode(1);
             }
-        } else if (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) {
+        } else if (IsMacOS ? e.metaKey : e.ctrlKey) {
             // `CTRL + S`保存
             if (e.keyCode === 83) {
                 e.preventDefault();
