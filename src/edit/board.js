@@ -91,7 +91,7 @@ const Board = () => {
         document.addEventListener(`keydown`, handlekeyDown, false);
         document.addEventListener(`keyup`, handlekeyUp, false);
         // 鼠标滚轮
-        document.addEventListener('wheel', handlewheel, false);
+        document.addEventListener('wheel', handlewheel, { passive: false, capture: false });
         // 浏览器窗口改变
         window.addEventListener('resize', repainting, false);
         // 鼠标抬起置空拖动编辑组件对象
@@ -151,8 +151,8 @@ const Board = () => {
                 clearTimeout(mouseWheelTimmer.current);
                 mouseWheelTimmer.current = null;
             }, 20);
-
-            const scale = Math.min(1, Math.max(0.1, paintScaleRef.current - e.deltaY / 1000));
+            const scaleSpeed = 0.05;
+            const scale = Math.min(1, Math.max(0.1, paintScaleRef.current - (e.deltaY > 0 ? scaleSpeed : -scaleSpeed)));
 
             repainting(scale);
         }
