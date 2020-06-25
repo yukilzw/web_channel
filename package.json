@@ -1,6 +1,6 @@
 {
     "name": "web_channel",
-    "version": "0.1.1",
+    "version": "0.1.2-dev",
     "description": "Web page visualization productivity tools",
     "author": "yukilzw",
     "scripts": {
@@ -9,7 +9,7 @@
         "server": "node ./server/index.js",
         "build:edit": "webpack --progress --config ./script/webpack.config.edit.js",
         "build:page": "webpack --progress --config ./script/webpack.config.page.js",
-        "build:comp": "webpack --progress --config ./script/webpack.config.comp.js",
+        "build:comp": "webpack --progress --config ./script/webpacSWk.config.comp.js",
         "dev": "node ./script/debugComp.js -dev",
         "dev:edit": "webpack-dev-server --progress --config ./script/webpack.config.edit.js -dev"
     },
