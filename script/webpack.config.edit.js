@@ -38,7 +38,7 @@ const config = {
             cacheGroups: {
                 commons: {
                     chunks: 'initial',
-                    test: /[\\/]node_modules[\\/]/,
+                    test: /[\\/]node_modules[\\/]|(antd.less)/,
                     name: 'commons',
                     priority: 10
                 }
