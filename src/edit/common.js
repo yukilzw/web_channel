@@ -54,9 +54,9 @@ const searchTree = (arr, el, type, expand) => {
                         var { tabIndex, items } = expand;
 
                         items.forEach(({ key, value }) => {
-                            if (tabIndex === 0) {
+                            if (tabIndex === 1) {
                                 child.style[key] = value;
-                            } else if (tabIndex === 1) {
+                            } else if (tabIndex === 2) {
                                 child.props[key] = value;
                             }
                         });

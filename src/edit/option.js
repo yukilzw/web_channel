@@ -16,9 +16,10 @@ import style from './style/index.less';
 const IsMacOS = navigator.platform.match('Mac');
 const { TabPane } = Tabs;
 const { Option } = Select;
-const tab = ['样式', '属性'];
+const tab = ['页面设置', '样式', '属性'];
 // 定义固有的样式属性配置项，后续可持续拓展（自定义属性配置项没有固有的，是根据每个组件JSON中staticProps动态渲染的）
 const initStylesItemArr = require('./_style.json');
+const initPageItemArr = require('./_page.json');
 
 const TooltipProps = {
     mouseLeaveDelay: 0,
@@ -96,42 +97,59 @@ const Edit = () => {
 };
 
 const OptionBoard = ({ optionInputHasFocus }) => {
-    const { state, dispatch } = useContext(storeContext);
-    const { tabIndex, choose, tree, menu } = state;
+    const { pid, state, dispatch } = useContext(storeContext);
+    const { tabIndex, choose, page, tree, menu } = state;
     const chooseObj = useRef();
 
     // 渲染面板配置列表
     const renderOption = useCallback(() => {
-        // 没选中组件不显示面板
-        if (!chooseObj.current) {
-            return null;
-        }
+        let optionList;
+        let optionName;
+
         // 面板操作类型，样式还是自定义属性
-        const optionList = tabIndex === 0 ? initStylesItemArr : [
-            {
-                name: '开启懒加载',
-                prop: 'lazy',
-                type: 'switch',
-                size: 'long'
-            },
-            ...menu[chooseObj.current.name].staticProps
-        ];
-        const optionName = tabIndex === 0 ? 'style' : 'props';
+        switch (tabIndex) {
+            case 0:
+                optionList = initPageItemArr;
+                optionName = 0;
+                break;
+            case 1:
+                optionList = initStylesItemArr;
+                optionName = 'style';
+                break;
+            case 2:
+                optionList = [
+                    {
+                        name: '开启懒加载',
+                        prop: 'lazy',
+                        type: 'switch',
+                        size: 'long'
+                    },
+                    ...menu[chooseObj.current.name].staticProps
+                ];
+                optionName = 'props';
+                break;
+            default: return;
+        }
 
         return <div className={style.configWrap}>
             {
                 optionList.map((item) => <div
                     className={[style.config, item.size === 'long' ? style.long : ''].join(' ')}
-                    key={item.prop} key={item.prop}
+                    key={item.prop}
                 >
                     {renderItemByType(item, optionName)}
                 </div>)
             }
         </div>;
-    }, [menu, tree, choose, tabIndex]);
+    }, [menu, tree, choose, tabIndex, page]);
 
     const renderItemByType = useCallback(({ name, prop, type = 'text', option, mirrorValue }, optionName) => {
-        const curValue = chooseObj.current[optionName][prop];
+        let curValue;
+        if (optionName === 0) {
+            curValue = page[prop];
+        } else {
+            curValue = chooseObj.current[optionName][prop];
+        }
 
         switch (type) {
             case 'switch':
@@ -195,7 +213,7 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                     />
                 </>;
         }
-    }, [menu, tree, choose, tabIndex]);
+    }, [menu, tree, choose, tabIndex, page]);
 
     const changeOptionInputHasFocus = useCallback((type) => {
         if (!type) {
@@ -228,13 +246,21 @@ const OptionBoard = ({ optionInputHasFocus }) => {
 
             value = `rgba(${r},${g},${b},${a})`;
         }
-        const nextTree = searchTree(tree, choose, EnumEdit.change, { tabIndex, items: [{ key, value }] });
 
-        dispatch({
-            type: 'UPDATE_TREE',
-            payload: nextTree
-        });
-    }, [tree, choose, tabIndex]);
+        if (tabIndex === 0) {
+            dispatch({
+                type: 'UPDATE_PAGE_INFO',
+                payload: { [key]: value }
+            });
+        } else {
+            const nextTree = searchTree(tree, choose, EnumEdit.change, { tabIndex, items: [{ key, value }] });
+
+            dispatch({
+                type: 'UPDATE_TREE',
+                payload: nextTree
+            });
+        }
+    }, [tree, choose, tabIndex, page]);
 
     // 面板TAB切换
     const changeTab = useCallback((i) => {
@@ -246,23 +272,31 @@ const OptionBoard = ({ optionInputHasFocus }) => {
 
     const comp = useMemo(() => {
         chooseObj.current = searchTree(tree, choose, EnumEdit.choose);
-        const content = choose && <Layout className={style.tabPane}>
-            <p className={style.compName}>
-                <span>{menu[chooseObj.current.name].name}({chooseObj.current.name})</span>
-                <span>ID:{chooseObj.current.el.replace(/^wc/, '')}</span>
-            </p>
+        const content = <Layout className={style.tabPane}>
+            {
+                tabIndex === 0 ? <p className={style.compName}>
+                    <span>页面ID：{pid}</span>
+                </p> : <p className={style.compName}>
+                    <span>{menu[chooseObj.current.name].name}({chooseObj.current.name})</span>
+                    <span>ID:{chooseObj.current.el.replace(/^wc/, '')}</span>
+                </p>
+            }
             {renderOption()}
         </Layout>;
 
         return <Tabs activeKey={tabIndex.toString()} onChange={changeTab}>
-            <TabPane tab={tab[0]} key="0">
-                {content}
-            </TabPane>
-            <TabPane tab={tab[1]} key="1">
-                {content}
-            </TabPane>
+            {
+                tab.map((tabText, i) => {
+                    if (!choose && i > 0) {
+                        return null;
+                    }
+                    return <TabPane tab={tabText} key={`${i}`}>
+                        {content}
+                    </TabPane>;
+                })
+            }
         </Tabs>;
-    }, [tree, choose, tabIndex]);
+    }, [tree, choose, tabIndex, page]);
 
     return <>
         <Edit />

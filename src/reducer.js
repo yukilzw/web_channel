@@ -21,11 +21,19 @@ const reducer = (state, action) => {
                 ...state,
                 tree: newTree
             };
-        // 编辑选中的组件配置
+        // 选中组件
         case 'EDIT_CHOOSE_CMP':
+            var resetTabIndex = {};
+
+            if (action.payload === null) {
+                resetTabIndex.tabIndex = 0;
+            } else if (state.choose !== action.payload || state.tabIndex === 0) {
+                resetTabIndex.tabIndex = 1;
+            }
             return {
                 ...state,
-                choose: action.payload
+                choose: action.payload,
+                ...resetTabIndex
             };
         // 切换操作面板tab
         case 'EDIT_CHANGE_TABNAV':
@@ -39,18 +47,28 @@ const reducer = (state, action) => {
                 ...state,
                 changeCompBox: action.payload
             };
+        // 更新页面基本设置
+        case 'UPDATE_PAGE_INFO':
+            return {
+                ...state,
+                page: {
+                    ...state.page,
+                    ...action.payload
+                }
+            };
         default:
             return state;
     }
 };
 
-const App = ({ tree, menu, children }) => {
+const App = ({ pid, page, tree, menu, children }) => {
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
     // 预览页面只需要tree，不注入编辑器内的reducer
     const [state, dispatch] = useReducer(reducer, Object.assign(
         {
             tree: JSON.parse(JSON.stringify(tree))           // 页面配置JSON树
         }, window.ENV === 'edit' ? {
+            page: JSON.parse(JSON.stringify(page)),
             menu: JSON.parse(JSON.stringify(menu)),
             choose: null,   // 当前选中的组件配置
             // type changeCompBox = {
@@ -72,7 +90,7 @@ const App = ({ tree, menu, children }) => {
         } : {}
     ));
 
-    return <Provider value={{ state, dispatch, forceUpdate }}>
+    return <Provider value={{ pid, state, dispatch, forceUpdate }}>
         {children}
     </Provider>;
 };

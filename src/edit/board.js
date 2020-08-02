@@ -508,12 +508,14 @@ const Board = () => {
 
     // 保存页面配置
     const savePage = useCallback(() => new Promise((resolve) => {
-        const { tree } = stateRef.current;
+        const { tree, page } = stateRef.current;
 
         fetch(DOMIN + '/savepage', {
             method: 'POST',
             headers: Headers.json,
-            body: JSON.stringify(tree)
+            body: JSON.stringify({
+                page, tree
+            })
         }).then(response => response.json()).then(res => {
             if (res.error !== 0) {
                 message.error(res.msg);

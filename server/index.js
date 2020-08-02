@@ -79,7 +79,8 @@ app.post('/loadPage', (req, res) => {
         error: 0,
         msg: 'succ',
         data: {
-            tree: getPageJSON(),
+            pid: 1,
+            ...getPageJSON(),
             hook: getCompUrlHook()
         }
     });

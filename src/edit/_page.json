@@ -1,0 +1,17 @@
+[
+    {
+        "name": "页面标题",
+        "prop": "title",
+        "size": "long"
+    },
+    {
+        "name": "页面关键词",
+        "prop": "keys",
+        "size": "long"
+    },
+    {
+        "name": "页面描述",
+        "prop": "desc",
+        "size": "long"
+    }
+]

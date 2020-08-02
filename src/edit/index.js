@@ -34,13 +34,15 @@ Promise.all([
         message.error(resMenu.msg);
         return;
     }
-    const { tree, hook } = resPage.data;
+    const { tree, hook, page, pid } = resPage.data;
 
     Object.assign(hookMap, hook);
     searchTree(tree, null, EnumEdit.maxKeyNum);
     ReactDom.render(
         <App
             tree={tree}
+            page={page}
+            pid={pid}
             menu={resMenu.data}
         >
             <Board />

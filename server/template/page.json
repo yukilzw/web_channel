@@ -1,140 +1,147 @@
-[
-  {
-    "name": "View",
-    "style": {
-      "position": "relative",
-      "width": "100%",
-      "height": "1215px",
-      "backgroundImage": "http://r.photo.store.qq.com/psb?/V14dALyK4bMoWS/cfA9nq49UyTIPQjesI0SktmLGS373fN4SUQSr6klDsM!/r/dDwBAAAAAAAA",
-      "backgroundRepeat": "no-repeat",
-      "backgroundSize": "100% 100%"
-    },
-    "props": {
-      "lazy": true
-    },
-    "el": "wc8",
-    "children": [
-      {
-        "name": "ImageText",
-        "style": {
-          "position": "relative",
-          "width": "888px",
-          "marginLeft": "auto",
-          "marginRight": "auto",
-          "left": "56px",
-          "top": "321px",
-          "height": "494px"
-        },
-        "props": {},
-        "children": [
-          {
-            "name": "Image",
-            "style": {
-              "position": "relative",
-              "width": "360px",
-              "height": "360px",
-              "marginTop": "0px",
-              "marginLeft": "auto",
-              "marginRight": "auto",
-              "display": "block",
-              "overflow": "hidden"
-            },
-            "props": {
-              "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA",
-              "blank": true,
-              "link": "https://lol.qq.com"
-            },
-            "el": "wc6"
-          },
-          {
-            "name": "Text",
-            "style": {
-              "position": "relative",
-              "width": "100%",
-              "height": "110px",
-              "backgroundColor": "rgba(0,0,0,1)"
-            },
-            "props": {
-              "text": "内容",
-              "fontSize": "70px",
-              "lineHeight": "100px",
-              "textAlign": "center",
-              "fontWeight": "normal",
-              "color": "rgba(248,231,28,1)"
-            },
-            "el": "wc7"
-          }
-        ],
-        "el": "wc5"
-      }
-    ]
+{
+  "page": {
+    "title": "lzw的限定~",
+    "keys": "游戏，电竞，LOL",
+    "desc": "这是一段页面的描述文案"
   },
-  {
-    "name": "Iframe",
-    "style": {
-      "position": "relative",
-      "width": "",
-      "height": "1180px",
-      "top": "0px",
-      "left": "0px"
-    },
-    "props": {
-      "src": "https://lol.qq.com/act/a20200424fpxskin/index.html",
-      "lazy": true,
-      "scrolling": false
-    },
-    "el": "wc3",
-    "hide": true
-  },
-  {
-    "name": "View",
-    "style": {
-      "position": "relative",
-      "width": "100%",
-      "height": "1122px",
-      "backgroundColor": "rgba(74,226,93,0.3)",
-      "top": "",
-      "overflow": "hidden"
-    },
-    "props": {
-      "lazy": true
-    },
-    "el": "wc9",
-    "children": [
-      {
-        "name": "Text",
-        "style": {
-          "position": "relative",
-          "width": "auto",
-          "marginLeft": "auto",
-          "marginRight": "auto",
-          "marginTop": "30px"
-        },
-        "props": {
-          "text": "这是下面这个元素的标题",
-          "fontSize": "50px",
-          "lineHeight": "100px",
-          "textAlign": "center",
-          "lazy": true,
-          "color": "rgba(182,36,54,1)",
-          "fontWeight": "bold"
-        },
-        "el": "wc11"
+  "tree": [
+    {
+      "name": "View",
+      "style": {
+        "position": "relative",
+        "width": "100%",
+        "height": "1215px",
+        "backgroundImage": "http://r.photo.store.qq.com/psb?/V14dALyK4bMoWS/cfA9nq49UyTIPQjesI0SktmLGS373fN4SUQSr6klDsM!/r/dDwBAAAAAAAA",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100% 100%"
       },
-      {
-        "name": "View",
-        "style": {
-          "position": "relative",
-          "width": "1089px",
-          "height": "820px"
+      "props": {
+        "lazy": true
+      },
+      "el": "wc8",
+      "children": [
+        {
+          "name": "ImageText",
+          "style": {
+            "position": "relative",
+            "width": "888px",
+            "marginLeft": "auto",
+            "marginRight": "auto",
+            "left": "56px",
+            "top": "321px",
+            "height": "494px"
+          },
+          "props": {},
+          "children": [
+            {
+              "name": "Image",
+              "style": {
+                "position": "relative",
+                "width": "360px",
+                "height": "360px",
+                "marginTop": "0px",
+                "marginLeft": "auto",
+                "marginRight": "auto",
+                "display": "block",
+                "overflow": "hidden"
+              },
+              "props": {
+                "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA",
+                "blank": true,
+                "link": "https://lol.qq.com"
+              },
+              "el": "wc6"
+            },
+            {
+              "name": "Text",
+              "style": {
+                "position": "relative",
+                "width": "100%",
+                "height": "110px",
+                "backgroundColor": "rgba(0,0,0,1)"
+              },
+              "props": {
+                "text": "内容",
+                "fontSize": "70px",
+                "lineHeight": "100px",
+                "textAlign": "center",
+                "fontWeight": "normal",
+                "color": "rgba(248,231,28,1)"
+              },
+              "el": "wc7"
+            }
+          ],
+          "el": "wc5"
+        }
+      ]
+    },
+    {
+      "name": "Iframe",
+      "style": {
+        "position": "relative",
+        "width": "",
+        "height": "1180px",
+        "top": "0px",
+        "left": "0px"
+      },
+      "props": {
+        "src": "https://lol.qq.com/act/a20200424fpxskin/index.html",
+        "lazy": true,
+        "scrolling": false
+      },
+      "el": "wc3",
+      "hide": true
+    },
+    {
+      "name": "View",
+      "style": {
+        "position": "relative",
+        "width": "100%",
+        "height": "1122px",
+        "backgroundColor": "rgba(74,226,93,0.3)",
+        "top": "",
+        "overflow": "hidden"
+      },
+      "props": {
+        "lazy": true
+      },
+      "el": "wc9",
+      "children": [
+        {
+          "name": "Text",
+          "style": {
+            "position": "relative",
+            "width": "auto",
+            "marginLeft": "auto",
+            "marginRight": "auto",
+            "marginTop": "30px"
+          },
+          "props": {
+            "text": "这是下面这个元素的标题",
+            "fontSize": "50px",
+            "lineHeight": "100px",
+            "textAlign": "center",
+            "lazy": true,
+            "color": "rgba(182,36,54,1)",
+            "fontWeight": "bold"
+          },
+          "el": "wc11"
         },
-        "props": {
-          "lazy": true
-        },
-        "el": "wc12",
-        "children": [],
-        "hide": true
-      }
-    ]
-  }
-]
+        {
+          "name": "View",
+          "style": {
+            "position": "relative",
+            "width": "1089px",
+            "height": "820px"
+          },
+          "props": {
+            "lazy": true
+          },
+          "el": "wc12",
+          "children": [],
+          "hide": true
+        }
+      ]
+    }
+  ]
+}
