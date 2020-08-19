@@ -640,7 +640,7 @@ const Board = () => {
                 });
             }
             const nextTree = searchTree(tree, changeCompBox.el, EnumEdit.change, {
-                tabIndex: 0,
+                tabIndex: 1,
                 items: nextStyleItems
             });
 
