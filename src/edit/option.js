@@ -18,8 +18,8 @@ const { TabPane } = Tabs;
 const { Option } = Select;
 const tab = ['页面设置', '样式', '属性'];
 // 定义固有的样式属性配置项，后续可持续拓展（自定义属性配置项没有固有的，是根据每个组件JSON中staticProps动态渲染的）
-const initStylesItemArr = require('./_style.json');
-const initPageItemArr = require('./_page.json');
+const initStylesItemArr = require('./config/_style.json');
+const initPageItemArr = require('./config/_page.json');
 
 const TooltipProps = {
     mouseLeaveDelay: 0,

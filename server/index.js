@@ -36,7 +36,7 @@ app.get('/page', (req, res) => {
 
     res.render(path.join(__dirname, './template/index.ejs'), {
         id: 'app',
-        title: '预览页',
+        title: getPageJSON().page.title,
         js: [
             `${CONFIG.HOST}:${CONFIG.PORT}/page/commons.js`,
             `${CONFIG.HOST}:${CONFIG.PORT}/page/main.js`,
@@ -103,8 +103,8 @@ console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit\x1B[0m`);
 console.log(`页面预览：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page\x1B[0m`);
 console.log(`\x1B[32m----------↓ DEV模式 ↓(请勿退出进程,否则'npm run server'重启服务)--------------\x1B[0m`);
 console.log(`页面预览组件调试(XXX为组件文件夹名称，逗号隔开)：`);
-console.log(`'npm run dev:comp debug=XXX,YYY'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page?debug_comp=XXX,YYY\x1B[0m`);
+console.log(`'npm run dev debug=XXX,YYY'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page?debug_comp=XXX,YYY\x1B[0m`);
 console.log(`编辑器预览组件调试：`);
-console.log(`'npm run dev:comp debug=XXX,YYY'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug_comp=XXX,YYY\x1B[0m`);
+console.log(`'npm run dev debug=XXX,YYY'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug_comp=XXX,YYY\x1B[0m`);
 console.log(`编辑器功能开发：`);
 console.log(`'npm run dev:edit'  \x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit?debug=1\x1B[0m`);
