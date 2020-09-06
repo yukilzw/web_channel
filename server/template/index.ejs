@@ -2,6 +2,9 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <% if (id === 'app') { %>
+    <meta name="description" content="<%= keys %> - <%= desc %>">
+    <% } %>
     <title><%= title %></title>
     <link rel="shortcut icon" href="/template/favicon.ico"/>
     <script>window.comp = {};</script>

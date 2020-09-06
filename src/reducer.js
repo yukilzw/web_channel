@@ -62,7 +62,7 @@ const reducer = (state, action) => {
 };
 
 const App = ({ pid, page, tree, menu, children }) => {
-    const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
     // 预览页面只需要tree，不注入编辑器内的reducer
     const [state, dispatch] = useReducer(reducer, Object.assign(
         {

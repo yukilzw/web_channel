@@ -33,10 +33,13 @@ app.all('*', (req, res, next) => {
 app.get('/page', (req, res) => {
     const { debug_comp } = req.query;
     const commonsDebug = debug_comp ? [`${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons-dev.js`] : [];
+    const { page: {
+        title, keys, desc
+    } } = getPageJSON();
 
     res.render(path.join(__dirname, './template/index.ejs'), {
         id: 'app',
-        title: getPageJSON().page.title,
+        title, keys, desc,
         js: [
             `${CONFIG.HOST}:${CONFIG.PORT}/page/commons.js`,
             `${CONFIG.HOST}:${CONFIG.PORT}/page/main.js`,
