@@ -89,8 +89,7 @@
         "lazy": true,
         "scrolling": false
       },
-      "el": "wc3",
-      "hide": true
+      "el": "wc3"
     },
     {
       "name": "View",

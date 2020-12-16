@@ -1,17 +1,15 @@
 /**
  * @description 编辑器打包总入口
  */
-import { Headers, DOMIN, hookMap } from '../global';
+import { Headers, DOMIN, hookMap } from './utils/global';
 import React from 'react';
 import ReactDom from 'react-dom';
 import Board from './board';
 import { searchTree, EnumEdit } from './common';
-import App from '../reducer';
+import App from './model/reducer';
 import { message } from 'antd';
 import { setTwoToneColor } from '@ant-design/icons';
 import './style/antd.less';
-
-window.ENV = 'edit';
 
 setTwoToneColor('#ec78cf');
 

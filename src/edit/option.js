@@ -2,7 +2,7 @@
  * @description 编辑器属性操作面板
  */
 import React, { useContext, useCallback, useRef, useMemo } from 'react';
-import storeContext, { EditFuncContext } from '../context';
+import storeContext, { EditFuncContext } from './model/context';
 import { searchTree, EnumEdit } from './common';
 import { record } from './record';
 import { Tabs, Layout, Input, Select, Switch, Tooltip, Popover, message } from 'antd';

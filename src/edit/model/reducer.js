@@ -64,13 +64,14 @@ const reducer = (state, action) => {
 const App = ({ pid, page, tree, menu, children }) => {
     const [, forceUpdate] = useReducer(x => x + 1, 0);
     // 预览页面只需要tree，不注入编辑器内的reducer
-    const [state, dispatch] = useReducer(reducer, Object.assign(
+    const [state, dispatch] = useReducer(reducer,
         {
-            tree: JSON.parse(JSON.stringify(tree))           // 页面配置JSON树
-        }, window.ENV === 'edit' ? {
+            tree: JSON.parse(JSON.stringify(tree)),           // 页面配置JSON树
             page: JSON.parse(JSON.stringify(page)),
             menu: JSON.parse(JSON.stringify(menu)),
-            choose: null,   // 当前选中的组件配置
+            changeCompBox: null,
+            tabIndex: 0,    // 属性面板tab索引
+            choose: null   // 当前选中的组件配置
             // type changeCompBox = {
             //     el: string;    组件容器id
             //     key: string;   操作按下的是哪个蒙版，取自complie.js中的changeTabList数组
@@ -85,10 +86,8 @@ const App = ({ pid, page, tree, menu, children }) => {
             //           }
             //     }
             // },
-            changeCompBox: null,
-            tabIndex: 0    // 属性面板tab索引
-        } : {}
-    ));
+        }
+    );
 
     return <Provider value={{ pid, state, dispatch, forceUpdate }}>
         {children}

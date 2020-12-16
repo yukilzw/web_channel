@@ -1,14 +1,12 @@
 /**
  * @description 页面打包总入口
  */
-import { Headers, DOMIN, hookMap } from '../global';
+import { Headers, DOMIN, hookMap } from './utils/global';
 import React from 'react';
 import ReactDom from 'react-dom';
-import App from '../reducer';
+import App from './model/reducer';
 import Page from './compile';
 import './index.less';
-
-window.ENV = 'page';
 
 // 拉取当前页面的JSON配置后再渲染页面
 fetch(DOMIN + '/loadPage', {

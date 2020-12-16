@@ -2,7 +2,7 @@
  * @description 编辑器组件菜单
  */
 import React, { useContext } from 'react';
-import storeContext from '../context';
+import storeContext from './model/context';
 import { Menu } from 'antd';
 
 const CompMenu = ({ chooseDragComp }) => {

@@ -2,7 +2,7 @@
  * @description 编辑器组件树视图
  */
 import React, { useContext, useCallback, useMemo } from 'react';
-import storeContext from '../context';
+import storeContext from './model/context';
 import { searchTree, EnumEdit } from './common';
 import { Tree, message } from 'antd';
 import style from './style/index.less';

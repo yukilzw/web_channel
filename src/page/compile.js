@@ -4,8 +4,8 @@
  */
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import LazyLoad from 'react-lazyload';
-import storeContext from '../context';
-import { loadAsync } from '../global';
+import storeContext from './model/context';
+import { loadAsync } from './utils/global';
 
 const CompBox = ({ hide, el, name, style, props, children }) => {
     const [compHasLoad, setCompHasLoad] = useState(false);
@@ -45,7 +45,7 @@ const CompBox = ({ hide, el, name, style, props, children }) => {
         {
             // 下载完成后再加载组件
             !compHasLoad ? null :  <>
-                <Comp.current {...props} env={window.ENV} >
+                <Comp.current {...props} env="page" >
                     {childrenComp}
                 </Comp.current>
             </>

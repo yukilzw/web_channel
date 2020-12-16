@@ -5,8 +5,8 @@
  */
 import ReactDom from 'react-dom';
 import React, { useContext, useEffect, useRef, useCallback, useState } from 'react';
-import storeContext, { EditFuncContext } from '../context';
-import { Headers, DOMIN } from '../global';
+import storeContext, { EditFuncContext } from './model/context';
+import { Headers, DOMIN } from './utils/global';
 import Page from './compile';
 import CompMenu from './menu';
 import Option from './option';

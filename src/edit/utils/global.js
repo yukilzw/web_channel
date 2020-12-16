@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import ReactDom from 'react-dom';
-import { CONFIG } from '../config';
+import { CONFIG } from '../../../config';
 
 window.__react__ = React;
 window.__reactDOM__ = ReactDom;
