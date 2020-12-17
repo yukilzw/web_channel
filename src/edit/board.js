@@ -59,8 +59,20 @@ const Board = () => {
         paintScaleRef.current = paintScale;
     });
 
+    // 注册编辑器事event
     useEffect(() => {
-        bindEditDomEvent();
+        document.addEventListener('click', handleBodyClick, false);
+        // 键盘快捷键自定义
+        document.addEventListener(`keydown`, handlekeyDown, false);
+        document.addEventListener(`keyup`, handlekeyUp, false);
+        // 鼠标滚轮
+        document.addEventListener('wheel', handlewheel, { passive: false, capture: false });
+        // 浏览器窗口改变
+        window.addEventListener('resize', repainting, false);
+        // 鼠标抬起置空拖动编辑组件对象
+        document.addEventListener('mouseup', handleMouseUp, false);
+        // 鼠标右键
+        document.addEventListener('contextmenu', handleRightClick, false);
     }, []);
 
     // 渲染外层容器后再计算出最合适的比例
@@ -85,28 +97,12 @@ const Board = () => {
         }
     }, [paintScale, paintMinHeight, state.tree]);
 
-    // 绑定编辑器事件
-    let bindEditDomEvent = useCallback(() => {
-        document.addEventListener('click', handleBodyClick, false);
-        // 键盘快捷键自定义
-        document.addEventListener(`keydown`, handlekeyDown, false);
-        document.addEventListener(`keyup`, handlekeyUp, false);
-        // 鼠标滚轮
-        document.addEventListener('wheel', handlewheel, { passive: false, capture: false });
-        // 浏览器窗口改变
-        window.addEventListener('resize', repainting, false);
-        // 鼠标抬起置空拖动编辑组件对象
-        document.addEventListener('mouseup', handleMouseUp, false);
-        // 鼠标右键
-        document.addEventListener('contextmenu', handleRightClick, false);
-    }, []);
-
-    const handleBodyClick = useCallback(() => {
+    const handleBodyClick = () => {
         setContextMenu(false);
-    });
+    };
 
     // 重新计算画布尺寸
-    const repainting = useCallback((forceScale) => {
+    const repainting = (forceScale) => {
         const paintingWrapDom = paintingWrap.current;
         const shouldFoceUpdate = typeof forceScale === 'number';
 
@@ -123,10 +119,10 @@ const Board = () => {
             setPaintScale(nextPaintScale);
             setPaintMinHeight(nextPaintMinHeight);
         }
-    }, []);
+    };
 
     // 清空当前选中的编辑组件
-    const clearChooseCmp = useCallback((e) => {
+    const clearChooseCmp = (e) => {
         if (e && e.button !== 0) {
             return;
         }
@@ -139,10 +135,10 @@ const Board = () => {
             type: 'EDIT_CHOOSE_CMP',
             payload: null
         });
-    }, []);
+    };
 
     // 空格+滚轮缩放画布
-    const handlewheel = useCallback((e) => {
+    const handlewheel = (e) => {
         if (spaceDown.current) {
             e.preventDefault();
             if (mouseWheelTimmer.current) {
@@ -157,15 +153,15 @@ const Board = () => {
 
             repainting(scale);
         }
-    }, []);
+    };
 
     // 鼠标右键
-    const handleRightClick = useCallback((e) => {
+    const handleRightClick = (e) => {
         e.preventDefault();
-    });
+    };
 
     // 键盘事件
-    const handlekeyDown = useCallback((e) => {
+    const handlekeyDown = (e) => {
         const { choose } = stateRef.current;
 
         // `空格`键
@@ -220,16 +216,16 @@ const Board = () => {
                 resumeEdit();
             }
         }
-    }, []);
+    };
 
-    const handlekeyUp = useCallback((e) => {
+    const handlekeyUp = (e) => {
         // `空格`键
         if (e.keyCode === 32) {
             e.preventDefault();
             spaceDown.current = false;
             forceUpdate();
         }
-    }, []);
+    };
 
     // 删除节点方法
     const deleteNode = useCallback(() => {
@@ -362,7 +358,7 @@ const Board = () => {
     }, []);
 
     // 指针切换历史记录时，校验当前选中组件是否还存在，不存在就把选中框去掉
-    const checkCurChooseExist = useCallback((tree) => {
+    const checkCurChooseExist = (tree) => {
         const { choose } = stateRef.current;
 
         if (choose) {
@@ -372,7 +368,7 @@ const Board = () => {
                 clearChooseCmp();
             }
         }
-    }, []);
+    };
 
     // 移入事件回调
     const handleRightClickCallBack = useCallback((el, e) => {
@@ -458,7 +454,7 @@ const Board = () => {
     }, []);
 
     // 递归向上查询该节点的所有祖先节点数组
-    const expandedParentsNode = useCallback((dom) => {
+    const expandedParentsNode = (dom) => {
         if (dom.parentNode.id === EnumId.root) {
             return [];
         }
@@ -471,10 +467,10 @@ const Board = () => {
         } else {
             return expandedParentsNode(dom.parentNode);
         }
-    }, []);
+    };
 
     // 释放拖拽，将新组建加入页面配置
-    const putCmpIntoArea = useCallback(() => {
+    const putCmpIntoArea = () => {
         const { tree, menu } = stateRef.current;
         // 生成新组件的配置
         const compObj = creatPart(dragCmpConfig.current, menu);
@@ -498,7 +494,7 @@ const Board = () => {
             payload: nextTree
         });
         dispatchCallBack.current = () => handleClick(el, null, true);
-    }, []);
+    };
 
     // 选中菜单中的组件开始拖拽时
     const chooseDragComp = useCallback((config) => {
@@ -527,20 +523,20 @@ const Board = () => {
     }), []);
 
     // 在新窗口预览页面
-    const showPage = useCallback(async () => {
+    const showPage = async () => {
         const pageWindow = window.open('about:blank', '_blank');
 
         await savePage();
         pageWindow.location.href = `${DOMIN}/page`;
-    }, []);
+    };
 
     // 拖动顶部滑块强制改变画布尺寸
-    const changeSlider = useCallback((num) => {
+    const changeSlider = (num) => {
         repainting(num / 100);
-    }, []);
+    };
 
     // 响应compile.js中changeTab事件，实现拖动蒙版编辑组件尺寸、定位
-    const changeBoxByMask = useCallback((e) => {
+    const changeBoxByMask = (e) => {
         const { changeCompBox } = stateRef.current;
 
         if (!changeCompBox) {
@@ -619,10 +615,10 @@ const Board = () => {
         document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(computedStyle.width);
         document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(computedStyle.height);
 
-    }, [state.changeCompBox]);
+    };
 
     // 画布内编辑释放鼠标
-    const handleMouseUp = useCallback((e) => {
+    const handleMouseUp = (e) => {
         if (e.button !== 0) {
             return;
         }
@@ -655,18 +651,18 @@ const Board = () => {
         });
         nextStylesbYChangeMask.current = null;
         paintMaskMove.current = false;
-    }, [state.changeCompBox]);
+    };
 
     // 拖动画布
-    const dragPaintMaskDown = useCallback((e) => {
+    const dragPaintMaskDown = (e) => {
         const { clientX, clientY } = e;
 
         paintMaskMove.current = {
             clientX, clientY
         };
-    }, []);
+    };
 
-    const dragPaintMaskMove = useCallback((e) => {
+    const dragPaintMaskMove = (e) => {
         e.preventDefault();
         if (paintMaskMove.current) {
             const { clientX, clientY } = paintMaskMove.current;
@@ -683,7 +679,7 @@ const Board = () => {
                 clientY: e.clientY
             };
         }
-    }, []);
+    };
 
     return <Layout className={style.main}>
         <Layout.Sider theme="light" >

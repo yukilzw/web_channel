@@ -1,7 +1,7 @@
 /**
  * @description 编辑器属性操作面板
  */
-import React, { useContext, useCallback, useRef, useMemo } from 'react';
+import React, { useContext, useRef, useMemo } from 'react';
 import storeContext, { EditFuncContext } from './model/context';
 import { searchTree, EnumEdit } from './common';
 import { record } from './record';
@@ -35,7 +35,7 @@ const Edit = () => {
     const canResumeEdit = record.point < record.stack.length - 1;
     const canPaste = !!copyCompEl.current;
 
-    const fillUnable = useCallback((can) => can ? undefined : style.unable);
+    const fillUnable = (can) => can ? undefined : style.unable;
 
     return <div className={style.edt}>
         <a onClick={savePage}>
@@ -102,7 +102,7 @@ const OptionBoard = ({ optionInputHasFocus }) => {
     const chooseObj = useRef();
 
     // 渲染面板配置列表
-    const renderOption = useCallback(() => {
+    const renderOption = () => {
         let optionList;
         let optionName;
 
@@ -141,9 +141,9 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                 </div>)
             }
         </div>;
-    }, [menu, tree, choose, tabIndex, page]);
+    };
 
-    const renderItemByType = useCallback(({ name, prop, type = 'text', option, mirrorValue }, optionName) => {
+    const renderItemByType = ({ name, prop, type = 'text', option, mirrorValue }, optionName) => {
         let curValue;
         if (optionName === 0) {
             curValue = page[prop];
@@ -213,19 +213,19 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                     />
                 </>;
         }
-    }, [menu, tree, choose, tabIndex, page]);
+    };
 
-    const changeOptionInputHasFocus = useCallback((type) => {
+    const changeOptionInputHasFocus = (type) => {
         if (!type) {
             // 只有输入框失去焦点时才算完成编辑，记录一次当前tree到堆栈
             record.add(tree);
         }
         // 释放当前编辑输入框状态，开启撤销、恢复快捷键权限
         optionInputHasFocus.current = type;
-    }, []);
+    };
 
     // 改变面板属性值的回调
-    const changeValue = useCallback((dynamic, key, type) => {
+    const changeValue = (dynamic, key, type) => {
         let value;
 
         if (type === 'text') {
@@ -260,15 +260,15 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                 payload: nextTree
             });
         }
-    }, [tree, choose, tabIndex, page]);
+    };
 
     // 面板TAB切换
-    const changeTab = useCallback((i) => {
+    const changeTab = (i) => {
         dispatch({
             type: 'EDIT_CHANGE_TABNAV',
             payload: Number(i)
         });
-    }, []);
+    };
 
     const comp = useMemo(() => {
         chooseObj.current = searchTree(tree, choose, EnumEdit.choose);

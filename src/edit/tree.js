@@ -1,7 +1,7 @@
 /**
  * @description 编辑器组件树视图
  */
-import React, { useContext, useCallback, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import storeContext from './model/context';
 import { searchTree, EnumEdit } from './common';
 import { Tree, message } from 'antd';
@@ -14,20 +14,20 @@ const PageTree = ({
     const { choose, tree, menu } = state;
 
     // 选中某个节点
-    const selectNode = useCallback(([el], e) => {
+    const selectNode = ([el], e) => {
         handleClick(e.node.key);
         const selectCompDom = document.querySelector(`#${e.node.key}`);
         const paintingWrapDom =  document.querySelector(`.${style.paintingWrap}`);
         const nextScrollTop = selectCompDom.getBoundingClientRect().top - 50 - 30 + paintingWrapDom.scrollTop;
 
         paintingWrapDom.scrollTop = nextScrollTop;
-    }, []);
+    };
 
     // 显示隐藏某个节点
-    const checkNode = useCallback((_, e) => triggerShowEl(e.node.key), []);
+    const checkNode = (_, e) => triggerShowEl(e.node.key);
 
     // 展开节点
-    const expendNode = useCallback((_, e) => {
+    const expendNode = (_, e) => {
         const hasKey = expandedKeys.current.has(e.node.key);
 
         if (hasKey) {
@@ -37,10 +37,10 @@ const PageTree = ({
         }
         expandedKeys.current = new Set(expandedKeys.current);
         forceUpdate();
-    }, []);
+    };
 
     // 用于将页面原始tree字段映射为ANTD树组件所需字段
-    const fixTreeKey = useCallback((children) => {
+    const fixTreeKey = (children) => {
         for (let child of children) {
             child.key = child.el;
             child.title = state.menu[child.name].name + '(' + child.el.replace(/^wc/, '') + ')';
@@ -58,10 +58,10 @@ const PageTree = ({
                 delete child.children;
             }
         }
-    }, []);
+    };
 
     // 拖拽数组件移动节点
-    const dropNodeTree = useCallback(({ dragNode, dropPosition, node }) => {
+    const dropNodeTree = ({ dragNode, dropPosition, node }) => {
         const { key: dragNodeKey } = dragNode;
         const { pos: posStr, key: targetKey } = node;
         const posArr = posStr.split('-');
@@ -83,7 +83,7 @@ const PageTree = ({
             type: 'UPDATE_TREE',
             payload: nextTree
         });
-    }, [tree, menu]);
+    };
 
     // 缓存树组件，如果没有涉及到影响树组件展示的状态更新，直接渲染缓存树组件
     const compTree = useMemo(() => {
