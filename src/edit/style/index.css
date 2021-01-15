@@ -1,0 +1,229 @@
+.main {
+    overflow-x: hidden;
+    min-width: 700px;
+    height: 100vh;
+}
+
+.mainSider {
+    overflow: auto;
+    height: 50%;
+}
+
+.mainSider .menu {
+    overflow-x: hidden;
+    border-bottom: 1px solid #f0f0f0;;
+    border-bottom-width: 2px;
+}
+
+.hoverIn {
+    outline-offset: -3px;
+    outline: 3px solid #1890FF;
+}
+
+.dragIn {
+    outline-offset: -5px;
+    outline: 5px solid #03d000;
+}
+
+.dragInUnable {
+    outline-offset: -5px;
+    outline: 5px solid #ff0303;
+}
+
+.chooseIn {
+    outline-offset: -5px;
+    outline: 5px solid #1890FF;
+}
+
+.header {
+    height: 50px !important;
+    padding: 0 !important;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: #fff !important;
+    border-left: 1px solid #f0f0f0;;
+    border-bottom: 1px solid #f0f0f0;;
+    z-index: 1;
+}
+
+.headerLeft {
+    flex: 1;
+    display: flex;
+    margin-left: 15px;
+}
+
+.headerBtn {
+    margin-right: 15px;
+}
+
+.headerSlider {
+    width: 200px;
+}
+
+.optionSlide {
+    flex: 1;
+}
+
+.paintingLayout {
+    height: calc(100% - 50px);
+}
+
+.paintingWrap {
+    flex: 1;
+    overflow: auto;
+    padding: 30px;
+    text-align: center;
+}
+
+.paintingWrap::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.paintingWrap::-webkit-scrollbar-thumb {
+    border-radius: 3.5px;
+}
+
+.paintingBox {
+    display: inline-block;
+    overflow: hidden;
+    box-shadow: 1px solid #f0f0f0;;
+    background-color: #fff;
+    position: relative;
+}
+
+.paintingBox .moveMask {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: grab;
+    background-color: rgba(204, 204, 204, .55);
+}
+
+.root {
+    overflow: hidden;
+    width: 1920px;
+    transform-origin: 0 0;
+    min-height: calc(100% - 30px);
+    padding-bottom: 300px;
+    background-color: #fff;
+}
+
+.tabPane {
+    overflow: auto;
+    height: calc(100vh - 95px);
+    padding: 10px 0;
+    background-color: #fff !important;
+}
+
+.configWrap{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.compName {
+    color: #1890FF;
+    margin: 0 10px 8px;
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.config {
+    width: 120px;
+    margin: 0 10px 10px 10px;
+}
+
+.config.long {
+    width: 260px;
+}
+
+.config.long .longSwitch {
+    display: flex;
+    align-items: center;
+}
+
+.config.long .longSwitch>p {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 0;
+    white-space: normal;
+}
+
+.config p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+.config p .colorBlock {
+    display: block;
+    width: 20px;
+    height: 20px;
+    float: right;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.config p .colorBlock i {
+    width: 14px;
+    height: 14px;
+    display: block;
+    margin: 2px;
+    border-radius: 2px;
+}
+
+.option {
+    font-size: 0;
+}
+
+.opt {
+    width: 300px;
+    height: 100%;
+    display: inline-block;
+}
+
+.edt {
+    width: 50px;
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    border-right: 1px solid #f0f0f0;;
+}
+
+.edt a {
+    display: block;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.edt a .icons {
+    font-size: 25px;
+    transition: .25s;
+}
+
+.edt a:hover .icons {
+    transform: scale(1.2);
+}
+
+.edt a.unable {
+    cursor: not-allowed;
+    opacity: .37;
+}
+
+.edt a.unable:hover .icons {
+    transform: scale(1);
+}

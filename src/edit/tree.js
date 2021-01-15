@@ -5,7 +5,7 @@ import React, { useContext, useMemo } from 'react';
 import storeContext from './model/context';
 import { searchTree, EnumEdit } from './common';
 import { Tree, message } from 'antd';
-import style from './style/index.less';
+import './style/index.css';
 
 const PageTree = ({
     handleClick, checkedKeysList, expandedKeys, triggerShowEl
@@ -17,7 +17,7 @@ const PageTree = ({
     const selectNode = ([el], e) => {
         handleClick(e.node.key);
         const selectCompDom = document.querySelector(`#${e.node.key}`);
-        const paintingWrapDom =  document.querySelector(`.${style.paintingWrap}`);
+        const paintingWrapDom =  document.querySelector(`.paintingWrap`);
         const nextScrollTop = selectCompDom.getBoundingClientRect().top - 50 - 30 + paintingWrapDom.scrollTop;
 
         paintingWrapDom.scrollTop = nextScrollTop;

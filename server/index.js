@@ -67,6 +67,20 @@ app.get('/edit', (req, res) => {
     });
 });
 
+// 编辑器路由模板 esbuild
+app.get('/edit-es', (req, res) => {
+    res.render(path.join(__dirname, './template/index-es.ejs'), {
+        id: 'edit',
+        title: '搭建编辑器 by esbuild',
+        js: [
+            `${CONFIG.HOST}:${CONFIG.PORT}/edit-es/main.js`
+        ],
+        css: [
+            `${CONFIG.HOST}:${CONFIG.PORT}/edit-es/main.css`
+        ]
+    });
+});
+
 // 编辑器内获取当前可拖入的组件菜单
 app.post('/getCompMenu', (req, res) => {
     res.send({
@@ -102,7 +116,7 @@ app.post('/savePage', (req, res) => {
 app.listen(CONFIG.PORT);
 
 console.log(`\x1B[32m★\x1B[0m web_channel\x1B[32m★\x1B[0m server start.`);
-console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit\x1B[0m`);
+console.log(`编辑器：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/edit-es\x1B[0m`);
 console.log(`页面预览：\x1B[35m${CONFIG.HOST}:${CONFIG.PORT}/page\x1B[0m`);
 console.log(`\x1B[32m----------↓ DEV模式 ↓(请勿退出进程,否则'npm run server'重启服务)--------------\x1B[0m`);
 console.log(`页面预览组件调试(XXX为组件文件夹名称，逗号隔开)：`);

@@ -1,0 +1,123 @@
+.changeSizeMask>div,
+.changeSizeMask>span {
+    position: absolute;
+    z-index: 0;
+}
+
+.changeSizeMask>span {
+    background-color: rgba(0, 0, 0, .8);
+    color: #fff;
+    font-size: 48px;
+    line-height: 59px;
+    padding: 0 10px;
+}
+
+.LT, .RT, .LB, .RB {
+    width: 20%;
+    height: 20%;
+}
+
+.MT, .MB {
+    width: 60%;
+    height: 20%;
+    cursor: ns-resize;
+}
+
+.LM, .RM {
+    width: 20%;
+    height: 60%;
+    cursor: ew-resize;
+}
+
+.MM {
+    width: 60%;
+    height: 60%;
+    cursor: move;
+}
+
+.LB, .RT {
+    cursor: nesw-resize;
+}
+
+.LT, .RB {
+    cursor: nwse-resize;
+}
+
+.LT {
+    left: 0;
+    top: 0;
+}
+
+.MT {
+    left: 20%;
+    top: 0;
+}
+
+.RT {
+    right: 0;
+    top: 0;
+}
+
+.LM {
+    left: 0;
+    top: 20%;
+}
+
+.MM {
+    left: 20%;
+    top: 20%;
+}
+
+.RM {
+    right: 0;
+    top: 20%;
+}
+
+.LB {
+    left: 0;
+    bottom: 0;
+}
+
+.MB {
+    left: 20%;
+    bottom: 0;
+}
+
+.RB {
+    right: 0;
+    bottom: 0;
+}
+
+.topLeftTip {
+    left: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.rightTip {
+    right: 0;
+    top: 50%;
+    margin-top: -30px;
+    z-index: 1;
+}
+
+.topTip {
+    top: 0px;
+    left: 50%;
+    margin-left: -45px;
+    z-index: 1;
+}
+
+.container {
+    user-select: none;
+    z-index: 1;
+    pointer-events: auto;
+}
+
+.container>* {
+    pointer-events: none;
+}
+
+.container>.changeSizeMask {
+    pointer-events: auto;
+}

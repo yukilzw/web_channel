@@ -9,9 +9,10 @@ import { searchTree, EnumEdit } from './common';
 import App from './model/reducer';
 import { message } from 'antd';
 import { setTwoToneColor } from '@ant-design/icons';
-import './style/antd.less';
+import './style/main.css';
+import 'antd/dist/antd.css';
 
-setTwoToneColor('#ec78cf');
+setTwoToneColor('#1890FF');
 
 // 拉取当前页面的JSON配置、组件菜单后再渲染编辑器
 Promise.all([

@@ -14,8 +14,8 @@ import PageTree from './tree';
 import { searchTree, rangeKey, creatPart, EnumEdit } from './common';
 import { record } from './record';
 import { Layout, Button, Slider, Menu, message } from 'antd';
-import style from './style/index.less';
-import styleBd from './style/changeBox.less';
+import './style/index.css';
+import './style/changeBox.css';
 
 const IsMacOS = navigator.platform.match('Mac');
 const EnumId = { root: 'root' };    // 画布id
@@ -127,7 +127,7 @@ const Board = () => {
             return;
         }
         if (targetCmpDom.current) {
-            targetCmpDom.current.classList.remove(style.chooseIn);
+            targetCmpDom.current.classList.remove('chooseIn');
             targetCmpDom.current = null;
         }
 
@@ -395,10 +395,10 @@ const Board = () => {
         const { menu } = stateRef.current;
         const targetCanDragIn = (el === EnumId.root) || menu[name].hasChild;
 
-        let dragClassName = style.dragIn;
+        let dragClassName = 'dragIn';
 
         if (!targetCanDragIn) {     // 如果目标组件不能有子组件，标红提示
-            dragClassName = style.dragInUnable;
+            dragClassName = 'dragInUnable';
         }
         targetCmpDom.current = document.querySelector(`#${el}`);
 
@@ -425,22 +425,22 @@ const Board = () => {
         const hoverCmpDom = document.querySelector(`#${el}`);
 
         if (type === 'mouseover') {
-            hoverCmpDom.classList.add(style.hoverIn);
+            hoverCmpDom.classList.add('hoverIn');
         } else if (type === 'mouseleave') {
-            hoverCmpDom.classList.remove(style.hoverIn);
+            hoverCmpDom.classList.remove('hoverIn');
         }
     }, []);
 
     // 点击事件回调
     const handleClick = useCallback((el, e, expanded) => {
         e && e.stopPropagation();
-        const currentChoose = document.querySelector(`.${style.chooseIn}`);
+        const currentChoose = document.querySelector(`.chooseIn`);
 
-        currentChoose && currentChoose.classList.remove(style.chooseIn);
+        currentChoose && currentChoose.classList.remove('chooseIn');
 
         // 如果组件被隐藏就不显示选中框
         targetCmpDom.current = document.querySelector(`#${el}`);
-        targetCmpDom.current && targetCmpDom.current.classList.add(style.chooseIn);
+        targetCmpDom.current && targetCmpDom.current.classList.add('chooseIn');
 
         // 需要展开侧边栏树
         if (expanded) {
@@ -461,7 +461,7 @@ const Board = () => {
         if (
             typeof dom.parentNode.id === 'string' &&
             /^wc.+/g.test(dom.parentNode.id) &&
-            Array.from(dom.parentNode.classList).indexOf(style.container)
+            Array.from(dom.parentNode.classList).indexOf('container')
         ) {
             return [dom.parentNode.id].concat(expandedParentsNode(dom.parentNode));
         } else {
@@ -611,9 +611,9 @@ const Board = () => {
         nextStylesbYChangeMask.current = nextStyles;
         const computedStyle = window.getComputedStyle(container);
 
-        document.querySelector(`.${styleBd.topLeftTip}`).innerHTML = `${parseInt(computedStyle.left)},${parseInt(computedStyle.top)}`;
-        document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(computedStyle.width);
-        document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(computedStyle.height);
+        document.querySelector(`.topLeftTip`).innerHTML = `${parseInt(computedStyle.left)},${parseInt(computedStyle.top)}`;
+        document.querySelector(`.topTip`).innerHTML = parseInt(computedStyle.width);
+        document.querySelector(`.rightTip`).innerHTML = parseInt(computedStyle.height);
 
     };
 
@@ -668,7 +668,7 @@ const Board = () => {
             const { clientX, clientY } = paintMaskMove.current;
             const changeX = e.clientX - clientX;
             const changeY = e.clientY - clientY;
-            const paintingWrapDom =  document.querySelector(`.${style.paintingWrap}`);
+            const paintingWrapDom =  document.querySelector(`.paintingWrap`);
             const nextScrollTop =  paintingWrapDom.scrollTop - changeY;
             const nextScrollLeft =  paintingWrapDom.scrollLeft - changeX;
 
@@ -681,12 +681,12 @@ const Board = () => {
         }
     };
 
-    return <Layout className={style.main}>
+    return <Layout className="main">
         <Layout.Sider theme="light" >
-            <div className={[style.mainSider, style.menu].join(' ')} onClick={clearChooseCmp}>
+            <div className={['mainSider', 'menu'].join(' ')} onClick={clearChooseCmp}>
                 <CompMenu chooseDragComp={chooseDragComp}/>
             </div>
-            <div className={style.mainSider} onMouseUp={clearChooseCmp}>
+            <div className="mainSider" onMouseUp={clearChooseCmp}>
                 <PageTree
                     handleClick={handleClick}
                     checkedKeysList={checkedKeysList}
@@ -696,26 +696,26 @@ const Board = () => {
             </div>
         </Layout.Sider>
         <Layout>
-            <Layout.Header className={style.header}>
-                <div className={style.headerLeft}>
+            <Layout.Header className="header">
+                <div className="headerLeft">
                     <Slider
                         marks={SliderMarks}
-                        className={style.headerSlider}
+                        className="headerSlider"
                         tipFormatter={num => `${num}%`}
                         value={paintScale * 100}
                         onChange={changeSlider}
                     />
                 </div>
-                <Button type="primary" className={style.headerBtn} onClick={showPage}>预览</Button>
+                <Button type="primary" className="headerBtn" onClick={showPage}>预览</Button>
             </Layout.Header>
-            <Layout className={style.paintingLayout}>
-                <Layout className={style.flex1}>
-                    <div className={style.paintingWrap} ref={paintingWrap} onClick={clearChooseCmp}>
-                        <div className={style.paintingBox} style={{
+            <Layout className="paintingLayout">
+                <Layout className="flex1">
+                    <div className="paintingWrap" ref={paintingWrap} onClick={clearChooseCmp}>
+                        <div className="paintingBox" style={{
                             height: `${paintOffset.height}px`,
                             width: `${paintOffset.width}px`
                         }}>
-                            {!!spaceDown.current && <div className={style.moveMask}
+                            {!!spaceDown.current && <div className="moveMask"
                                 onMouseDown={dragPaintMaskDown}
                                 onMouseMove={dragPaintMaskMove}
                             ></div>}
@@ -725,7 +725,7 @@ const Board = () => {
                                     minHeight: `${paintMinHeight}px`
                                 }}
                                 id={EnumId.root}
-                                className={style.root}
+                                className="root"
                                 onDragOver={(e) => handleEventCallBack('dragover', EnumId.root, null, e)}
                                 onDragLeave={(e) => handleEventCallBack('dragout', EnumId.root, null, e)}
                                 onDrop={(e) => handleEventCallBack('drop', EnumId.root, null, e)}
@@ -742,7 +742,7 @@ const Board = () => {
                         </div>
                     </div>
                 </Layout>
-                <Layout.Sider width={350} theme="light" className={style.option}>
+                <Layout.Sider width={350} theme="light" className="option">
                     <EditFuncContext.Provider value={{ savePage, deleteNode, copeNode, pasteNode, cutNode, returnEdit, resumeEdit, changePosNode, copyCompEl }}>
                         <Option optionInputHasFocus={optionInputHasFocus} />
                     </EditFuncContext.Provider>

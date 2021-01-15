@@ -6,7 +6,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import storeContext from './model/context';
 import { loadAsync } from './utils/global';
 import { record } from './record';
-import styleBd from './style/changeBox.less';
+import './style/changeBox.css';
 
 const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   // 组件容器事件蒙层类名
 
@@ -63,7 +63,7 @@ const CompBox = ({ hide, el, name, style, props, children }) => {
     return <div
         key={el}
         id={el}
-        className={styleBd.container}
+        className="container"
         style={Object.assign({}, style, fillter)}
         {...editEvent}
     >
@@ -94,16 +94,16 @@ const renderEditSizeTab = (name, el, { position }, store) => {
     if (!menu[name].canResizeByMouse) {
         return;
     }
-    return <div className={styleBd.changeSizeMask}>
+    return <div className="changeSizeMask">
         {
             changeCompBox && <>
-                <span className={styleBd.topLeftTip}></span>
-                <span className={styleBd.topTip}></span>
-                <span className={styleBd.rightTip}></span>
+                <span className="topLeftTip"></span>
+                <span className="topTip"></span>
+                <span className="rightTip"></span>
             </>
         }
         {
-            changeTabList.map((key) => <div key={el + key} className={styleBd[key]}
+            changeTabList.map((key) => <div key={el + key} className={key}
                 onMouseDown={(e) => changeTab(e, key, el, store)}
             ></div>)
         }

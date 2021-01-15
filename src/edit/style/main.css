@@ -1,18 +1,13 @@
-@import '~antd/dist/antd.less';
-@import './var.less';
-// 此文件仅支持覆写antd样式，以及全局样式重置，不要写页面内自定义样式，非CSS模块打包，样式名即为className
 #edit {
     overflow: hidden;
-
-    * {
-        user-select: none
-    }
 }
 
-#root {
-    ul, li, ol, dl, p, h1, h2, h3, h4, h5, h6, img, nav { margin: 0; padding: 0; }
-    ol, ul { list-style: none; }
+#edit * {
+    user-select: none
 }
+
+ul, li, ol, dl, p, h1, h2, h3, h4, h5, h6, img, nav { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
 
 ::-webkit-scrollbar {
     width: 4px;
@@ -54,10 +49,10 @@
 
 #antd-colorPop {
     box-shadow: none;
+}
 
-    .ant-popover-inner-content {
-        padding: 0;
-    }
+#antd-colorPop .ant-popover-inner-content {
+    padding: 0;
 }
 
 #contextMenu {
@@ -65,8 +60,8 @@
     width: 200px;
     z-index: 10000;
     box-shadow: 0 3px 6px -4px rgba(0,0,0,.12), 0 6px 16px 0 rgba(0,0,0,.08), 0 9px 28px 8px rgba(0,0,0,.05) !important;
+}
 
-    .ant-menu-item {
-        margin: 0;
-    }
+#contextMenu .ant-menu-item {
+    margin: 0;
 }

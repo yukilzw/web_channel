@@ -11,7 +11,7 @@ import { FolderTwoTone, LeftCircleTwoTone, RightCircleTwoTone, DeleteTwoTone,
     UpSquareTwoTone, DownSquareTwoTone
 } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
-import style from './style/index.less';
+import './style/index.css';
 
 const IsMacOS = navigator.platform.match('Mac');
 const { TabPane } = Tabs;
@@ -35,62 +35,62 @@ const Edit = () => {
     const canResumeEdit = record.point < record.stack.length - 1;
     const canPaste = !!copyCompEl.current;
 
-    const fillUnable = (can) => can ? undefined : style.unable;
+    const fillUnable = (can) => can ? undefined : 'unable';
 
-    return <div className={style.edt}>
+    return <div className="edt">
         <a onClick={savePage}>
             <Tooltip {...TooltipProps} title={<span>保存({IsMacOS ? 'Command' : 'Ctrl'}+S)</span>}>
-                <FolderTwoTone className={style.icons}/>
+                <FolderTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={canReturnEdit ? returnEdit : undefined} className={fillUnable(canReturnEdit)}>
             <Tooltip {...TooltipProps} title={<span>撤销({IsMacOS ? 'Command' : 'Ctrl'}+Z)</span>}>
-                <LeftCircleTwoTone className={style.icons}/>
+                <LeftCircleTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={canResumeEdit ? resumeEdit : undefined} className={fillUnable(canResumeEdit)}>
             <Tooltip {...TooltipProps} title={<span>恢复({IsMacOS ? 'Command' : 'Ctrl'}+Y)</span>}>
-                <RightCircleTwoTone className={style.icons}/>
+                <RightCircleTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={choose ? deleteNode : undefined} className={fillUnable(choose)}>
             <Tooltip {...TooltipProps} title={<span>删除({IsMacOS ? '删除键' : 'DEL'})</span>}>
-                <DeleteTwoTone className={style.icons}/>
+                <DeleteTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={choose ? copeNode : undefined} className={fillUnable(choose)}>
             <Tooltip {...TooltipProps} title={<span>复制({IsMacOS ? 'Command' : 'Ctrl'}+C)</span>}>
-                <CopyTwoTone className={style.icons}/>
+                <CopyTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={choose ? cutNode : undefined} className={fillUnable(choose)}>
             <Tooltip {...TooltipProps} title={<span>剪切({IsMacOS ? 'Command' : 'Ctrl'}+X)</span>}>
-                <PieChartTwoTone className={style.icons}/>
+                <PieChartTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={canPaste ? pasteNode : undefined} className={fillUnable(canPaste)}>
             <Tooltip {...TooltipProps} title={<span>粘贴({IsMacOS ? 'Command' : 'Ctrl'}+V)</span>}>
-                <SnippetsTwoTone className={style.icons}/>
+                <SnippetsTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={() => choose && changePosNode(-1)} className={fillUnable(choose)}>
             <Tooltip {...TooltipProps} title={<span>上移节点(↑)</span>}>
-                <UpSquareTwoTone className={style.icons}/>
+                <UpSquareTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={() => choose && changePosNode(1)} className={fillUnable(choose)}>
             <Tooltip {...TooltipProps} title={<span>下移节点(↓)</span>}>
-                <DownSquareTwoTone className={style.icons}/>
+                <DownSquareTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a onClick={() => message.warn('请按住空格后拖动画布、鼠标滚轮')}>
             <Tooltip {...TooltipProps} title={<span>移动画布(Space+滚动+左键)</span>}>
-                <EyeTwoTone className={style.icons}/>
+                <EyeTwoTone className="icons"/>
             </Tooltip>
         </a>
         <a href="/template/page.json" download>
             <Tooltip {...TooltipProps} title={<span>导出页面JSON配置</span>}>
-                <WalletTwoTone className={style.icons}/>
+                <WalletTwoTone className="icons"/>
             </Tooltip>
         </a>
     </div>;
@@ -131,10 +131,10 @@ const OptionBoard = ({ optionInputHasFocus }) => {
             default: return;
         }
 
-        return <div className={style.configWrap}>
+        return <div className="configWrap">
             {
                 optionList.map((item) => <div
-                    className={[style.config, item.size === 'long' ? style.long : ''].join(' ')}
+                    className={['config', item.size === 'long' ? 'long' : ''].join(' ')}
                     key={item.prop}
                 >
                     {renderItemByType(item, optionName)}
@@ -169,7 +169,7 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                     }
                 }
 
-                return <div className={style.longSwitch}>
+                return <div className="longSwitch">
                     <p>{name}</p>
                     <Switch checked={swtichValue}
                         onChange={(checked) => changeValue({ checked, mirrorValue }, prop, type)}
@@ -194,7 +194,7 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                             color={curValue}
                             onChangeComplete={(color) => changeValue(color.rgb, prop, type)}
                         />} trigger="click">
-                            <span className={style.colorBlock}><i style={{ backgroundColor: curValue }}></i></span>
+                            <span className="colorBlock"><i style={{ backgroundColor: curValue }}></i></span>
                         </Popover>
                     </p>
                     <Input value={curValue || ''}
@@ -272,11 +272,11 @@ const OptionBoard = ({ optionInputHasFocus }) => {
 
     const comp = useMemo(() => {
         chooseObj.current = searchTree(tree, choose, EnumEdit.choose);
-        const content = <Layout className={style.tabPane}>
+        const content = <Layout className="tabPane">
             {
-                tabIndex === 0 ? <p className={style.compName}>
+                tabIndex === 0 ? <p className="compName">
                     <span>页面ID：{pid}</span>
-                </p> : <p className={style.compName}>
+                </p> : <p className="compName">
                     <span>{menu[chooseObj.current.name].name}({chooseObj.current.name})</span>
                     <span>ID:{chooseObj.current.el.replace(/^wc/, '')}</span>
                 </p>
@@ -300,7 +300,7 @@ const OptionBoard = ({ optionInputHasFocus }) => {
 
     return <>
         <Edit />
-        <div className={style.opt}>
+        <div className="opt">
             {comp}
         </div>
     </>;
