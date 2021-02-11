@@ -3,16 +3,12 @@
  */
 import React from 'react';
 
-export default class Text extends React.PureComponent {
-    render() {
-        const { text, color, fontSize, lineHeight, textAlign, fontWeight } = this.props;
-
-        return <p className="wp-text" style={{
-            color,
-            fontSize,
-            lineHeight,
-            textAlign,
-            fontWeight
-        }}>{text}</p>;
-    }
-}
+export default ({
+    text, color, fontSize, lineHeight, textAlign, fontWeight
+}) => <p className="wp-text" style={{
+    color,
+    fontSize,
+    lineHeight,
+    textAlign,
+    fontWeight
+}}>{text}</p>;

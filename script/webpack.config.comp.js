@@ -4,6 +4,7 @@
 const path = require('path');
 const fs = require('fs');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const WebpackBar = require('webpackbar');
 const { CONFIG } = require('../config');
 
 const isDev = process.argv.indexOf('-dev') !== -1;
@@ -63,6 +64,9 @@ const config = {
         ]
     },
     plugins: [
+        new WebpackBar({
+            name: 'channel-comp'
+        }),
         new CleanWebpackPlugin()
     ],
     resolve: {

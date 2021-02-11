@@ -4,6 +4,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const WebpackBar = require('webpackbar');
 const { CONFIG } = require('../config');
 
 const isDev = process.argv.indexOf('-dev') !== -1;
@@ -75,6 +76,9 @@ const config = {
         ]
     },
     plugins: ([
+        new WebpackBar({
+            name: 'channel-page'
+        }),
         new CleanWebpackPlugin()
     ]).concat(isDev ? [
         new webpack.HotModuleReplacementPlugin()

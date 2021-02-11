@@ -4,19 +4,13 @@
 import React from 'react';
 import './index.less';
 
-export default class Image extends React.PureComponent {
-    openLink() {
-        const { link, blank, env } = this.props;
-
+export default ({ link, blank, env, src }) => {
+    const openLink = () => {
         if (env === 'edit') {
             return;
         }
         window.open(link, blank ? '_blank' : '_self');
-    }
+    };
 
-    render() {
-        const { src } = this.props;
-
-        return <img className="wp-img" src={src} onClick={this.openLink.bind(this)} />;
-    }
-}
+    return <img className="wp-img" src={src} onClick={openLink} />;
+};

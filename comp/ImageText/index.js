@@ -4,10 +4,4 @@
  */
 import React from 'react';
 
-export default class ImageText extends React.PureComponent {
-    render() {
-        const { children } = this.props;
-
-        return <div className="wp-imageText">{children}</div>;
-    }
-}
+export default ({ children }) => <div className="wp-imageText">{children}</div>;

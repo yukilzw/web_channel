@@ -5,15 +5,16 @@ const path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
+const WebpackBar = require('webpackbar');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { CONFIG } = require('../config');
 
 const isDev = process.argv.indexOf('-dev') !== -1;
 
-const cssFillPath = [
-    path.join(process.cwd(), './src/edit/style/antd.less'),
-    path.join(process.cwd(), './node_modules/')
-];
+// const cssFillPath = [
+//     path.join(process.cwd(), './src/edit/style/antd.less'),
+//     path.join(process.cwd(), './node_modules/')
+// ];
 
 const config = {
     entry: {
@@ -55,37 +56,39 @@ const config = {
             },
             {
                 test: /\.(css|less)$/,
-                include: cssFillPath,
-                use: [
-                    'style-loader',
+                oneOf: [
                     {
-                        loader: 'css-loader',
-                        options: {
-                            minimize: !isDev
-                        }
+                        resourceQuery: /css_modules/, // 只要匹配到了这个，就是用css modules，
+                        use: [
+                            'style-loader',
+                            {
+                                loader: 'css-loader',
+                                options: {
+                                    minimize: !isDev,
+                                    modules: true,
+                                    localIdentName: isDev ? '[path]-[local]' : '[hash:base64:6]'
+                                }
+                            },
+                            'less-loader'
+                        ]
                     },
                     {
-                        loader: 'less-loader',
-                        options: {
-                            javascriptEnabled: true
-                        }
+                        use: [
+                            'style-loader',
+                            {
+                                loader: 'css-loader',
+                                options: {
+                                    minimize: !isDev
+                                }
+                            },
+                            {
+                                loader: 'less-loader',
+                                options: {
+                                    javascriptEnabled: true
+                                }
+                            }
+                        ]
                     }
-                ]
-            },
-            {
-                test: /\.(css|less)$/,
-                exclude: cssFillPath,
-                use: [
-                    'style-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            minimize: !isDev,
-                            modules: true,
-                            localIdentName: isDev ? '[path]-[local]' : '[hash:base64:6]'
-                        }
-                    },
-                    'less-loader'
                 ]
             },
             {
@@ -102,13 +105,17 @@ const config = {
                         '@babel/proposal-class-properties',
                         '@babel/plugin-syntax-dynamic-import',
                         '@babel/plugin-transform-object-assign',
-                        ['@babel/plugin-transform-runtime', { 'corejs': 2 }]
+                        ['@babel/plugin-transform-runtime', { 'corejs': 2 }],
+                        path.join(__dirname, './plugin/auto-css-modules.js')
                     ]
                 }
             }
         ]
     },
     plugins: ([
+        new WebpackBar({
+            name: 'channel-edit'
+        }),
         new CleanWebpackPlugin(),
         new AntdDayjsWebpackPlugin()
     ]).concat(isDev ? [
