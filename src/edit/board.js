@@ -13,13 +13,15 @@ import Option from './option';
 import PageTree from './tree';
 import { searchTree, rangeKey, creatPart, EnumEdit } from './common';
 import { record } from './record';
-import { Layout, Button, Slider, Menu, message } from 'antd';
+import { Layout, Button, Slider, Radio, Menu, message } from 'antd';
 import style from './style/index.less';
 import styleBd from './style/changeBox.less';
 
 const IsMacOS = navigator.platform.match('Mac');
 const EnumId = { root: 'root' };    // 画布id
+const PCboardWidth = 1920;  // pc页面搭建宽度
 const PaintBoxMargin = 30;  // 画布边距
+const BoardBottom = 300;    // 画布底部留白距离，用于拖入新的元素
 const SliderMarks = {   // 缩放拖动条坐标轴
     0: '0%',
     25: '26%',
@@ -31,7 +33,6 @@ const SliderMarks = {   // 缩放拖动条坐标轴
 const Board = () => {
     const { state, dispatch, forceUpdate } = useContext(storeContext);
     const stateRef = useRef();          // 暂存实时reducer
-    const paintScaleRef = useRef();
     const dragCmpConfig = useRef();     // 选取拖拽菜单内组件时，暂存该组件的默认配置
     const targetCmpDom = useRef();      // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
@@ -46,6 +47,7 @@ const Board = () => {
     const [paintScale, setPaintScale] = useState(0);     // 画布缩放比例
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
     const [contextMenu, setContextMenu] = useState(false);     // 右键菜单展示
+    const [boardMode, setBoardMode] = useState('pc');   // 编辑器环境类型
 
     // 子组件渲染需要使用的实时常量，在父组件dispatch前设置好，便于子组件重新渲染时直接读取
     const optionInputHasFocus = useRef(false);      // 编辑区输入框聚焦开关（避免键盘事件与输入框默认快捷键冲突）
@@ -53,10 +55,12 @@ const Board = () => {
     const expandedKeys = useRef(new Set());         // 侧边栏树组件展开的集合
 
     useEffect(() => {
-        // 由于hooks自带闭包机制，浏览器全局事件回调函数的异步触发只能最初拿到绑定事件时注入的state
-        // 每次状态有改变，就将state存到静态变量stateRef，在事件触发时取改变量代替state
-        stateRef.current = state;
-        paintScaleRef.current = paintScale;
+        // 缓存当前环境下的state
+        stateRef.current = {
+            ...state,
+            paintScale,
+            boardMode
+        };
     });
 
     // 注册编辑器事event
@@ -68,7 +72,11 @@ const Board = () => {
         // 鼠标滚轮
         document.addEventListener('wheel', handlewheel, { passive: false, capture: false });
         // 浏览器窗口改变
-        window.addEventListener('resize', repainting, false);
+        window.addEventListener('resize', () => {
+            if (stateRef.current.boardMode === 'pc') {
+                repainting();
+            }
+        }, false);
         // 鼠标抬起置空拖动编辑组件对象
         document.addEventListener('mouseup', handleMouseUp, false);
         // 鼠标右键
@@ -79,7 +87,7 @@ const Board = () => {
     useEffect(() => {
         repainting();
     }, [paintingWrap.current]);
-
+    // 比例实时缩放渲染后，将包裹缩放画布的div设置为真实的高度，以此来撑开外部root容器
     useEffect(() => {
         const rootDom = document.querySelector(`#${EnumId.root}`);
 
@@ -97,6 +105,11 @@ const Board = () => {
         }
     }, [paintScale, paintMinHeight, state.tree]);
 
+    // 切换pc、h5预览时，重新计算缩放比例
+    useEffect(()  => {
+        repainting();
+    }, [boardMode]);
+
     const handleBodyClick = () => {
         setContextMenu(false);
     };
@@ -106,19 +119,20 @@ const Board = () => {
         const paintingWrapDom = paintingWrap.current;
         const shouldFoceUpdate = typeof forceScale === 'number';
 
-        // 画布所在区域宽度变化,或者拖动滑块强制缩放，就重新计算画布缩放比例
-        if (
-            paintingWrapDom.offsetWidth !== paintingWrapWidthPre.current ||
-            shouldFoceUpdate
-        ) {
-            const nextPaintScale = shouldFoceUpdate ? forceScale : (paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / 1920;
-            const nextPaintMinHeight = ((paintingWrapDom.offsetHeight - PaintBoxMargin) + 300) / nextPaintScale;
+        const getEnvScale = () => {
+            if (boardMode === 'pc') {
+                return (paintingWrapDom.offsetWidth - PaintBoxMargin * 2) / PCboardWidth;
+            }
+            return 0.5;
+        };
 
-            paintingWrapWidthPre.current = paintingWrapDom.offsetWidth;
+        const nextPaintScale = shouldFoceUpdate ? forceScale : getEnvScale();
+        const nextPaintMinHeight = ((paintingWrapDom.offsetHeight - PaintBoxMargin) + BoardBottom) / nextPaintScale;
 
-            setPaintScale(nextPaintScale);
-            setPaintMinHeight(nextPaintMinHeight);
-        }
+        paintingWrapWidthPre.current = paintingWrapDom.offsetWidth;
+
+        setPaintScale(nextPaintScale);
+        setPaintMinHeight(nextPaintMinHeight);
     };
 
     // 清空当前选中的编辑组件
@@ -149,7 +163,7 @@ const Board = () => {
                 mouseWheelTimmer.current = null;
             }, 20);
             const scaleSpeed = 0.05;
-            const scale = Math.min(1, Math.max(0.1, paintScaleRef.current - (e.deltaY > 0 ? scaleSpeed : -scaleSpeed)));
+            const scale = Math.min(1, Math.max(0.1, stateRef.current.paintScale - (e.deltaY > 0 ? scaleSpeed : -scaleSpeed)));
 
             repainting(scale);
         }
@@ -681,6 +695,11 @@ const Board = () => {
         }
     };
 
+    const handleModeChange = (e) => {
+        const mode = e.target.value;
+        setBoardMode(mode);
+    };
+
     return <Layout className={style.main}>
         <Layout.Sider theme="light" >
             <div className={[style.mainSider, style.menu].join(' ')} onClick={clearChooseCmp}>
@@ -706,6 +725,10 @@ const Board = () => {
                         onChange={changeSlider}
                     />
                 </div>
+                <Radio.Group className={style.changeMode} onChange={handleModeChange} value={boardMode} >
+                    <Radio.Button value="pc">PC</Radio.Button>
+                    <Radio.Button value="h5">H5</Radio.Button>
+                </Radio.Group>
                 <Button type="primary" className={style.headerBtn} onClick={showPage}>预览</Button>
             </Layout.Header>
             <Layout className={style.paintingLayout}>
@@ -725,7 +748,7 @@ const Board = () => {
                                     minHeight: `${paintMinHeight}px`
                                 }}
                                 id={EnumId.root}
-                                className={style.root}
+                                className={[style.root, boardMode === 'h5' ? style.isH5 : ''].join(' ')}
                                 onDragOver={(e) => handleEventCallBack('dragover', EnumId.root, null, e)}
                                 onDragLeave={(e) => handleEventCallBack('dragout', EnumId.root, null, e)}
                                 onDrop={(e) => handleEventCallBack('drop', EnumId.root, null, e)}
