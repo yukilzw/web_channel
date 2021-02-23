@@ -228,7 +228,7 @@ const OptionBoard = ({ optionInputHasFocus }) => {
     const changeValue = (dynamic, key, type) => {
         let value;
 
-        if (type === 'text') {
+        if (type === 'text' || type === 'number') {
             value = dynamic.target.value;
         } else if (type === 'select') {
             value = dynamic;

@@ -188,7 +188,7 @@ const Board = () => {
             e.preventDefault();
             deleteNode();
         // mac下`删除键`删除选中的可视区组件
-        } else if (IsMacOS && e.keyCode === 8) {
+        } else if (IsMacOS && e.keyCode === 8 && !optionInputHasFocus.current) {
             e.preventDefault();
             deleteNode();
         // `↑`向上箭头

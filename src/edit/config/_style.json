@@ -71,14 +71,9 @@
     "prop": "zIndex",
     "type": "number"
 }, {
-    "name": "显示布局",
-    "prop": "display",
-    "type": "switch",
-    "mirrorValue": {
-        "true": "block",
-        "false": "none",
-        "init": true
-    }
+    "name": "透明度",
+    "prop": "opacity",
+    "type": "number"
 }, {
     "name": "背景图",
     "prop": "backgroundImage",
@@ -116,6 +111,16 @@
     "mirrorValue": {
         "true": "repeat",
         "false": "no-repeat",
+        "init": true
+    }
+}, {
+    "name": "显示布局",
+    "prop": "display",
+    "type": "switch",
+    "size": "long",
+    "mirrorValue": {
+        "true": "block",
+        "false": "none",
         "init": true
     }
 }]
