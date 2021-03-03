@@ -3,7 +3,6 @@
 搭建体系已成为互联网公司必不可少的研发提效模式。
 
 此项目旨在用最少的代码实现可视化搭建、发布、预览、调试等核心功能。并对每一个关键原理进行说明。
-在此之前，希望你对**Javascript（ES2015，React hooks）、nodejs、webpack**等基础知识有所了解，便可轻松设计开发属于你的建站平台（也许只需要你花费一周的时间ヽ(￣▽￣)ﾉ）。
 
 首先我们来看看效果：
 ![可视化编辑器面板](https://upload-images.jianshu.io/upload_images/19675139-97e33b952b24485c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
