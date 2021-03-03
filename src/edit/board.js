@@ -38,7 +38,7 @@ const Board = () => {
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
     const paintingWrapWidthPre = useRef();     // 上次改变画布大小时的画布所在DOM的宽度，用于鉴别容器是否变宽
     const nextStylesbYChangeMask = useRef();    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
-    const copyCompEl = useRef();          // 剪切板el存储
+    const copyCompEl = useRef();          // 剪切板操作 - 节点暂存
     const dispatchCallBack = useRef();      // 重新渲染完成后触发回调
     const spaceDown = useRef();            // 空格键是否按下
     const mouseWheelTimmer = useRef();          // 鼠标滚轮缩放画布函数节流定时器
