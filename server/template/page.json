@@ -71,7 +71,8 @@
               "el": "wc7"
             }
           ],
-          "el": "wc5"
+          "el": "wc5",
+          "hide": true
         }
       ]
     },
@@ -89,14 +90,15 @@
         "lazy": true,
         "scrolling": false
       },
-      "el": "wc3"
+      "el": "wc3",
+      "hide": true
     },
     {
       "name": "View",
       "style": {
         "position": "relative",
         "width": "100%",
-        "height": "1122px",
+        "height": "901px",
         "backgroundColor": "rgba(74,226,93,0.3)",
         "top": "",
         "overflow": "hidden"
@@ -110,10 +112,13 @@
           "name": "Text",
           "style": {
             "position": "relative",
-            "width": "auto",
-            "marginLeft": "auto",
-            "marginRight": "auto",
-            "marginTop": "30px"
+            "width": "900px",
+            "marginLeft": "",
+            "marginRight": "",
+            "marginTop": "30px",
+            "height": "270px",
+            "left": "322px",
+            "top": "1px"
           },
           "props": {
             "text": "这是下面这个元素的标题",
@@ -139,6 +144,38 @@
           "el": "wc12",
           "children": [],
           "hide": true
+        },
+        {
+          "name": "View",
+          "style": {
+            "position": "relative",
+            "width": "821px",
+            "height": "247px",
+            "left": "46px",
+            "top": "202px",
+            "backgroundColor": "rgba(180,175,206,1)"
+          },
+          "props": {
+            "lazy": true
+          },
+          "el": "wc13"
+        },
+        {
+          "name": "Image",
+          "style": {
+            "position": "relative",
+            "width": "180px",
+            "height": "180px",
+            "marginTop": "0px",
+            "left": "1464px",
+            "top": "-205px"
+          },
+          "props": {
+            "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA",
+            "blank": true,
+            "lazy": true
+          },
+          "el": "wc14"
         }
       ]
     }

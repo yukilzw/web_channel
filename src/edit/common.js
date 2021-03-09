@@ -11,6 +11,7 @@ const EnumEdit = {
     change: Symbol(),   // 编辑
     delete: Symbol(),   // 删除
     hide: Symbol(),       // 隐藏
+    ruler: Symbol(),       // 标尺
     maxKeyNum: Symbol()     // 首次加载计算当前页面配置key递增最大值
 };
 
@@ -93,6 +94,11 @@ const searchTree = (arr, el, type, expand) => {
                             children.splice(children.indexOf(child) + 1, 0, dragNodeObj);
                         }
                         return arr;
+                    case EnumEdit.ruler:
+                        return {
+                            parent: config.el ? config : null,
+                            brother: children.filter((brother) => brother !== child && !brother.hide)
+                        };
                     default: return;
                 }
             } else if (type === EnumEdit.maxKeyNum) {

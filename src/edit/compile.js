@@ -9,6 +9,7 @@ import { record } from './record';
 import styleBd from './style/changeBox.less';
 
 const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   // 组件容器事件蒙层类名
+// const rulerLineList = ['row_top', 'row_mid', 'row_bottom', 'col_top', 'col_mid', 'col_bottom'];   // 拖动自动对齐辅助线
 
 let EventObj = {};
 
@@ -74,6 +75,7 @@ const CompBox = ({ hide, el, name, style, props, children }) => {
                     {childrenComp}
                 </Comp.current>
                 {renderEditSizeTab(name, el, style, store)}
+                {/* {renderEditRuler(name, el, style, store)} */}
             </>
         }
     </div>;
@@ -85,7 +87,7 @@ const renderEditSizeTab = (name, el, { position }, store) => {
         menu, choose, changeCompBox
     } } = store;
 
-    if (['relative', 'fiexd', 'absolute'].indexOf(position) === -1) {
+    if (!~['relative', 'fiexd', 'absolute'].indexOf(position)) {
         return;
     }
     if (choose !== el) {
@@ -109,6 +111,24 @@ const renderEditSizeTab = (name, el, { position }, store) => {
         }
     </div>;
 };
+
+// const renderEditRuler = (name, el, { position }, store) => {
+//     const { state: {
+//         menu, choose, changeCompBox
+//     } } = store;
+
+//     // if (!~['relative', 'fiexd', 'absolute'].indexOf(position)) {
+//     //     return;
+//     // }
+//     if (choose === el) {
+//         return;
+//     }
+//     return changeCompBox && <div className={styleBd.rulerMask}>
+//         {
+//             rulerLineList.map((key) => <div key={el + key} className={styleBd[key]}></div>)
+//         }
+//     </div>;
+// };
 
 // 检查当前层级子节点
 const checkChildren = (children) => {

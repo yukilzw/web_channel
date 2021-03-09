@@ -447,6 +447,7 @@ const Board = () => {
 
     // 点击事件回调
     const handleClick = useCallback((el, e, expanded) => {
+        const { tree } = stateRef.current;
         e && e.stopPropagation();
         const currentChoose = document.querySelector(`.${style.chooseIn}`);
 
@@ -465,6 +466,9 @@ const Board = () => {
             type: 'EDIT_CHOOSE_CMP',
             payload: el     // 将当前选中的组件配置el记录，需要的时候直接通过el搜索对应的配置对象
         });
+
+        const res = searchTree(tree, targetCmpDom.current.id, EnumEdit.ruler);
+        console.log(res);
     }, []);
 
     // 递归向上查询该节点的所有祖先节点数组
