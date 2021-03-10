@@ -183,7 +183,7 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                         onChange={(value) => changeValue(value, prop, type)}
                     >
                         {
-                            option.map(({ value, label }) => <Option value={value} key={value}>{label}</Option>)
+                            option.map(({ value, label, unable }) => <Option value={value} key={value} disabled={unable}>{label}</Option>)
                         }
                     </Select>
                 </>;
@@ -241,7 +241,6 @@ const OptionBoard = ({ optionInputHasFocus }) => {
                 value = mirrorValue[checked.toString()];
             }
         } else if (type === 'color') {
-            console.log(dynamic);
             const { r, g, b, a } = dynamic;
 
             value = `rgba(${r},${g},${b},${a})`;

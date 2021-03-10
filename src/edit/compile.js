@@ -142,7 +142,8 @@ const checkChildren = (children) => {
 // 记录鼠标按下组件蒙版的各项数据，用于鼠标移动时计算更新组件样式
 const changeTab = ({ button, clientX, clientY }, key, el, { dispatch }) => {
     if (button === 0) {
-        const elStyles = window.getComputedStyle(document.querySelector(`#${el}`), null);
+        const moveDom = document.querySelector(`#${el}`);
+        const elStyles = window.getComputedStyle(moveDom, null);
 
         dispatch({
             type: 'EDIT_COMP_BOX',
@@ -151,6 +152,8 @@ const changeTab = ({ button, clientX, clientY }, key, el, { dispatch }) => {
                 key,
                 clientX,
                 clientY,
+                startLeft: moveDom.offsetLeft,
+                startTop: moveDom.offsetTop,
                 current: {
                     width: parseFloat(elStyles.width),
                     height: parseFloat(elStyles.height),

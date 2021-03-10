@@ -57,7 +57,7 @@
         // 禁止对 catch 子句的参数重新赋值
         "no-ex-assign": 2,
         // 禁止不必要的布尔转换
-        "no-extra-boolean-cast": 2,
+        "no-extra-boolean-cast": 0,
         // 禁止不必要的括号 //(a * b) + c;//报错
         "no-extra-parens": 0,
         // 禁止不必要的分号

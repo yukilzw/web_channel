@@ -22,17 +22,18 @@
     "prop": "position",
     "type": "select",
     "option": [{
-        "label": "相对",
+        "label": "相对定位",
         "value": "relative"
     }, {
-        "label": "绝对",
+        "label": "绝对定位",
         "value": "absolute"
     }, {
-        "label": "屏幕",
+        "label": "屏幕定位",
         "value": "fixed"
     }, {
-        "label": "默认(不推荐)",
-        "value": "static"
+        "label": "静止(static)",
+        "value": "static",
+        "unable": true
     }]
 }, {
     "name": "左定位",

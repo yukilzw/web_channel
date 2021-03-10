@@ -11,6 +11,7 @@ import Page from './compile';
 import CompMenu from './menu';
 import Option from './option';
 import PageTree from './tree';
+import Ruler from './ruler';
 import { searchTree, rangeKey, creatPart, EnumEdit } from './common';
 import { record } from './record';
 import { Layout, Button, Slider, Radio, Menu, message } from 'antd';
@@ -48,11 +49,13 @@ const Board = () => {
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
     const [contextMenu, setContextMenu] = useState(false);     // 右键菜单展示
     const [boardMode, setBoardMode] = useState('pc');   // 编辑器环境类型
+    const [isMovingChild, setIsMovingChild] = useState(false);  // 正在拖动节点
 
     // 子组件渲染需要使用的实时常量，在父组件dispatch前设置好，便于子组件重新渲染时直接读取
     const optionInputHasFocus = useRef(false);      // 编辑区输入框聚焦开关（避免键盘事件与输入框默认快捷键冲突）
     const checkedKeysList = useRef(new Set());             // 侧边栏树组件选中集合
     const expandedKeys = useRef(new Set());         // 侧边栏树组件展开的集合
+    const rulerPointList = useRef();        // 暂存当前选中节点所关联标尺线的坐标集合
 
     useEffect(() => {
         // 缓存当前环境下的state
@@ -445,10 +448,41 @@ const Board = () => {
         }
     }, []);
 
+    // 获取当前选定节点的兄弟节点和父节点，生成所有可能的辅助线坐标
     const calcRulerLines = () => {
         const { tree } = stateRef.current;
-        const res = searchTree(tree, targetCmpDom.current.id, EnumEdit.ruler);
-        console.log(res);
+        const { parent, brother } = searchTree(tree, targetCmpDom.current.id, EnumEdit.ruler);
+        const pointsList = [];
+        pointsList.tampPoint = new Set();
+        pointsList.checkPush = function() {
+            for (let point of arguments) {
+                const { x, y } = point;
+                if (!this.tampPoint.has(`${x},${y}`)) {
+                    this.push(point);
+                    this.tampPoint.add(`${x},${y}`);
+                }
+            }
+        };
+        // if (parent) {
+        //     const { el } = parent;
+        //     const parentDOM = document.getElementById(el);
+        //     pointsList.checkPush(
+        //         { x: parentDOM.offsetWidth / 2, y: 0, el, pos: 'TM' },
+        //         { x: 0, y: parentDOM.offsetHeight / 2, el, pos: 'LM' },
+        //         { x: parentDOM.offsetWidth, y: parentDOM.offsetHeight, el, pos: 'RB' }
+        //     );
+        // }
+        brother.forEach(({ el }) => {
+            const brotherDOM = document.getElementById(el);
+            pointsList.checkPush(
+                { x: brotherDOM.offsetLeft, y: brotherDOM.offsetTop, el, pos: 'LT' },
+                { x: brotherDOM.offsetLeft + brotherDOM.offsetWidth / 2, y: brotherDOM.offsetTop + brotherDOM.offsetHeight / 2, el, pos: 'MM' },
+                { x: brotherDOM.offsetLeft + brotherDOM.offsetWidth, y: brotherDOM.offsetTop + brotherDOM.offsetHeight, el, pos: 'RB' }
+            );
+        });
+        delete pointsList.tampPoint;
+        delete pointsList.checkPush;
+        rulerPointList.current = pointsList;
     };
 
     // 点击事件回调
@@ -564,7 +598,7 @@ const Board = () => {
         if (!changeCompBox) {
             return;
         }
-        const { key, el, clientY, clientX, current } = changeCompBox;
+        const { key, el, clientY, clientX, startLeft, startTop, current } = changeCompBox;
         const container = document.querySelector(`#${el}`);
         const changeX = (e.clientX - clientX) / paintScale;
         const changeY = (e.clientY - clientY) / paintScale;
@@ -599,9 +633,43 @@ const Board = () => {
                 });
                 break;
             case 'MM':
+                var nextLeft = current.position.left + changeX;
+                var nextTop = current.position.top + changeY;
+                var movePointList = [
+                    { x: startLeft + changeX, y: startTop + changeY, el, pos: 'LT' },
+                    { x: startLeft + container.offsetWidth / 2 + changeX, y: startTop + container.offsetHeight / 2 + changeY, el, pos: 'MM' },
+                    { x: startLeft + container.offsetWidth + changeX, y: startTop + container.offsetHeight + changeY, el, pos: 'RB' }
+                ];
+                rulerPointList.current.forEach((point) => {
+                    const dis = 16;
+                    const minX = point.x - dis;
+                    const maxX = point.x + dis;
+                    const minY = point.y - dis;
+                    const maxY = point.y + dis;
+                    movePointList.forEach((mPoint) => {
+                        if (mPoint.x >= minX && mPoint.x <= maxX) {
+                            if (!!~mPoint.pos.indexOf('R')) {
+                                nextLeft = point.x - container.offsetWidth;
+                            } else if (!!~mPoint.pos.indexOf('M')) {
+                                nextLeft = point.x - container.offsetWidth / 2;
+                            } else {
+                                nextLeft = point.x;
+                            }
+                        }
+                        if (mPoint.y >= minY && mPoint.y <= maxY) {
+                            if (!!~mPoint.pos.indexOf('B')) {
+                                nextTop = point.y - container.offsetHeight;
+                            } else if (!!~mPoint.pos.indexOf('M')) {
+                                nextTop = point.y - container.offsetHeight / 2;
+                            } else {
+                                nextTop = point.y;
+                            }
+                        }
+                    });
+                });
                 Object.assign(nextStyles, {
-                    left: (current.position.left + changeX).toFixed(0) + 'px',
-                    top: (current.position.top + changeY).toFixed(0) + 'px',
+                    left: nextLeft.toFixed(0) + 'px',
+                    top: nextTop.toFixed(0) + 'px',
                     right: null,
                     bottom: null
                 });
@@ -639,6 +707,7 @@ const Board = () => {
         document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(computedStyle.width);
         document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(computedStyle.height);
 
+        setIsMovingChild(true);
     };
 
     // 画布内编辑释放鼠标
@@ -675,6 +744,8 @@ const Board = () => {
         });
         nextStylesbYChangeMask.current = null;
         paintMaskMove.current = false;
+
+        setIsMovingChild(false);
     };
 
     // 拖动画布
@@ -771,6 +842,7 @@ const Board = () => {
                                     handleHoverCallBack={handleHoverCallBack}
                                     optionInputHasFocus={optionInputHasFocus}
                                 />
+                                {isMovingChild && <Ruler rulerPointList={rulerPointList} />}
                             </div>
                         </div>
                     </div>

@@ -74,7 +74,8 @@
           "el": "wc5",
           "hide": true
         }
-      ]
+      ],
+      "hide": true
     },
     {
       "name": "Iframe",
@@ -97,12 +98,15 @@
       "name": "View",
       "style": {
         "position": "relative",
-        "width": "100%",
-        "height": "901px",
+        "width": "1690px",
+        "height": "1147px",
         "backgroundColor": "rgba(74,226,93,0.3)",
-        "top": "",
+        "top": "36px",
         "overflow": "visible",
-        "display": "block"
+        "display": "block",
+        "left": "112px",
+        "right": null,
+        "bottom": null
       },
       "props": {
         "lazy": true
@@ -132,7 +136,8 @@
             "color": "rgba(182,36,54,1)",
             "fontWeight": "bold"
           },
-          "el": "wc11"
+          "el": "wc11",
+          "hide": true
         },
         {
           "name": "View",
@@ -151,12 +156,14 @@
         {
           "name": "View",
           "style": {
-            "position": "relative",
+            "position": "absolute",
             "width": "821px",
             "height": "247px",
-            "left": "35px",
-            "top": "34px",
-            "backgroundColor": "rgba(180,175,206,1)"
+            "left": "706px",
+            "top": "101px",
+            "backgroundColor": "rgba(180,175,206,1)",
+            "right": null,
+            "bottom": null
           },
           "props": {
             "lazy": true
@@ -166,12 +173,14 @@
         {
           "name": "Image",
           "style": {
-            "position": "relative",
-            "width": "180px",
-            "height": "180px",
+            "position": "absolute",
+            "width": "412px",
+            "height": "498px",
             "marginTop": "0px",
-            "left": "1464px",
-            "top": "-205px"
+            "left": "233px",
+            "top": "406px",
+            "right": null,
+            "bottom": null
           },
           "props": {
             "src": "http://r.photo.store.qq.com/psb?/V14dALyK4PrHuj/h50SMf97hSy.BJlJw31fagrw.NUaJD83gvydmoGN77w!/r/dLgAAAAAAAAA",
