@@ -3,6 +3,7 @@
 /**
  * @description 数据结构处理相关方法
  */
+const EnumId = { root: 'root' };    // 画布id
 const EnumEdit = {
     add: Symbol(),         // 插入
     choose: Symbol(),   // 选择
@@ -153,9 +154,39 @@ const creatPart = (initConfig, menu) => {
     };
 };
 
+/**
+ * 获取当前元素距离某个祖先级元素的距离
+ * @param {string} name 当前元素选择器
+ * @param {string} targetMame 目标元素选择器
+ */
+const getOffsetWith = (name, targetMame = EnumId.root) => {
+    const id = `#${name}`;
+    const targetId = `#${targetMame}`;
+    const offset = {
+        top: 0,
+        left: 0
+    };
+    if (id === targetId) {
+        return offset;
+    }
+    let dom = document.querySelector(id);
+    const targetDom = document.querySelector(targetId);
+    while (dom.offsetParent !== targetDom) {
+        offset.top += dom.offsetTop;
+        offset.left += dom.offsetLeft;
+        dom = dom.offsetParent;
+    }
+    offset.top += dom.offsetTop;
+    offset.left += dom.offsetLeft;
+
+    return offset;
+};
+
 export {
+    EnumId,
     EnumEdit,
     searchTree,
     rangeKey,
-    creatPart
+    creatPart,
+    getOffsetWith
 };

@@ -1,12 +1,10 @@
-import ReactDom from 'react-dom';
-import React, { useContext, useEffect, useRef, useCallback, useState } from 'react';
-import storeContext from './model/context';
+/**
+ * @description 动态标尺画布
+ */
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import style from './style/ruler.less';
 
-export default ({
-    rulerPointList
-}) => {
-    const { state, dispatch, forceUpdate } = useContext(storeContext);
+export default forwardRef((_, ref) => {
     const canvasBoxDOM = useRef();
     const canvasDOM = useRef();
 
@@ -15,23 +13,23 @@ export default ({
         canvasDOM.current.height = canvasBoxDOM.current.offsetHeight;
     }, []);
 
-    // useEffect(() => {
-    //     const ctx = canvasDOM.current.getContext('2d');
-    //     ctx.beginPath();
-    //     ctx.strokeStyle = 'red';
-    //     ctx.lineWidth = 20;
-    //     ctx.moveTo(100, 100);
-    //     ctx.lineTo(240, 200);
-    //     ctx.stroke();
-    //     ctx.beginPath();
-    //     ctx.lineWidth = 5;
-    //     ctx.strokeStyle = 'blue';
-    //     ctx.moveTo(0, 20);
-    //     ctx.lineTo(100, 120);
-    //     ctx.stroke();
-    // }, [rulerPointList]);
+    useImperativeHandle(ref, () => ({
+        repaint: (path) => {
+            const ctx = canvasDOM.current.getContext('2d');
+            ctx.clearRect(0, 0, canvasDOM.current.width, canvasDOM.current.height);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 3;
+            path.forEach(({ start, end }) => {
+                ctx.beginPath();
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+            });
+        }
+    }), []);
 
     return <div ref={canvasBoxDOM} className={style.box} >
         <canvas width="0" height="0" ref={canvasDOM} />
     </div>;
-};
+});

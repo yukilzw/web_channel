@@ -99,7 +99,7 @@
       "style": {
         "position": "relative",
         "width": "1690px",
-        "height": "1147px",
+        "height": "2191px",
         "backgroundColor": "rgba(74,226,93,0.3)",
         "top": "36px",
         "overflow": "visible",
@@ -114,44 +114,22 @@
       "el": "wc9",
       "children": [
         {
-          "name": "Text",
-          "style": {
-            "position": "absolute",
-            "width": "200px",
-            "marginLeft": "",
-            "marginRight": "",
-            "marginTop": "30px",
-            "height": "",
-            "left": "651px",
-            "top": "359px",
-            "bottom": "10px",
-            "right": "200px"
-          },
-          "props": {
-            "text": "这是下面这个元素的标题",
-            "fontSize": "50px",
-            "lineHeight": "100px",
-            "textAlign": "center",
-            "lazy": true,
-            "color": "rgba(182,36,54,1)",
-            "fontWeight": "bold"
-          },
-          "el": "wc11",
-          "hide": true
-        },
-        {
           "name": "View",
           "style": {
-            "position": "relative",
-            "width": "1089px",
-            "height": "820px"
+            "position": "absolute",
+            "width": "612px",
+            "height": "409px",
+            "left": "881px",
+            "top": "725px",
+            "right": null,
+            "bottom": null,
+            "backgroundColor": "rgba(88,86,97,1)"
           },
           "props": {
             "lazy": true
           },
           "el": "wc12",
-          "children": [],
-          "hide": true
+          "children": []
         },
         {
           "name": "View",
@@ -174,11 +152,11 @@
           "name": "Image",
           "style": {
             "position": "absolute",
-            "width": "412px",
-            "height": "498px",
+            "width": "466px",
+            "height": "527px",
             "marginTop": "0px",
-            "left": "233px",
-            "top": "406px",
+            "left": "25px",
+            "top": "16px",
             "right": null,
             "bottom": null
           },
@@ -188,6 +166,31 @@
             "lazy": true
           },
           "el": "wc14"
+        },
+        {
+          "name": "Text",
+          "style": {
+            "position": "absolute",
+            "width": "712px",
+            "left": "133px",
+            "top": "1507px",
+            "right": null,
+            "bottom": null,
+            "height": "399px",
+            "marginTop": "40px",
+            "backgroundImage": "https://gw.alicdn.com/imgextra/i3/O1CN01pEByG01PHltw6LlTc_!!6000000001816-0-tps-240-240.jpg",
+            "backgroundSize": "contain",
+            "backgroundRepeat": "repeat"
+          },
+          "props": {
+            "text": "测试",
+            "fontSize": "60px",
+            "lineHeight": "195px",
+            "textAlign": "center",
+            "lazy": true,
+            "color": "rgba(255,255,255,1)"
+          },
+          "el": "wc18"
         }
       ]
     }

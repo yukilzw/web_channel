@@ -6,6 +6,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import storeContext from './model/context';
 import { loadAsync } from './utils/global';
 import { record } from './record';
+import { getOffsetWith, EnumId } from './common';
 import styleBd from './style/changeBox.less';
 
 const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   // 组件容器事件蒙层类名
@@ -143,24 +144,34 @@ const checkChildren = (children) => {
 const changeTab = ({ button, clientX, clientY }, key, el, { dispatch }) => {
     if (button === 0) {
         const moveDom = document.querySelector(`#${el}`);
+        const moveDomParent = moveDom.offsetParent;
         const elStyles = window.getComputedStyle(moveDom, null);
+        const { left, top } = getOffsetWith(el);
+        const { left: pLeft, top: pTop } = getOffsetWith(moveDomParent.id);
 
         dispatch({
             type: 'EDIT_COMP_BOX',
             payload: {
                 el,
                 key,
-                clientX,
-                clientY,
-                startLeft: moveDom.offsetLeft,
-                startTop: moveDom.offsetTop,
+                clientX,            // 鼠标按下的坐标x
+                clientY,            // 鼠标按下的坐标y
+                startLeft: left,    // 当前节点相对root的坐标
+                startTop: top,      // 当前节点相对root的坐标
+                parentOffset: {     // 当前节点的父节点相对root的坐标
+                    width: moveDomParent.offsetWidth,
+                    height: moveDomParent.offsetHeight,
+                    left: pLeft,
+                    top: pTop
+                },
                 current: {
                     width: parseFloat(elStyles.width),
                     height: parseFloat(elStyles.height),
-                    position: {
-                        left: parseFloat(elStyles.left),
-                        top: parseFloat(elStyles.top)
-                    }
+                    marginLeft: parseFloat(elStyles.marginLeft || 0),
+                    marginTop: parseFloat(elStyles.marginTop || 0),
+                    position: elStyles.position,
+                    left: parseFloat(elStyles.left),
+                    top: parseFloat(elStyles.top)
                 }
             }
         });

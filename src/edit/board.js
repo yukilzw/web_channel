@@ -12,14 +12,13 @@ import CompMenu from './menu';
 import Option from './option';
 import PageTree from './tree';
 import Ruler from './ruler';
-import { searchTree, rangeKey, creatPart, EnumEdit } from './common';
+import { searchTree, rangeKey, creatPart, EnumEdit, EnumId, getOffsetWith } from './common';
 import { record } from './record';
 import { Layout, Button, Slider, Radio, Menu, message } from 'antd';
 import style from './style/index.less';
 import styleBd from './style/changeBox.less';
 
 const IsMacOS = navigator.platform.match('Mac');
-const EnumId = { root: 'root' };    // 画布id
 const PCboardWidth = 1920;  // pc页面搭建宽度
 const PaintBoxMargin = 30;  // 画布边距
 const BoardBottom = 300;    // 画布底部留白距离，用于拖入新的元素
@@ -31,6 +30,178 @@ const SliderMarks = {   // 缩放拖动条坐标轴
     100: '100%'
 };
 
+let rulerPointList; // 暂存当前选中节点所关联标尺线的坐标集
+let nextStylesbYChangeMask;    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
+
+// 执行时机在compile.js中changeTab按下拖动区域后，实现拖动蒙版编辑组件尺寸、定位、吸附
+const changeBoxByMask = ({ rulerCanvas, stateRef, setIsMoving }, e) => {
+    const { changeCompBox, paintScale } = stateRef.current;
+
+    if (!changeCompBox) {
+        return;
+    }
+    const { key, el, clientY, clientX, startLeft, startTop, parentOffset, current } = changeCompBox;
+    const container = document.querySelector(`#${el}`);
+    const changeX = (e.clientX - clientX) / paintScale;
+    const changeY = (e.clientY - clientY) / paintScale;
+    const nextStyles = {};
+
+    switch (key) {
+        case 'LT':
+            Object.assign(nextStyles, {
+                width: (current.width - changeX).toFixed(0) + 'px',
+                height: (current.height - changeY).toFixed(0) + 'px',
+                left: (current.left + changeX).toFixed(0) + 'px',
+                top: (current.top + changeY).toFixed(0) + 'px'
+            });
+            break;
+        case 'MT':
+            Object.assign(nextStyles, {
+                height: (current.height - changeY).toFixed(0) + 'px',
+                top: (current.top + changeY).toFixed(0) + 'px'
+            });
+            break;
+        case 'RT':
+            Object.assign(nextStyles, {
+                width: (current.width + changeX).toFixed(0) + 'px',
+                height: (current.height - changeY).toFixed(0) + 'px',
+                top: (current.top + changeY).toFixed(0) + 'px'
+            });
+            break;
+        case 'LM':
+            Object.assign(nextStyles, {
+                width: (current.width - changeX).toFixed(0) + 'px',
+                left: (current.left + changeX).toFixed(0) + 'px'
+            });
+            break;
+        case 'MM':
+            var nextLeft = current.left + changeX;
+            var nextTop = current.top + changeY;
+            // 绝对定位时，拖动节点启用自动吸附算法
+            if (current.position === 'absolute') {
+                // 获取当前拖动节点的 左上、中央、右下 三个关键点的页面全局坐标
+                var movePointList = [
+                    {
+                        x: startLeft + changeX,
+                        y: startTop + changeY,
+                        el, pos: 'LT'
+                    },
+                    {
+                        x: startLeft + container.offsetWidth / 2 + changeX,
+                        y: startTop + container.offsetHeight / 2 + changeY,
+                        el, pos: 'MM'
+                    },
+                    {
+                        x: startLeft + container.offsetWidth + changeX,
+                        y: startTop + container.offsetHeight + changeY,
+                        el, pos: 'RB'
+                    }
+                ];
+                var newRulerLineList = [];      // 辅助线数据集
+                // 将拖动节点的关键点与其兄弟节点、父节点的关键点进行匹配校验。如果两点间的x或y坐标小于dis，则触发吸附
+                rulerPointList.forEach((point) => {
+                    const dis = 16;
+                    const minX = point.x - dis;
+                    const maxX = point.x + dis;
+                    const minY = point.y - dis;
+                    const maxY = point.y + dis;
+                    movePointList.forEach((mPoint) => {
+                        // 判断是否存在纵轴吸附
+                        if (mPoint.x >= minX && mPoint.x <= maxX) {
+                            if (!!~mPoint.pos.indexOf('R')) {
+                                // 拖动节点关键点如果在元素右侧，则需要在坐标计算定位后，额外再减去自身的宽度
+                                nextLeft = point.x - parentOffset.left - current.marginLeft - container.offsetWidth;
+                            } else if (!!~mPoint.pos.indexOf('M')) {
+                                // 同理，关键点为中央时，计算定位后，要减去自身宽度的一半
+                                nextLeft = point.x - parentOffset.left - current.marginLeft - container.offsetWidth / 2;
+                            } else {
+                                nextLeft = point.x - parentOffset.left - current.marginLeft;
+                            }
+                            // 将两个点连成直线
+                            let start = {
+                                ...mPoint,
+                                x: point.x
+                            };
+                            let end = point;
+                            // 如果是关键点来自父级，则从头到尾绘制一条贯穿辅助线
+                            if (point.parent) {
+                                start.y = parentOffset.top;
+                                end.y = parentOffset.top + parentOffset.height;
+                            }
+                            newRulerLineList.push({
+                                start, end
+                            });
+                        }
+                        // 判断是否存在横轴吸附
+                        if (mPoint.y >= minY && mPoint.y <= maxY) {
+                            if (!!~mPoint.pos.indexOf('B')) {
+                                nextTop = point.y - parentOffset.top - current.marginTop - container.offsetHeight;
+                            } else if (!!~mPoint.pos.indexOf('M')) {
+                                nextTop = point.y - parentOffset.top - current.marginTop - container.offsetHeight / 2;
+                            } else {
+                                nextTop = point.y - parentOffset.top - current.marginTop;
+                            }
+                            let start = {
+                                ...mPoint,
+                                y: point.y
+                            };
+                            let end = point;
+                            if (point.parent) {
+                                start.x = parentOffset.left;
+                                end.x = parentOffset.left + parentOffset.width;
+                            }
+                            newRulerLineList.push({
+                                start, end
+                            });
+                        }
+                    });
+                });
+                // 通知标尺cavans重绘辅助线
+                rulerCanvas.current?.repaint(newRulerLineList);
+            }
+            Object.assign(nextStyles, {
+                left: nextLeft.toFixed(0) + 'px',
+                top: nextTop.toFixed(0) + 'px',
+                right: null,
+                bottom: null
+            });
+            break;
+        case 'RM':
+            Object.assign(nextStyles, {
+                width: (current.width + changeX).toFixed(0) + 'px'
+            });
+            break;
+        case 'LB':
+            Object.assign(nextStyles, {
+                width: (current.width - changeX).toFixed(0) + 'px',
+                height: (current.height + changeY).toFixed(0) + 'px',
+                left: (current.left + changeX).toFixed(0) + 'px'
+            });
+            break;
+        case 'MB':
+            Object.assign(nextStyles, {
+                height: (current.height + changeY).toFixed(0) + 'px'
+            });
+            break;
+        case 'RB':
+            Object.assign(nextStyles, {
+                width: (current.width + changeX).toFixed(0) + 'px',
+                height: (current.height + changeY).toFixed(0) + 'px'
+            });
+            break;
+        default: break;
+    }
+    Object.assign(container.style, nextStyles);
+    nextStylesbYChangeMask = nextStyles;
+    const computedStyle = window.getComputedStyle(container);
+
+    document.querySelector(`.${styleBd.topLeftTip}`).innerHTML = `${parseInt(computedStyle.left)},${parseInt(computedStyle.top)}`;
+    document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(computedStyle.width);
+    document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(computedStyle.height);
+
+    setIsMoving(true);
+};
+
 const Board = () => {
     const { state, dispatch, forceUpdate } = useContext(storeContext);
     const stateRef = useRef();          // 暂存实时reducer
@@ -38,7 +209,6 @@ const Board = () => {
     const targetCmpDom = useRef();      // 暂存当前编辑事件的目标元素（拖拽释放、点击等）
     const paintingWrap = useRef();       // 画布所在的区域DOM元素
     const paintingWrapWidthPre = useRef();     // 上次改变画布大小时的画布所在DOM的宽度，用于鉴别容器是否变宽
-    const nextStylesbYChangeMask = useRef();    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
     const copyCompEl = useRef();          // 剪切板操作 - 节点暂存
     const dispatchCallBack = useRef();      // 重新渲染完成后触发回调
     const spaceDown = useRef();            // 空格键是否按下
@@ -49,13 +219,13 @@ const Board = () => {
     const [paintMinHeight, setPaintMinHeight] = useState(0);     // 画布实际最小高度
     const [contextMenu, setContextMenu] = useState(false);     // 右键菜单展示
     const [boardMode, setBoardMode] = useState('pc');   // 编辑器环境类型
-    const [isMovingChild, setIsMovingChild] = useState(false);  // 正在拖动节点
+    const [isMoving, setIsMoving] = useState(false);  // 正在拖动节点
 
     // 子组件渲染需要使用的实时常量，在父组件dispatch前设置好，便于子组件重新渲染时直接读取
     const optionInputHasFocus = useRef(false);      // 编辑区输入框聚焦开关（避免键盘事件与输入框默认快捷键冲突）
     const checkedKeysList = useRef(new Set());             // 侧边栏树组件选中集合
     const expandedKeys = useRef(new Set());         // 侧边栏树组件展开的集合
-    const rulerPointList = useRef();        // 暂存当前选中节点所关联标尺线的坐标集合
+    const rulerCanvas = useRef();     // 标尺线画布组件实例
 
     useEffect(() => {
         // 缓存当前环境下的state
@@ -463,26 +633,28 @@ const Board = () => {
                 }
             }
         };
-        // if (parent) {
-        //     const { el } = parent;
-        //     const parentDOM = document.getElementById(el);
-        //     pointsList.checkPush(
-        //         { x: parentDOM.offsetWidth / 2, y: 0, el, pos: 'TM' },
-        //         { x: 0, y: parentDOM.offsetHeight / 2, el, pos: 'LM' },
-        //         { x: parentDOM.offsetWidth, y: parentDOM.offsetHeight, el, pos: 'RB' }
-        //     );
-        // }
+        if (parent) {
+            const { el } = parent;
+            const parentDOM = document.getElementById(el);
+            const { top, left } = getOffsetWith(el);
+            pointsList.checkPush(
+                { x: left + parentDOM.offsetWidth / 2, y: top, el, parent: true, pos: 'TM' },
+                { x: left, y: top + parentDOM.offsetHeight / 2, el, parent: true, pos: 'LM' },
+                { x: left + top + parentDOM.offsetWidth, y: parentDOM.offsetHeight, el, parent: true, pos: 'RB' }
+            );
+        }
         brother.forEach(({ el }) => {
             const brotherDOM = document.getElementById(el);
+            const { top, left } = getOffsetWith(el);
             pointsList.checkPush(
-                { x: brotherDOM.offsetLeft, y: brotherDOM.offsetTop, el, pos: 'LT' },
-                { x: brotherDOM.offsetLeft + brotherDOM.offsetWidth / 2, y: brotherDOM.offsetTop + brotherDOM.offsetHeight / 2, el, pos: 'MM' },
-                { x: brotherDOM.offsetLeft + brotherDOM.offsetWidth, y: brotherDOM.offsetTop + brotherDOM.offsetHeight, el, pos: 'RB' }
+                { x: left, y: top, el, pos: 'LT' },
+                { x: left + brotherDOM.offsetWidth / 2, y: top + brotherDOM.offsetHeight / 2, el, pos: 'MM' },
+                { x: left + brotherDOM.offsetWidth, y: top + brotherDOM.offsetHeight, el, pos: 'RB' }
             );
         });
         delete pointsList.tampPoint;
         delete pointsList.checkPush;
-        rulerPointList.current = pointsList;
+        rulerPointList = pointsList;
     };
 
     // 点击事件回调
@@ -591,124 +763,6 @@ const Board = () => {
         repainting(num / 100);
     };
 
-    // 响应compile.js中changeTab事件，实现拖动蒙版编辑组件尺寸、定位
-    const changeBoxByMask = (e) => {
-        const { changeCompBox } = stateRef.current;
-
-        if (!changeCompBox) {
-            return;
-        }
-        const { key, el, clientY, clientX, startLeft, startTop, current } = changeCompBox;
-        const container = document.querySelector(`#${el}`);
-        const changeX = (e.clientX - clientX) / paintScale;
-        const changeY = (e.clientY - clientY) / paintScale;
-        const nextStyles = {};
-
-        switch (key) {
-            case 'LT':
-                Object.assign(nextStyles, {
-                    width: (current.width - changeX).toFixed(0) + 'px',
-                    height: (current.height - changeY).toFixed(0) + 'px',
-                    left: (current.position.left + changeX).toFixed(0) + 'px',
-                    top: (current.position.top + changeY).toFixed(0) + 'px'
-                });
-                break;
-            case 'MT':
-                Object.assign(nextStyles, {
-                    height: (current.height - changeY).toFixed(0) + 'px',
-                    top: (current.position.top + changeY).toFixed(0) + 'px'
-                });
-                break;
-            case 'RT':
-                Object.assign(nextStyles, {
-                    width: (current.width + changeX).toFixed(0) + 'px',
-                    height: (current.height - changeY).toFixed(0) + 'px',
-                    top: (current.position.top + changeY).toFixed(0) + 'px'
-                });
-                break;
-            case 'LM':
-                Object.assign(nextStyles, {
-                    width: (current.width - changeX).toFixed(0) + 'px',
-                    left: (current.position.left + changeX).toFixed(0) + 'px'
-                });
-                break;
-            case 'MM':
-                var nextLeft = current.position.left + changeX;
-                var nextTop = current.position.top + changeY;
-                var movePointList = [
-                    { x: startLeft + changeX, y: startTop + changeY, el, pos: 'LT' },
-                    { x: startLeft + container.offsetWidth / 2 + changeX, y: startTop + container.offsetHeight / 2 + changeY, el, pos: 'MM' },
-                    { x: startLeft + container.offsetWidth + changeX, y: startTop + container.offsetHeight + changeY, el, pos: 'RB' }
-                ];
-                rulerPointList.current.forEach((point) => {
-                    const dis = 16;
-                    const minX = point.x - dis;
-                    const maxX = point.x + dis;
-                    const minY = point.y - dis;
-                    const maxY = point.y + dis;
-                    movePointList.forEach((mPoint) => {
-                        if (mPoint.x >= minX && mPoint.x <= maxX) {
-                            if (!!~mPoint.pos.indexOf('R')) {
-                                nextLeft = point.x - container.offsetWidth;
-                            } else if (!!~mPoint.pos.indexOf('M')) {
-                                nextLeft = point.x - container.offsetWidth / 2;
-                            } else {
-                                nextLeft = point.x;
-                            }
-                        }
-                        if (mPoint.y >= minY && mPoint.y <= maxY) {
-                            if (!!~mPoint.pos.indexOf('B')) {
-                                nextTop = point.y - container.offsetHeight;
-                            } else if (!!~mPoint.pos.indexOf('M')) {
-                                nextTop = point.y - container.offsetHeight / 2;
-                            } else {
-                                nextTop = point.y;
-                            }
-                        }
-                    });
-                });
-                Object.assign(nextStyles, {
-                    left: nextLeft.toFixed(0) + 'px',
-                    top: nextTop.toFixed(0) + 'px',
-                    right: null,
-                    bottom: null
-                });
-                break;
-            case 'RM':
-                Object.assign(nextStyles, {
-                    width: (current.width + changeX).toFixed(0) + 'px'
-                });
-                break;
-            case 'LB':
-                Object.assign(nextStyles, {
-                    width: (current.width - changeX).toFixed(0) + 'px',
-                    height: (current.height + changeY).toFixed(0) + 'px',
-                    left: (current.position.left + changeX).toFixed(0) + 'px'
-                });
-                break;
-            case 'MB':
-                Object.assign(nextStyles, {
-                    height: (current.height + changeY).toFixed(0) + 'px'
-                });
-                break;
-            case 'RB':
-                Object.assign(nextStyles, {
-                    width: (current.width + changeX).toFixed(0) + 'px',
-                    height: (current.height + changeY).toFixed(0) + 'px'
-                });
-                break;
-            default: break;
-        }
-        Object.assign(container.style, nextStyles);
-        nextStylesbYChangeMask.current = nextStyles;
-        const computedStyle = window.getComputedStyle(container);
-
-        document.querySelector(`.${styleBd.topLeftTip}`).innerHTML = `${parseInt(computedStyle.left)},${parseInt(computedStyle.top)}`;
-        document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(computedStyle.width);
-        document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(computedStyle.height);
-
-        setIsMovingChild(true);
-    };
 
     // 画布内编辑释放鼠标
     const handleMouseUp = (e) => {
@@ -717,7 +771,7 @@ const Board = () => {
         }
         e.preventDefault();
         const { tree, changeCompBox } = stateRef.current;
-        const nsbcMask = nextStylesbYChangeMask.current;
+        const nsbcMask = nextStylesbYChangeMask;
 
         if (nsbcMask && changeCompBox) {
             const nextStyleItems = [];
@@ -742,10 +796,10 @@ const Board = () => {
             type: 'EDIT_COMP_BOX',
             payload: null
         });
-        nextStylesbYChangeMask.current = null;
+        nextStylesbYChangeMask = null;
         paintMaskMove.current = false;
 
-        setIsMovingChild(false);
+        setIsMoving(false);
     };
 
     // 拖动画布
@@ -833,7 +887,9 @@ const Board = () => {
                                 onDragOver={(e) => handleEventCallBack('dragover', EnumId.root, null, e)}
                                 onDragLeave={(e) => handleEventCallBack('dragout', EnumId.root, null, e)}
                                 onDrop={(e) => handleEventCallBack('drop', EnumId.root, null, e)}
-                                onMouseMove={changeBoxByMask}
+                                onMouseMove={changeBoxByMask.bind(this, {
+                                    rulerCanvas, stateRef, setIsMoving
+                                })}
                             >
                                 <Page
                                     handleEventCallBack={handleEventCallBack}
@@ -842,7 +898,7 @@ const Board = () => {
                                     handleHoverCallBack={handleHoverCallBack}
                                     optionInputHasFocus={optionInputHasFocus}
                                 />
-                                {isMovingChild && <Ruler rulerPointList={rulerPointList} />}
+                                {isMoving && <Ruler ref={rulerCanvas} />}
                             </div>
                         </div>
                     </div>
