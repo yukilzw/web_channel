@@ -6,7 +6,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import storeContext from './model/context';
 import { loadAsync } from './utils/global';
 import { record } from './record';
-import { getOffsetWith, EnumId } from './common';
+import { getOffsetWith } from './common';
 import styleBd from './style/changeBox.less';
 
 const changeTabList = ['LT', 'MT', 'RT', 'LM', 'MM', 'RM', 'LB', 'MB', 'RB'];   // 组件容器事件蒙层类名
@@ -112,24 +112,6 @@ const renderEditSizeTab = (name, el, { position }, store) => {
         }
     </div>;
 };
-
-// const renderEditRuler = (name, el, { position }, store) => {
-//     const { state: {
-//         menu, choose, changeCompBox
-//     } } = store;
-
-//     // if (!~['relative', 'fiexd', 'absolute'].indexOf(position)) {
-//     //     return;
-//     // }
-//     if (choose === el) {
-//         return;
-//     }
-//     return changeCompBox && <div className={styleBd.rulerMask}>
-//         {
-//             rulerLineList.map((key) => <div key={el + key} className={styleBd[key]}></div>)
-//         }
-//     </div>;
-// };
 
 // 检查当前层级子节点
 const checkChildren = (children) => {

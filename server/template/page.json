@@ -137,8 +137,8 @@
             "position": "absolute",
             "width": "821px",
             "height": "247px",
-            "left": "706px",
-            "top": "101px",
+            "left": "320px",
+            "top": "178px",
             "backgroundColor": "rgba(180,175,206,1)",
             "right": null,
             "bottom": null
@@ -165,19 +165,20 @@
             "blank": true,
             "lazy": true
           },
-          "el": "wc14"
+          "el": "wc14",
+          "hide": true
         },
         {
           "name": "Text",
           "style": {
             "position": "absolute",
             "width": "712px",
-            "left": "133px",
-            "top": "1507px",
+            "left": "79px",
+            "top": "1134px",
             "right": null,
             "bottom": null,
             "height": "399px",
-            "marginTop": "40px",
+            "marginTop": "",
             "backgroundImage": "https://gw.alicdn.com/imgextra/i3/O1CN01pEByG01PHltw6LlTc_!!6000000001816-0-tps-240-240.jpg",
             "backgroundSize": "contain",
             "backgroundRepeat": "repeat"
