@@ -101,7 +101,7 @@ const renderEditSizeTab = (name, el, { position }, store) => {
         {
             changeCompBox && <>
                 <span className={styleBd.topLeftTip}></span>
-                <span className={styleBd.topTip}></span>
+                <span className={styleBd.bottomTip}></span>
                 <span className={styleBd.rightTip}></span>
             </>
         }

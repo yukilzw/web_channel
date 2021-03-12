@@ -12,7 +12,7 @@ import CompMenu from './menu';
 import Option from './option';
 import PageTree from './tree';
 import Ruler from './ruler';
-import { searchTree, rangeKey, creatPart, EnumEdit, EnumId, getOffsetWith } from './common';
+import { searchTree, rangeKey, creatPart, EnumEdit, EnumId, getOffsetWith, isOverlap } from './common';
 import { record } from './record';
 import { Layout, Button, Slider, Radio, Menu, message } from 'antd';
 import style from './style/index.less';
@@ -42,8 +42,8 @@ const changeBoxByMask = ({ rulerCanvas, stateRef, setIsMoving }, e) => {
     }
     const { key, el, clientY, clientX, startLeft, startTop, parentOffset, current } = changeCompBox;
     const container = document.querySelector(`#${el}`);
-    const changeX = (e.clientX - clientX) / paintScale;
-    const changeY = (e.clientY - clientY) / paintScale;
+    const changeX = +((e.clientX - clientX) / paintScale).toFixed(0);
+    const changeY = +((e.clientY - clientY) / paintScale).toFixed(0);
     const nextStyles = {};
 
     switch (key) {
@@ -79,85 +79,129 @@ const changeBoxByMask = ({ rulerCanvas, stateRef, setIsMoving }, e) => {
             var nextTop = current.top + changeY;
             // 绝对定位时，拖动节点启用自动吸附算法
             if (current.position === 'absolute') {
-                // 获取当前拖动节点的 左上、中央、右下 三个关键点的页面全局坐标
-                var movePointList = [
-                    {
+                // 获取当前拖动节点的5个关键点的页面全局坐标
+                var aboutDom = {
+                    dom: document.getElementById(el),
+                    offsetRoot: getOffsetWith(el)
+                };
+                var movePoint = {
+                    el,
+                    rect: {
                         x: startLeft + changeX,
                         y: startTop + changeY,
-                        el, pos: 'LT'
+                        width: container.offsetWidth,
+                        height: container.offsetHeight
                     },
-                    {
-                        x: startLeft + container.offsetWidth / 2 + changeX,
-                        y: startTop + container.offsetHeight / 2 + changeY,
-                        el, pos: 'MM'
-                    },
-                    {
-                        x: startLeft + container.offsetWidth + changeX,
-                        y: startTop + container.offsetHeight + changeY,
-                        el, pos: 'RB'
-                    }
-                ];
-                var newRulerLineList = [];      // 辅助线数据集
+                    data: [
+                        {
+                            x: startLeft + changeX,
+                            y: startTop + changeY,
+                            el, pos: 'LT', ...aboutDom
+                        },
+                        {
+                            x: startLeft + container.offsetWidth / 2 + changeX,
+                            y: startTop + container.offsetHeight / 2 + changeY,
+                            el, pos: 'MM', ...aboutDom
+                        },
+                        {
+                            x: startLeft + container.offsetWidth + changeX,
+                            y: startTop + container.offsetHeight + changeY,
+                            el, pos: 'RB', ...aboutDom
+                        },
+                        {
+                            x: startLeft + container.offsetWidth + changeX,
+                            y: startTop + changeY,
+                            el, pos: 'RT', ...aboutDom
+                        },
+                        {
+                            x: startLeft + changeX,
+                            y: startTop + container.offsetHeight + changeY,
+                            el, pos: 'LB', ...aboutDom
+                        }
+                    ]
+                };
+                var newRulerLineList = {
+                    x: {}, y: {}
+                };
+                var tempShortDis = {
+                    x: {}, y: {}
+                };
                 // 将拖动节点的关键点与其兄弟节点、父节点的关键点进行匹配校验。如果两点间的x或y坐标小于dis，则触发吸附
-                rulerPointList.forEach((point) => {
-                    const dis = 16;
-                    const minX = point.x - dis;
-                    const maxX = point.x + dis;
-                    const minY = point.y - dis;
-                    const maxY = point.y + dis;
-                    movePointList.forEach((mPoint) => {
-                        // 判断是否存在纵轴吸附
-                        if (mPoint.x >= minX && mPoint.x <= maxX) {
-                            if (!!~mPoint.pos.indexOf('R')) {
-                                // 拖动节点关键点如果在元素右侧，则需要在坐标计算定位后，额外再减去自身的宽度
-                                nextLeft = point.x - parentOffset.left - current.marginLeft - container.offsetWidth;
-                            } else if (!!~mPoint.pos.indexOf('M')) {
-                                // 同理，关键点为中央时，计算定位后，要减去自身宽度的一半
-                                nextLeft = point.x - parentOffset.left - current.marginLeft - container.offsetWidth / 2;
-                            } else {
-                                nextLeft = point.x - parentOffset.left - current.marginLeft;
+                rulerPointList.forEach(({ data, rect }) => {
+                    const overlap = isOverlap(rect, movePoint.rect);
+                    data.forEach((point) => {
+                        const dis = 16;
+                        const minX = point.x - dis;
+                        const maxX = point.x + dis;
+                        const minY = point.y - dis;
+                        const maxY = point.y + dis;
+                        movePoint.data.forEach((mPoint) => {
+                            // 判断是否存在y轴吸附
+                            if (mPoint.x >= minX && mPoint.x <= maxX) {
+                                // 将两个点连成直线
+                                let start = {
+                                    ...mPoint,
+                                    x: point.x
+                                };
+                                let end = { ...point };
+                                // 如果是关键点来自父级，则从头到尾绘制一条贯穿辅助线
+                                if (point.parent) {
+                                    start.y = parentOffset.top;
+                                    end.y = parentOffset.top + parentOffset.height;
+                                }
+                                if (isNaN(tempShortDis.x[point.x]) || Math.abs(start.y - end.y) < tempShortDis.x[point.x]) {
+                                    if (!!~mPoint.pos.indexOf('R')) {
+                                        // 拖动节点关键点如果在元素右侧，则需要在坐标计算定位后，额外再减去自身的宽度
+                                        nextLeft = point.x - parentOffset.left - current.marginLeft - container.offsetWidth;
+                                    } else if (!!~mPoint.pos.indexOf('M')) {
+                                        // 同理，关键点为中央时，计算定位后，要减去自身宽度的一半
+                                        nextLeft = point.x - parentOffset.left - current.marginLeft - container.offsetWidth / 2;
+                                    } else {
+                                        nextLeft = point.x - parentOffset.left - current.marginLeft;
+                                    }
+                                    newRulerLineList.x[point.x] = {
+                                        start, end, overlap
+                                    };
+                                    tempShortDis.x[point.x] = Math.abs(start.y - end.y);
+                                }
                             }
-                            // 将两个点连成直线
-                            let start = {
-                                ...mPoint,
-                                x: point.x
-                            };
-                            let end = point;
-                            // 如果是关键点来自父级，则从头到尾绘制一条贯穿辅助线
-                            if (point.parent) {
-                                start.y = parentOffset.top;
-                                end.y = parentOffset.top + parentOffset.height;
+                            // 判断是否存在x轴吸附
+                            if (mPoint.y >= minY && mPoint.y <= maxY) {
+                                let start = {
+                                    ...mPoint,
+                                    y: point.y
+                                };
+                                let end = { ...point };
+                                if (point.parent) {
+                                    start.x = parentOffset.left;
+                                    end.x = parentOffset.left + parentOffset.width;
+                                }
+                                if (isNaN(tempShortDis.y[point.y]) || Math.abs(start.x - end.x) < tempShortDis.y[point.y]) {
+                                    if (!!~mPoint.pos.indexOf('B')) {
+                                        nextTop = point.y - parentOffset.top - current.marginTop - container.offsetHeight;
+                                    } else if (!!~mPoint.pos.indexOf('M')) {
+                                        nextTop = point.y - parentOffset.top - current.marginTop - container.offsetHeight / 2;
+                                    } else {
+                                        nextTop = point.y - parentOffset.top - current.marginTop;
+                                    }
+                                    newRulerLineList.y[point.y] = {
+                                        start, end, overlap
+                                    };
+                                    tempShortDis.y[point.y] = Math.abs(start.x - end.x);
+                                }
                             }
-                            newRulerLineList.push({
-                                start, end
-                            });
-                        }
-                        // 判断是否存在横轴吸附
-                        if (mPoint.y >= minY && mPoint.y <= maxY) {
-                            if (!!~mPoint.pos.indexOf('B')) {
-                                nextTop = point.y - parentOffset.top - current.marginTop - container.offsetHeight;
-                            } else if (!!~mPoint.pos.indexOf('M')) {
-                                nextTop = point.y - parentOffset.top - current.marginTop - container.offsetHeight / 2;
-                            } else {
-                                nextTop = point.y - parentOffset.top - current.marginTop;
-                            }
-                            let start = {
-                                ...mPoint,
-                                y: point.y
-                            };
-                            let end = point;
-                            if (point.parent) {
-                                start.x = parentOffset.left;
-                                end.x = parentOffset.left + parentOffset.width;
-                            }
-                            newRulerLineList.push({
-                                start, end
-                            });
-                        }
+                        });
                     });
                 });
                 // 通知标尺cavans重绘辅助线
-                rulerCanvas.current?.repaint(newRulerLineList);
+                const lineList = [];
+                Object.keys(newRulerLineList).forEach((key) => {
+                    const data = newRulerLineList[key];
+                    Object.keys(data).forEach((keyR) => {
+                        lineList.push(data[keyR]);
+                    });
+                });
+                rulerCanvas.current?.repaint(lineList);
             }
             Object.assign(nextStyles, {
                 left: nextLeft.toFixed(0) + 'px',
@@ -196,7 +240,7 @@ const changeBoxByMask = ({ rulerCanvas, stateRef, setIsMoving }, e) => {
     const computedStyle = window.getComputedStyle(container);
 
     document.querySelector(`.${styleBd.topLeftTip}`).innerHTML = `${parseInt(computedStyle.left)},${parseInt(computedStyle.top)}`;
-    document.querySelector(`.${styleBd.topTip}`).innerHTML = parseInt(computedStyle.width);
+    document.querySelector(`.${styleBd.bottomTip}`).innerHTML = parseInt(computedStyle.width);
     document.querySelector(`.${styleBd.rightTip}`).innerHTML = parseInt(computedStyle.height);
 
     setIsMoving(true);
@@ -637,20 +681,43 @@ const Board = () => {
             const { el } = parent;
             const parentDOM = document.getElementById(el);
             const { top, left } = getOffsetWith(el);
-            pointsList.checkPush(
-                { x: left + parentDOM.offsetWidth / 2, y: top, el, parent: true, pos: 'TM' },
-                { x: left, y: top + parentDOM.offsetHeight / 2, el, parent: true, pos: 'LM' },
-                { x: left + top + parentDOM.offsetWidth, y: parentDOM.offsetHeight, el, parent: true, pos: 'RB' }
-            );
+            const aboutDom = {
+                dom: document.getElementById(el),
+                offsetRoot: getOffsetWith(el)
+            };
+            pointsList.push({
+                el,
+                parent: true,
+                data: [
+                    { x: left, y: top, el, parent: true, pos: 'LT', ...aboutDom },
+                    { x: left + parentDOM.offsetWidth / 2, y: top + parentDOM.offsetHeight / 2, el, parent: true, pos: 'MM', ...aboutDom },
+                    { x: left + parentDOM.offsetWidth, y: top + parentDOM.offsetHeight, el, parent: true, pos: 'RB', ...aboutDom }
+                ]
+            });
         }
         brother.forEach(({ el }) => {
             const brotherDOM = document.getElementById(el);
             const { top, left } = getOffsetWith(el);
-            pointsList.checkPush(
-                { x: left, y: top, el, pos: 'LT' },
-                { x: left + brotherDOM.offsetWidth / 2, y: top + brotherDOM.offsetHeight / 2, el, pos: 'MM' },
-                { x: left + brotherDOM.offsetWidth, y: top + brotherDOM.offsetHeight, el, pos: 'RB' }
-            );
+            const aboutDom = {
+                dom: document.getElementById(el),
+                offsetRoot: getOffsetWith(el)
+            };
+            pointsList.push({
+                el,
+                rect: {
+                    x: left,
+                    y: top,
+                    width: brotherDOM.offsetWidth,
+                    height: brotherDOM.offsetHeight
+                },
+                data: [
+                    { x: left, y: top, el, pos: 'LT', ...aboutDom },
+                    { x: left + brotherDOM.offsetWidth / 2, y: top + brotherDOM.offsetHeight / 2, el, pos: 'MM', ...aboutDom },
+                    { x: left + brotherDOM.offsetWidth, y: top + brotherDOM.offsetHeight, el, pos: 'RB', ...aboutDom },
+                    { x: left + brotherDOM.offsetWidth, y: top, el, pos: 'RT', ...aboutDom },
+                    { x: left, y: top + brotherDOM.offsetHeight, el, pos: 'LB', ...aboutDom }
+                ]
+            });
         });
         delete pointsList.tampPoint;
         delete pointsList.checkPush;

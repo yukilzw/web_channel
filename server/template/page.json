@@ -98,13 +98,13 @@
       "name": "View",
       "style": {
         "position": "relative",
-        "width": "1690px",
+        "width": "1735px",
         "height": "2191px",
         "backgroundColor": "rgba(74,226,93,0.3)",
         "top": "36px",
         "overflow": "visible",
         "display": "block",
-        "left": "112px",
+        "left": "168px",
         "right": null,
         "bottom": null
       },
@@ -119,8 +119,8 @@
             "position": "absolute",
             "width": "612px",
             "height": "409px",
-            "left": "881px",
-            "top": "725px",
+            "left": "1004px",
+            "top": "984px",
             "right": null,
             "bottom": null,
             "backgroundColor": "rgba(88,86,97,1)"
@@ -155,8 +155,8 @@
             "width": "466px",
             "height": "527px",
             "marginTop": "0px",
-            "left": "25px",
-            "top": "16px",
+            "left": "110px",
+            "top": "1514px",
             "right": null,
             "bottom": null
           },
@@ -165,19 +165,18 @@
             "blank": true,
             "lazy": true
           },
-          "el": "wc14",
-          "hide": true
+          "el": "wc14"
         },
         {
           "name": "Text",
           "style": {
             "position": "absolute",
-            "width": "712px",
-            "left": "79px",
-            "top": "1134px",
+            "width": "389px",
+            "left": "320px",
+            "top": "632px",
             "right": null,
             "bottom": null,
-            "height": "399px",
+            "height": "352px",
             "marginTop": "",
             "backgroundImage": "https://gw.alicdn.com/imgextra/i3/O1CN01pEByG01PHltw6LlTc_!!6000000001816-0-tps-240-240.jpg",
             "backgroundSize": "contain",
