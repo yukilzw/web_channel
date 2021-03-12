@@ -183,20 +183,21 @@ const getOffsetWith = (name, targetMame = EnumId.root) => {
 };
 
 /**
- * 判断两个轴对齐的矩形是否重叠
+ * 判断两个轴对齐的矩形是否重叠或间距过小
  * @param rc1 第一个矩阵的位置
  * @param rc2 第二个矩阵的位置
+ * @param dis 最小间距
  * @return 两个矩阵是否重叠（边沿重叠，也认为是重叠）
  */
-const isOverlap = (rc1, rc2) => {
+const isOverlap = (rc1, rc2, dis = 0) => {
     if (!rc1 || !rc2) {
         return true;
     }
     if (
-        rc1.x + rc1.width  > rc2.x &&
-        rc2.x + rc2.width  > rc1.x &&
-        rc1.y + rc1.height > rc2.y &&
-        rc2.y + rc2.height > rc1.y
+        rc1.x + rc1.width + dis  > rc2.x &&
+        rc2.x + rc2.width + dis  > rc1.x &&
+        rc1.y + rc1.height + dis > rc2.y &&
+        rc2.y + rc2.height + dis > rc1.y
     ) {
         return true;
     } else {

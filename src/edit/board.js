@@ -1,6 +1,6 @@
 /**
  * @description 编辑器主面板
- * 包含四个模块（组件菜单、组件结构树图、搭建可视区、操作属性面板）
+ * 包含四个模块（组件菜单、组件结构树图、搭建编辑器、操作属性面板）
  * 此根组件处理画布渲染逻辑，以及定义了编辑器内全局通用事件与函数
  */
 import ReactDom from 'react-dom';
@@ -19,7 +19,7 @@ import style from './style/index.less';
 import styleBd from './style/changeBox.less';
 
 const IsMacOS = navigator.platform.match('Mac');
-const PCboardWidth = 1920;  // pc页面搭建宽度
+const PCboardWidth = 1920;  // pc页面搭建宽度，H5为750
 const PaintBoxMargin = 30;  // 画布边距
 const BoardBottom = 300;    // 画布底部留白距离，用于拖入新的元素
 const SliderMarks = {   // 缩放拖动条坐标轴
@@ -32,8 +32,9 @@ const SliderMarks = {   // 缩放拖动条坐标轴
 
 let rulerPointList; // 暂存当前选中节点所关联标尺线的坐标集
 let nextStylesbYChangeMask;    // 拖动组件蒙层改变的属性记录，用于mouseup时同步更新到页面tree
+let lastHoverCmpDom;    // 记录上一次hover的节点，移入新节点时清理hover状态
 
-// 执行时机在compile.js中changeTab按下拖动区域后，实现拖动蒙版编辑组件尺寸、定位、吸附
+// 执行时机在compile.js中changeTab按下拖动区域后，实现拖动蒙版编辑组件尺寸、定位、吸附、生成辅助线元数据
 const changeBoxByMask = ({ rulerCanvas, stateRef, setIsMoving }, e) => {
     const { changeCompBox, paintScale } = stateRef.current;
 
@@ -128,9 +129,9 @@ const changeBoxByMask = ({ rulerCanvas, stateRef, setIsMoving }, e) => {
                 };
                 // 将拖动节点的关键点与其兄弟节点、父节点的关键点进行匹配校验。如果两点间的x或y坐标小于dis，则触发吸附
                 rulerPointList.forEach(({ data, rect }) => {
-                    const overlap = isOverlap(rect, movePoint.rect);
+                    const dis = 16;
+                    const overlap = isOverlap(rect, movePoint.rect, dis);    // 判断两个矩形是否有交集，用于后续辅助线距离标注
                     data.forEach((point) => {
-                        const dis = 16;
                         const minX = point.x - dis;
                         const maxX = point.x + dis;
                         const minY = point.y - dis;
@@ -652,11 +653,14 @@ const Board = () => {
     }, []);
 
     // 移入事件回调
-    const handleHoverCallBack = useCallback((type, el) => {
+    const handleHoverCallBack = useCallback((type, el, e) => {
+        e && e.stopPropagation();
         const hoverCmpDom = document.querySelector(`#${el}`);
 
         if (type === 'mouseover') {
+            lastHoverCmpDom?.classList.remove(style.hoverIn);
             hoverCmpDom.classList.add(style.hoverIn);
+            lastHoverCmpDom = hoverCmpDom;
         } else if (type === 'mouseleave') {
             hoverCmpDom.classList.remove(style.hoverIn);
         }

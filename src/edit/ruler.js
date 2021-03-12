@@ -8,6 +8,7 @@ const paint = (canvasDOM, path) => {
     const ctx = canvasDOM.current.getContext('2d');
     ctx.clearRect(0, 0, canvasDOM.current.width, canvasDOM.current.height);
     path.forEach(({ start, end, overlap }) => {
+        // 拖动节点对应的关键点实际DOM坐标（并不是鼠标拖动的坐标，因为当触发多个吸附边界时，鼠标的坐标与实际DOM坐标有差异，会影响canvas画线的精准性）
         const startAxis = {
             LT: {
                 x: start.offsetRoot.left,
@@ -30,6 +31,7 @@ const paint = (canvasDOM, path) => {
                 y: start.offsetRoot.top + start.dom.offsetHeight / 2
             }
         };
+        // 关联目标节点对应的关键点实际DOM坐标
         const endAxis = {
             LT: {
                 x: end.offsetRoot.left,
@@ -52,70 +54,99 @@ const paint = (canvasDOM, path) => {
                 y: end.offsetRoot.top + end.dom.offsetHeight / 2
             }
         };
-        if (
-            Math.abs(startAxis[start.pos].x - endAxis[end.pos].x) > 1 &&
-            Math.abs(startAxis[start.pos].y - endAxis[end.pos].y) > 1
-        ) {
+        const isXLine = Math.abs(startAxis[start.pos].y - endAxis[end.pos].y) <= 1;
+        const isYLine = Math.abs(startAxis[start.pos].x - endAxis[end.pos].x) <= 1;
+        // 不是水平线也不是垂直线就不绘制，视为脏数据
+        if (!isXLine && !isYLine) {
             return;
         }
+        // 开始绘制主辅助线
         ctx.beginPath();
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 3;
-        ctx.setLineDash([Infinity, 0]);
+        ctx.setLineDash([1e3, 0]);
         if (end.parent) {
-            if (Math.abs(startAxis[start.pos].x - endAxis[end.pos].x) <= 1) {
+            // 目标是自身父节点就绘制一条贯穿线
+            if (isYLine) {
                 ctx.moveTo(endAxis[end.pos].x, end.offsetRoot.top);
                 ctx.lineTo(endAxis[end.pos].x, end.offsetRoot.top + end.dom.offsetHeight);
             }
-            if (Math.abs(startAxis[start.pos].y - endAxis[end.pos].y) <= 1) {
+            if (isXLine) {
                 ctx.moveTo(end.offsetRoot.left, endAxis[end.pos].y);
                 ctx.lineTo(end.offsetRoot.left + end.dom.offsetWidth, endAxis[end.pos].y);
             }
         } else {
+            // 兄弟节点就将两最近关键点相连
             ctx.moveTo(startAxis[start.pos].x, startAxis[start.pos].y);
             ctx.lineTo(endAxis[end.pos].x, endAxis[end.pos].y);
         }
         ctx.stroke();
-        // console.log(overlap)
-        // const cur = document.getElementById(start.el);
-        // const target = document.getElementById(end.el);
-        // if (start.pos === 'LT' && end.pos === 'RB') {
-        //     ctx.beginPath();
-        //     ctx.setLineDash([5, 5]);
-        //     ctx.moveTo(end.x - target.offsetWidth, end.y);
-        //     ctx.lineTo(end.x - target.offsetWidth, end.y + cur.offsetHeight * 0.6);
-        //     ctx.stroke();
-
-        //     ctx.beginPath();
-        //     ctx.setLineDash([1, 0]);
-        //     ctx.lineWidth = 4.5;
-        //     ctx.strokeStyle = 'rgb(92,176,221)';
-        //     const y2 = end.y + cur.offsetHeight * 0.6 / 2;
-        //     const sx2 = start.x + cur.offsetWidth;
-        //     const ex2 = end.x - target.offsetWidth;
-        //     ctx.moveTo(sx2, y2);
-        //     ctx.lineTo(ex2, y2);
-        //     ctx.stroke();
-
-        //     ctx.beginPath();
-        //     ctx.fillStyle = 'rgb(92,176,221)';
-        //     const x3 = (sx2 + (ex2 - sx2) / 2);
-
-        //     ctx.fillRect(
-        //         x3 - 50, y2 - 15,
-        //         100, 30
-        //     );
-
-        //     ctx.beginPath();
-        //     ctx.fillStyle = '#fff';
-        //     ctx.textAlign = 'center';
-        //     ctx.textBaseline = 'middle';
-        //     ctx.font = '24px pingfangsc-Regular, Arial';
-        //     ctx.fillText(
-        //         (ex2 - sx2).toFixed(0),
-        //         x3, y2
-        //     );
-        // }
+        // 节点不重叠补充绘制距离标尺
+        if (!end.parent && !overlap) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.setLineDash([5, 5]);
+            ctx.fillStyle = 'red';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.font = '30px pingfangsc-Regular, Arial';
+            // x轴标尺
+            if (isXLine) {
+                // 两点间线长，也是标尺展示距离，太小就没必要显示了，反而有视觉干扰
+                const dis = Math.abs(endAxis[end.pos].x - startAxis[start.pos].x);
+                if (dis >= 5) {
+                    // 两测标尺卡槽的虚线
+                    ctx.moveTo(startAxis[start.pos].x, startAxis[start.pos].y);
+                    ctx.lineTo(startAxis[start.pos].x, startAxis[start.pos].y - 80);
+                    ctx.stroke();
+                    ctx.moveTo(endAxis[end.pos].x, endAxis[end.pos].y);
+                    ctx.lineTo(endAxis[end.pos].x, endAxis[end.pos].y - 80);
+                    ctx.stroke();
+                    // 连接卡槽中间线
+                    ctx.moveTo(startAxis[start.pos].x, endAxis[end.pos].y - 40);
+                    ctx.lineTo(endAxis[end.pos].x, endAxis[end.pos].y - 40);
+                    ctx.stroke();
+                    // 当前标尺数字
+                    ctx.fillText(
+                        dis.toFixed(0),
+                        startAxis[start.pos].x + (endAxis[end.pos].x - startAxis[start.pos].x) / 2, endAxis[end.pos].y - 40
+                    );
+                }
+            }
+            // y轴标尺
+            if (isYLine) {
+                const dis = Math.abs(endAxis[end.pos].y - startAxis[start.pos].y);
+                if (dis >= 5) {
+                    ctx.moveTo(startAxis[start.pos].x, startAxis[start.pos].y);
+                    ctx.lineTo(startAxis[start.pos].x - 80, startAxis[start.pos].y);
+                    ctx.stroke();
+                    ctx.moveTo(endAxis[end.pos].x, endAxis[end.pos].y);
+                    ctx.lineTo(endAxis[end.pos].x - 80, endAxis[end.pos].y);
+                    ctx.stroke();
+                    ctx.moveTo(endAxis[end.pos].x - 40, startAxis[start.pos].y);
+                    ctx.lineTo(endAxis[end.pos].x - 40, endAxis[end.pos].y);
+                    ctx.stroke();
+                    // 绘制纵向标尺的区别在于文字，需要对原有文字坐标进行旋转、平移后贴近卡槽中间线
+                    ctx.beginPath();
+                    ctx.textBaseline = 'middle';
+                    ctx.textAlign = 'center';
+                    ctx.save();
+                    const textCenterPoint = {
+                        x: endAxis[end.pos].x - 40,
+                        y: startAxis[start.pos].y + (endAxis[end.pos].y - startAxis[start.pos].y) / 2
+                    };
+                    ctx.translate(textCenterPoint.x, textCenterPoint.y);
+                    ctx.translate(-18, 0);
+                    ctx.rotate(-90 / 180 * Math.PI);
+                    ctx.translate(-textCenterPoint.x, -textCenterPoint.y);
+                    ctx.fillText(
+                        dis.toFixed(0),
+                        textCenterPoint.x, textCenterPoint.y
+                    );
+                    ctx.restore();
+                }
+            }
+        }
     });
 };
 
