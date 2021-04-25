@@ -61,5 +61,6 @@
         "editor",
         "channel"
     ],
+    "sideEffects": false,
     "license": "MIT"
 }
