@@ -1,11 +1,11 @@
-### 前言
----
-搭建体系已成为互联网公司必不可少的研发提效模式。
+<h2 align="left">关于搭建</h2>
+一个成熟的搭建体系包括：页面管理（权限），编辑器（搭建），模块研发（版本），渲染服务（SSR），数据投放（资源），模块监控（报警），数据上报（分析）。
 
-此项目旨在用最少的代码实现可视化搭建、发布、预览、调试等核心功能。并对每一个关键原理进行说明。
+对编辑器来说分轻搭建与重搭建。轻搭建代表多个模块按摆放顺序渲染页面，每个模块功能为黑盒独立，运营需要为每个模块提供投放数据。重搭建代表模块功能的解耦度高且可嵌套，对单个模块不仅能支持投放业务数据，还能进行ui布局上的定制。两种模式各有利弊，轻搭建可以使固定模式业务快速上线，灵活性差；重搭建可以对每个模块进行ui布局定制，灵活性高但搭建成本高。需根据业务进行判断选择。
 
-首先我们来看看效果：
-![可视化编辑器面板](https://upload-images.jianshu.io/upload_images/19675139-97e33b952b24485c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+该项目旨在用最少的代码实现可视化搭建、发布、预览、调试等核心功能。并对关键原理进行说明。
+
+![可视化编辑器面板](https://img.alicdn.com/imgextra/i2/O1CN01dTq9o61kwdBqAWOzl_!!6000000004748-0-tps-2700-1894.jpg)
 
 #### 目前支持的功能
 ###### 编辑器相关：
@@ -13,7 +13,8 @@
 - 鼠标按住拖动画布内组件四周改变宽高，拖动中心改变定位
 - 属性面板输入样式、自定义属性配置，实时更新画布预览
 - 页面编辑快捷键操作，包括：保存(Ctrl+S)，撤销(Ctrl+Z)，恢复(Ctrl+Y)，删除(DEL)，复制(Ctrl+C)，剪切(Ctrl+X)，粘贴(Ctr+V)，上移节点(↑)，下移节点(↓)，缩放移动画布(空格按下+左键拖动+滚轮缩放)
-- 直接拖动左下方树结构批量移动节点
+- 直接拖动左下方缩略图批量移动节点
+- **新增动态吸附与辅助标尺算法（类sketch设计）** 
 ###### 服务层相关：
 - 提供平台前端页面（编辑器、预览页）的请求接口与路由模板
 - 打包构建：对组件仓库的分包，对编辑器SDK的打包
@@ -22,9 +23,8 @@
 - 将页面搭建配置创建React组件树，动态加载所需组件JS文件
 - 组件懒加载功能
 
-### 实现原理
----
-主要划分为4个部分：编辑器、预览页、服务端、组件仓库
+<h2 align="left">实现原理</h2>
+此Tiny sdk主要划分为4个部分：编辑器、预览页、服务端、组件仓库
 用户在编辑器内拖入组件仓库已开发的组件，设置样式与自定义属性，为页面生成JSON配置，将配置提交服务端保存。预览页请求返回配置，预览页根据配置动态下载组件文件并渲染。
 ![整体流程](https://upload-images.jianshu.io/upload_images/19675139-92adb37f9ca97d62.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -140,7 +140,7 @@
 在编辑器或者预览页面，加载全局配置，也就是SDK初始化之前，就将组件所依赖的全局对象注入好了，这样后续组件异步下载后就可以直接执行。
 关于编辑器和预览页的打包不做特别说明，就是普通的`webpack`配置打包，记得抽出公共模块就好。
 
-##### 七、组件的代理调试
+##### 八、组件的代理调试
 平台开发好了，这个时候我们要往里开发业务组件了，那么如何调试呢。
 通过`npm run dev:comp debug=XXX,YYY`命令(XXX为组件名)来执行调试脚本
 ![](https://upload-images.jianshu.io/upload_images/19675139-a37f5916e8621ef3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -151,68 +151,15 @@
 ![server/index.js](https://upload-images.jianshu.io/upload_images/19675139-c30c714c856f1eda.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 最后记得如果当前用户请求的URL是调试模式，在node express服务的`ejs`模板接口里加上`webpack-dev-server`的代码script标签，
 
-##### 八、服务端对页面配置的管理
+##### 九、服务端对页面配置的管理
 因为此项目为演示项目，并没有对页面配置用id进行区分，每次提交都是存取同一个配置文件`page.json`
 ![opPageJSON.js](https://upload-images.jianshu.io/upload_images/19675139-d3aaa54dde9950fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 生产环境下需要连接数据库，将每一份配置生产一个ID，在打开编辑时取对应的请求ID返回配置。
 **要额外注意的一点，我们在返回配置接口数据时，要去搜索当前构建文件夹中存在的js与哈希值的映射，这样保证前端页面能正确的加载最新构建的js地址**
 ![](https://upload-images.jianshu.io/upload_images/19675139-8359a64b8dc6c344.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-### 项目结构
----
-```
-├─config.js			// 前后端通用配置
-├─comp				// 组件仓库
-│  ├─Image	       		// 组件名
-│  │      config.json			// 组件配置	
-│  │      index.js			    // 组件入口
-│  │      index.less			// 组件样式
-│  │      
-│  ├─Text
-│  │    ...
-│  │      
-│  └─View
-│       ...
-│          
-├─script				// 配置脚本
-│      debugComp.js		            // 组件调试脚本
-│      webpack.config.comp.js		// 组件打包配置
-│      webpack.config.edit.js		// 编辑器打包配置
-│      webpack.config.page.js		// 预览页打包配置
-│      
-├─server				// 建站平台服务端
-│  │  getCompUrlHook.js		// 生成组件js文件哈希映射
-│  │  getCompJSONconfig.js		// 查询组件仓库内当前所有存在的组件配置
-│  │  index.js			// 服务端总入口 
-│  │  opPageJSON.js		// 存取页面对应的配置JSON树
-│  │  
-│  └─template			// 模板
-│          index.ejs			// html渲染模板
-│          page.json			// 页面配置JSON树
-│          
-└─src				// 建站平台前端SDK
-    │  context.js			// 全局状态对象
-    │  global.js			// 全局配置依赖
-    │  reducer.js			// 全局状态管理
-    │  
-    ├─edit				// 编辑器
-    │  │  compile.js	    // 编译配置树为组件树
-    │  │  board.js			// 编辑器可视区域面板
-    │  │  index.js			// 编辑器总入口
-    │  │  menu.js			// 编辑器组件菜单
-    │  │  option.js			// 编辑器属性操作面板
-    │  │  record.js			// 操作历史记录管理
-    │  │  tree.js			// 搭建树层级展示
-    │  │  search.js		// 搜索页面配置树方法
-    │  │  
-    │  └─style			// 编辑器样式
-    │          
-    └─page			// 预览页
-        compile.js	// 渲染组件配置
-        index.js	    // 预览页总入口
-```
-### 结语
----
-此项目对可视化建站的整体前后端流程有一个完整实现。基于此基础上，可以根据需要拓展定制化的编辑器功能、页面渲染功能等。
 
-因篇幅原因文中缩减了很多代码片段，但是本身代码量也不多，我尽可能在每一个方法都标有详细的注释说明。更多详情可以下载此项目，直接`npm start`根据指引操作
+<h2 align="left">前言</h2>
+此项目对搭建前后端流程有一个初步实现。基于此基础上，可以根据需要拓展定制化的编辑器功能、页面渲染功能等。
+
+因篇幅原因文中缩减了很多代码片段，更多详情可以clone项目，运行`npm start`体验
 ![](https://upload-images.jianshu.io/upload_images/19675139-0c3cca2baf3ca505.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
