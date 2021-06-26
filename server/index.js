@@ -31,8 +31,8 @@ app.all('*', (req, res, next) => {
 
 // 预览页面路由模板
 app.get('/page', (req, res) => {
-    const { debug_comp } = req.query;
-    const commonsDebug = debug_comp ? [`${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons-dev.js`] : [];
+    const { debug_comp: debugComp } = req.query;
+    const commonsDebug = debugComp ? [`${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons-dev.js`] : [];
     const { page: {
         title, keys, desc
     } } = getPageJSON();
@@ -50,8 +50,8 @@ app.get('/page', (req, res) => {
 
 // 编辑器路由模板
 app.get('/edit', (req, res) => {
-    const { debug, debug_comp } = req.query;
-    const commonsDebug = debug_comp ? [`${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons-dev.js`] : [];
+    const { debug, debug_comp: debugComp } = req.query;
+    const commonsDebug = debugComp ? [`${CONFIG.HOST}:${CONFIG.DEV_SERVER_PORT}/commons-dev.js`] : [];
 
     res.render(path.join(__dirname, './template/index.ejs'), {
         id: 'edit',

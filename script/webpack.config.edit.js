@@ -45,6 +45,11 @@ const config = {
                 }
             }
         }
+        // minimize: false,
+        // sideEffects: false
+        // usedExports: false
+        // occurrenceOrder: false
+        // flagIncludedChunks: false
     },
     module: {
         rules: [
@@ -58,7 +63,7 @@ const config = {
                 test: /\.(css|less)$/,
                 oneOf: [
                     {
-                        resourceQuery: /css_modules/, // 只要匹配到了这个，就是用css modules，
+                        resourceQuery: /modules/, // 只要匹配到了这个，就是用css modules，
                         use: [
                             'style-loader',
                             {
