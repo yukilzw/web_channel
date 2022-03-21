@@ -1,4 +1,4 @@
-import { getOffsetWith, isOverlap } from './common';
+import { getOffsetWith, isOverlap } from '../common';
 import styleBd from '../style/changeBox.less';
 
 export const RulerData = {
